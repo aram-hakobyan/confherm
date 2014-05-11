@@ -13,5 +13,36 @@ Dat enim intervalla et relaxat. Sed nimis multa. Quod quidem iam fit etiam in Ac
 Sed eum qui audiebant, quoad poterant, defendebant sententiam suam. Sin aliud quid voles, postea. Quid de Pythagora? Tum Triarius: Posthac quidem, inquit, audacius.
 
 Hunc vos beatum; Nam, ut sint illa vendibiliora, haec uberiora certe sunt. Non est igitur summum malum dolor. Mihi vero, inquit, placet agi subtilius et, ut ipse dixisti, pressius. Illud mihi a te nimium festinanter dictum videtur, sapientis omnis esse semper beatos; Non modo carum sibi quemque, verum etiam vehementer carum esse? Cur id non ita fit? Facillimum id quidem est, inquam.</string>
+    <string name="login_info_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quae hic rei publicae vulnera inponebat, eadem ille sanabat. Pugnant Stoici cum Peripateticis. Quid ait Aristoteles reliquique Platonis alumni? Naturales divitias dixit parabiles esse, quod parvo esset natura contenta. Duo Reges: constructio interrete. Traditur, inquit, ab Epicuro ratio neglegendi doloris. Cur id non ita fit? Tollitur beneficium, tollitur gratia, quae sunt vincla concordiae. Nonne videmus quanta perturbatio rerum omnium consequatur, quanta confusio?
+
+At habetur! Et ego id scilicet nesciebam! Sed ut sit, etiamne post mortem coletur? Scisse enim te quis coarguere possit? At iste non dolendi status non vocatur voluptas. Beatus sibi videtur esse moriens.</string>
+
+    <!-- Calendar -->
+    <!-- P.M -->
+    <string name="time1pm">1 P.M</string>
+    <string name="time2pm">2 P.M</string>
+    <string name="time3pm">3 P.M</string>
+    <string name="time4pm">4 P.M</string>
+    <string name="time5pm">5 P.M</string>
+    <string name="time6pm">6 P.M</string>
+    <string name="time7pm">7 P.M</string>
+    <string name="time8pm">8 P.M</string>
+    <string name="time9pm">9 P.M</string>
+    <string name="time10pm">10 P.M</string>
+    <string name="time11pm">11 P.M</string>
+    <string name="time12pm">12 P.M</string>
+    <!-- A.M -->
+    <string name="time1am">1 A.M</string>
+    <string name="time2am">2 A.M</string>
+    <string name="time3am">3 A.M</string>
+    <string name="time4am">4 A.M</string>
+    <string name="time5am">5 A.M</string>
+    <string name="time6am">6 A.M</string>
+    <string name="time7am">7 A.M</string>
+    <string name="time8am">8 A.M</string>
+    <string name="time9am">9 A.M</string>
+    <string name="time10am">10 A.M</string>
+    <string name="time11am">11 A.M</string>
+    <string name="time12am">12 A.M</string>
 
 </resources>

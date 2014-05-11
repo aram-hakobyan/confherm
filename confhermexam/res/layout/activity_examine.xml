@@ -1,0 +1,82 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    tools:context="fr.conferencehermes.confhermexam.TelechargementActivity" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/app_main_color" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/logo_with_text" >
+        </ImageView>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30dp" >
+
+            <Button
+                android:id="@+id/headerBtnNotes1"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:background="@drawable/ic_top1" />
+
+            <Button
+                android:id="@+id/headerBtnNotes2"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/ic_top2" />
+
+            <Button
+                android:id="@+id/headerBtnNotes3"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/ic_top3" />
+
+            <Button
+                android:id="@+id/headerBtnNotes4"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/ic_top4" />
+
+            <Button
+                android:id="@+id/headerBtnNotes5"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/ic_top5" />
+
+            <Button
+                android:id="@+id/headerBtnNotes6"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/ic_top6" />
+        </LinearLayout>
+    </RelativeLayout>
+
+     <LinearLayout
+        android:id="@+id/examineLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+</RelativeLayout>
