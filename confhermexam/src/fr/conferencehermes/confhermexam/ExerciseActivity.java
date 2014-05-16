@@ -9,7 +9,7 @@ import android.view.Window;
 import android.widget.LinearLayout;
 import fr.conferencehermes.confhermexam.model.ExerciseLayout;
 
-public class ExersiceActivity extends Activity {
+public class ExerciseActivity extends Activity {
 	LayoutInflater inflater;
 
 	@Override
@@ -22,22 +22,22 @@ public class ExersiceActivity extends Activity {
 
 		LinearLayout exerscieLayout = (LinearLayout) findViewById(R.id.exerscieLayout);
 		for (int i = 0; i < 4; i++) {
-			exerscieLayout.addView(new ExerciseLayout(ExersiceActivity.this));
+			exerscieLayout.addView(new ExerciseLayout(ExerciseActivity.this));
 		}
 
 		LinearLayout exerscieLayout1 = (LinearLayout) findViewById(R.id.exerscieLayout1);
 		for (int i = 0; i < 4; i++) {
-			exerscieLayout1.addView(new ExerciseLayout(ExersiceActivity.this));
+			exerscieLayout1.addView(new ExerciseLayout(ExerciseActivity.this));
 		}
 
 		LinearLayout exerscieLayout2 = (LinearLayout) findViewById(R.id.exerscieLayout2);
 		for (int i = 0; i < 4; i++) {
-			exerscieLayout2.addView(new ExerciseLayout(ExersiceActivity.this));
+			exerscieLayout2.addView(new ExerciseLayout(ExerciseActivity.this));
 		}
 
 		LinearLayout exerscieLayout3 = (LinearLayout) findViewById(R.id.exerscieLayout3);
 		for (int i = 0; i < 4; i++) {
-			exerscieLayout3.addView(new ExerciseLayout(ExersiceActivity.this));
+			exerscieLayout3.addView(new ExerciseLayout(ExerciseActivity.this));
 		}
 
 	}

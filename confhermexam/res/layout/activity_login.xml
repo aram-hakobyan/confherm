@@ -72,17 +72,17 @@
             android:inputType="textPassword" />
 
         <Button
-            android:id="@+id/globalTest"
+            android:id="@+id/loginButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_gravity="left"
-            android:layout_margin="10dp"
+            android:layout_gravity="right"
+            android:layout_marginTop="20dp"
             android:background="@drawable/blue_bg"
-            android:padding="15dp"
-            android:text="CONNEXION"
             android:drawableLeft="@drawable/key1"
             android:drawablePadding="10dp"
+            android:padding="15dp"
+            android:text="CONNEXION"
             android:textColor="@android:color/white" />
     </LinearLayout>
 

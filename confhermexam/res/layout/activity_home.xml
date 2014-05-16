@@ -34,6 +34,7 @@
             android:orientation="horizontal" >
 
             <LinearLayout
+                android:id="@+id/homeButton1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"
@@ -55,6 +56,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/homeButton2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"
@@ -69,7 +71,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_margin="10dp"
                     android:text="PLANNIG"
                     android:textColor="#0d5c7c"
@@ -77,6 +78,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/homeButton3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"
@@ -91,7 +93,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_margin="10dp"
                     android:text="EXAMIN"
                     android:textColor="#0d5c7c"
@@ -106,6 +107,7 @@
             android:orientation="horizontal" >
 
             <LinearLayout
+                android:id="@+id/homeButton4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"
@@ -127,6 +129,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/homeButton5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"
@@ -141,7 +144,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
                     android:layout_margin="10dp"
                     android:text="RESULTATS"
                     android:textColor="#0d5c7c"
@@ -149,6 +151,7 @@
             </LinearLayout>
 
             <LinearLayout
+                android:id="@+id/homeButton6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="30dp"

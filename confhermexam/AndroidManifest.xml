@@ -14,22 +14,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="fr.conferencehermes.confhermexam.TelechargementActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape" >
-        </activity>
-        <activity
-            android:name="fr.conferencehermes.confhermexam.NotesActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape" >
-        </activity>
-        <activity
-            android:name="fr.conferencehermes.confhermexam.QuestionResponseActivity"
-            android:label="@string/app_name"
-            android:screenOrientation="landscape" >
-        </activity>
-        <activity
-            android:name="fr.conferencehermes.confhermexam.HomeActivity"
+            android:name="fr.conferencehermes.confhermexam.LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
             <intent-filter>
@@ -39,27 +24,27 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="fr.conferencehermes.confhermexam.LoginActivity"
+            android:name="fr.conferencehermes.confhermexam.HomeActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="fr.conferencehermes.confhermexam.ExamineActivity"
+            android:name="fr.conferencehermes.confhermexam.MyFragmentActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="fr.conferencehermes.confhermexam.ExersiceActivity"
+            android:name="fr.conferencehermes.confhermexam.QuestionResponseActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="fr.conferencehermes.confhermexam.MyProfileActivity"
+            android:name="fr.conferencehermes.confhermexam.QuestionResponseQCMActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="fr.conferencehermes.confhermexam.PlanningActivity"
+            android:name="fr.conferencehermes.confhermexam.ExerciseActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>

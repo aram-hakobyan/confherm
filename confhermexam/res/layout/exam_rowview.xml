@@ -6,7 +6,7 @@
     android:background="#f5f5f5"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    tools:context="fr.conferencehermes.confhermexam.TelechargementActivity" >
+    tools:context="fr.conferencehermes.confhermexam.fragments.TelechargementFragment" >
 
     <TextView
         android:id="@+id/examName"
