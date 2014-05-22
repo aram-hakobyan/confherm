@@ -7,6 +7,11 @@ public class Constants {
 	public static int ENTRAINMENT_FRAGMENT = 3;
 	public static int RESULTATS_FRAGMENT = 4;
 	public static int TELECHARG_FRAGMENT = 5;
+
 	public static String SERVER_URL = "http://hermesapp.web-isi.com//";
 	public static String AUTH_TOKEN = "tk=a1fdec44bbb50b3b7e524b4aceb96ea359124749";
+	public static final String RIGHT_SLASH = "/";
+	public static final String EQUAL = "=";
+	public static final String FIRST_PARAM_SEPARATOR = "?";
+	public static final String PARAMETER_SEPARATOR = "&";
 }

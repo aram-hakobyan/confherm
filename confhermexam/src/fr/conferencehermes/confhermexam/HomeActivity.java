@@ -7,6 +7,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.LinearLayout;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class HomeActivity extends Activity implements OnClickListener {
@@ -17,12 +18,18 @@ public class HomeActivity extends Activity implements OnClickListener {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_home);
 
-		findViewById(R.id.homeButton1).setOnClickListener(this);
-		findViewById(R.id.homeButton2).setOnClickListener(this);
-		findViewById(R.id.homeButton3).setOnClickListener(this);
-		findViewById(R.id.homeButton4).setOnClickListener(this);
-		findViewById(R.id.homeButton5).setOnClickListener(this);
-		findViewById(R.id.homeButton6).setOnClickListener(this);
+		((LinearLayout) findViewById(R.id.homeButton1))
+				.setOnClickListener(this);
+		((LinearLayout) findViewById(R.id.homeButton2))
+				.setOnClickListener(this);
+		((LinearLayout) findViewById(R.id.homeButton3))
+				.setOnClickListener(this);
+		((LinearLayout) findViewById(R.id.homeButton4))
+				.setOnClickListener(this);
+		((LinearLayout) findViewById(R.id.homeButton5))
+				.setOnClickListener(this);
+		((LinearLayout) findViewById(R.id.homeButton6))
+				.setOnClickListener(this);
 
 	}
 

@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import fr.conferencehermes.confhermexam.R;
 
-public class TelechargementFragment extends Fragment {
+public class DownloadsFragment extends Fragment {
 	LayoutInflater inflater;
 
 	@Override

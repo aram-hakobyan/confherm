@@ -4,9 +4,12 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -17,15 +20,66 @@ import android.view.WindowManager;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
 import fr.conferencehermes.confhermexam.fragments.ExamineFragment;
 import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
 import fr.conferencehermes.confhermexam.fragments.NotesFragment;
 import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
-import fr.conferencehermes.confhermexam.fragments.TelechargementFragment;
 
 public class Utilities {
 	private static ProgressDialog mDialog;
+
+	public static void writeBoolean(Context context, String key, boolean value) {
+		getEditor(context).putBoolean(key, value).commit();
+	}
+
+	public static boolean readBoolean(Context context, String key,
+			boolean defValue) {
+		return getPreferences(context).getBoolean(key, defValue);
+	}
+
+	public static void writeInteger(Context context, String key, int value) {
+		getEditor(context).putInt(key, value).commit();
+
+	}
+
+	public static int readInteger(Context context, String key, int defValue) {
+		return getPreferences(context).getInt(key, defValue);
+	}
+
+	public static void writeString(Context context, String key, String value) {
+		getEditor(context).putString(key, value).commit();
+
+	}
+
+	public static String readString(Context context, String key, String defValue) {
+		return getPreferences(context).getString(key, defValue);
+	}
+
+	public static void writeFloat(Context context, String key, float value) {
+		getEditor(context).putFloat(key, value).commit();
+	}
+
+	public static float readFloat(Context context, String key, float defValue) {
+		return getPreferences(context).getFloat(key, defValue);
+	}
+
+	public static void writeLong(Context context, String key, long value) {
+		getEditor(context).putLong(key, value).commit();
+	}
+
+	public static long readLong(Context context, String key, long defValue) {
+		return getPreferences(context).getLong(key, defValue);
+	}
+
+	public static SharedPreferences getPreferences(Context context) {
+		return PreferenceManager.getDefaultSharedPreferences(context);
+	}
+
+	public static Editor getEditor(Context context) {
+		return getPreferences(context).edit();
+	}
 
 	public static void selectFrag(FragmentActivity a, int PAGE_ID) {
 		Fragment fr = null;
@@ -47,7 +101,7 @@ public class Utilities {
 			fr = new ResultatFragment();
 			break;
 		case 5:
-			fr = new TelechargementFragment();
+			fr = new DownloadsFragment();
 			break;
 
 		default:

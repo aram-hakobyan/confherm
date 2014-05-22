@@ -14,7 +14,7 @@ import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
 import fr.conferencehermes.confhermexam.fragments.NotesFragment;
 import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
-import fr.conferencehermes.confhermexam.fragments.TelechargementFragment;
+import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
@@ -53,7 +53,7 @@ public class MyFragmentActivity extends FragmentActivity implements
 			fr = new ResultatFragment();
 			break;
 		case 5:
-			fr = new TelechargementFragment();
+			fr = new DownloadsFragment();
 			break;
 
 		default:

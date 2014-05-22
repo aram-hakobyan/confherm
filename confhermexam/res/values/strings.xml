@@ -4,18 +4,8 @@
     <string name="app_name">ConfHermExam</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="lorem_ipsum">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quae hic rei publicae vulnera inponebat, eadem ille sanabat. Pugnant Stoici cum Peripateticis. Quid ait Aristoteles reliquique Platonis alumni? Naturales divitias dixit parabiles esse, quod parvo esset natura contenta. Duo Reges: constructio interrete. Traditur, inquit, ab Epicuro ratio neglegendi doloris. Cur id non ita fit? Tollitur beneficium, tollitur gratia, quae sunt vincla concordiae. Nonne videmus quanta perturbatio rerum omnium consequatur, quanta confusio?
-
-At habetur! Et ego id scilicet nesciebam! Sed ut sit, etiamne post mortem coletur? Scisse enim te quis coarguere possit? At iste non dolendi status non vocatur voluptas. Beatus sibi videtur esse moriens.
-
-Dat enim intervalla et relaxat. Sed nimis multa. Quod quidem iam fit etiam in Academia. Varietates autem iniurasque fortunae facile veteres philosophorum praeceptis instituta vita superabat. Huius ego nunc auctoritatem sequens idem faciam.
-
-Sed eum qui audiebant, quoad poterant, defendebant sententiam suam. Sin aliud quid voles, postea. Quid de Pythagora? Tum Triarius: Posthac quidem, inquit, audacius.
-
-Hunc vos beatum; Nam, ut sint illa vendibiliora, haec uberiora certe sunt. Non est igitur summum malum dolor. Mihi vero, inquit, placet agi subtilius et, ut ipse dixisti, pressius. Illud mihi a te nimium festinanter dictum videtur, sapientis omnis esse semper beatos; Non modo carum sibi quemque, verum etiam vehementer carum esse? Cur id non ita fit? Facillimum id quidem est, inquam.</string>
-    <string name="login_info_text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quae hic rei publicae vulnera inponebat, eadem ille sanabat. Pugnant Stoici cum Peripateticis. Quid ait Aristoteles reliquique Platonis alumni? Naturales divitias dixit parabiles esse, quod parvo esset natura contenta. Duo Reges: constructio interrete. Traditur, inquit, ab Epicuro ratio neglegendi doloris. Cur id non ita fit? Tollitur beneficium, tollitur gratia, quae sunt vincla concordiae. Nonne videmus quanta perturbatio rerum omnium consequatur, quanta confusio?
-
-At habetur! Et ego id scilicet nesciebam! Sed ut sit, etiamne post mortem coletur? Scisse enim te quis coarguere possit? At iste non dolendi status non vocatur voluptas. Beatus sibi videtur esse moriens.</string>
+    <string name="lorem_ipsum"></string>
+    <string name="login_info_text"></string>
 
     <!-- Calendar -->
     <!-- P.M -->
