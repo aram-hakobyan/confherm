@@ -1,55 +1,56 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="2dp"
-    android:background="#f5f5f5"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    tools:context="fr.conferencehermes.confhermexam.fragments.DownloadsFragment" >
+    android:background="#eeeeee"
+    android:padding="10dp" >
 
-    <TextView
-        android:id="@+id/examName"
-        android:layout_width="200dp"
-        android:layout_height="match_parent"
-        android:gravity="center_vertical"
-        android:padding="5dp"
-        android:text="Exam Name"
-        android:textSize="20sp" />
-
-    <View
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:background="@android:color/white" />
-
-    <TextView
-        android:id="@+id/examDesc"
-        android:layout_width="380dp"
-        android:layout_height="match_parent"
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="20dp"
-        android:gravity="center_vertical"
-        android:padding="5dp"
-        android:text="Exam Description"
-        android:textSize="20sp" />
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/examName"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="Exam Name"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/examDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="Available from:"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/examStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="30dp"
+        android:text="Status"
+        android:textSize="15sp" />
 
     <Button
         android:id="@+id/button1"
-        android:layout_width="35dp"
-        android:layout_height="30dp"
+        android:layout_width="27dp"
+        android:layout_height="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:focusable="false"
+        android:layout_marginRight="30dp"
         android:background="@drawable/exam_checked" />
 
-    <View
-        android:layout_width="2dp"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="10dp"
-        android:background="@android:color/white" />
-
-    <Button
-        android:id="@+id/button2"
-        android:layout_width="30dp"
-        android:layout_height="40dp"
-        android:layout_marginLeft="10dp"
-        android:background="@drawable/exam_delete" />
-
-</LinearLayout>
+</RelativeLayout>
