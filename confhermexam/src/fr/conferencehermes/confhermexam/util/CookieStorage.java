@@ -2,11 +2,7 @@ package fr.conferencehermes.confhermexam.util;
 
 import java.util.ArrayList;
 
-/**
- * Cookie Storage class. Name says it all.
- * @author aabraham
- *
- */
+
 public class CookieStorage {
 	private ArrayList<Object> arrayList;
 

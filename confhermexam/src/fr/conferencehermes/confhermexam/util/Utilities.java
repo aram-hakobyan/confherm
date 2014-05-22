@@ -29,7 +29,7 @@ import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
 
 public class Utilities {
 	private static ProgressDialog mDialog;
-
+	public static final String IS_LOGGED_IN = "IS_LOGGED_IN";
 	public static void writeBoolean(Context context, String key, boolean value) {
 		getEditor(context).putBoolean(key, value).commit();
 	}

@@ -7,9 +7,9 @@ public class ViewTracker {
 	private static ViewTracker viewContext = null;
 
 	private Context currentContext = null;
+	private String currentViewName = null;
 
 	private ViewTracker() {
-
 	}
 
 	/**
@@ -36,4 +36,13 @@ public class ViewTracker {
 		this.currentContext = currentContext;
 	}
 
+	/** Returns current context name */
+	public String getCurrentViewName() {
+		return currentViewName;
+	}
+
+	/** Applies current context name */
+	public void setCurrentViewName(String currentViewName) {
+		this.currentViewName = currentViewName;
+	}
 }

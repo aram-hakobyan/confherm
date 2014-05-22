@@ -53,6 +53,7 @@ public class BaseNetworkManager {
 						break;
 					case HttpConnection.DID_SUCCEED:
 						Log.d("Response Recieved", successMessage);
+						handleFinishResponse();
 						break;
 
 					case HttpConnection.PUBLISH_SUCCESS:
@@ -118,23 +119,13 @@ public class BaseNetworkManager {
 					Log.d("Response Recieved", msg.obj.toString());
 					
 
-					/*
-					 * chainOfResponsibilities(msg.obj.toString(), classString,
-					 * managerObject, serviceName, null, urlAndParamsList);
-					 */
-
 					break;
 				case HttpConnection.DID_ERROR:
 					Exception ex = (Exception) msg.obj;
-					handleProblematicResponse();
+					// handleProblematicResponse();
 					Log.d("Exception occured while hitting response!",
 							ex.getMessage());
-					/*
-					 * Toast.makeText(
-					 * ViewTracker.getInstance().getCurrentContext(),
-					 * "Exception occured while hitting response!",
-					 * Toast.LENGTH_LONG).show();
-					 */
+
 					break;
 
 				}
@@ -168,11 +159,11 @@ public class BaseNetworkManager {
 	/**
 	 * Hides Activity Indicator
 	 */
-	private void handleProblematicResponse() {
-//		ActionDelegate del = (ActionDelegate) ViewTracker.getInstance()
-//				.getCurrentContext();
+	private void handleFinishResponse() {
+		ActionDelegate del = (ActionDelegate) ViewTracker.getInstance()
+				.getCurrentContext();
 
-		/* del.didFailRequestProcessing(); */
+		del.didFinishRequestProcessing();
 	}
 
 }

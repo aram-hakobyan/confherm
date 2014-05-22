@@ -5,12 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
 
-/**
- * This class is responsible to provide network status and connection type.
- * 
- * @author Armen Abrahamyan
- * 
- */
+
 public class NetworkReachability {
 
 	/**
