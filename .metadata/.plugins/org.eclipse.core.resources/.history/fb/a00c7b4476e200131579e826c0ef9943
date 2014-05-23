@@ -76,10 +76,13 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 		if (!uname.isEmpty() && !pass.isEmpty()) {
 			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
-					"Logging into Hermes..."); 
+					"Logging into Hermes...");
 
 			Map<String, String> params = creator.createAppropriateMapRequest(
-			 "username", uname, "password",pass);
+
+			Constants.AUTH_TOKEN, authToken, "armen_mkrtchyan",
+					"armen_mkrtchyan", "Student1!", "Student1!", "commit",
+					"Log In");
 
 			// ----------------------- Construct POST DATA
 			// ---------------------------//
@@ -139,7 +142,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 	@Override
 	public void didFailRequestProcessing() {
-		Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
+		Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
 				"Logging into Hermes...");
 		Toast.makeText(getApplicationContext(), "Request Failed",
 				Toast.LENGTH_SHORT).show();

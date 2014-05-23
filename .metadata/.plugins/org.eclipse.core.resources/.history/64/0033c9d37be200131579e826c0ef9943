@@ -161,12 +161,9 @@ public class HttpConnection implements Runnable {
 				// "_SchEnt2_session=740c8dc090d32826155e8eb8b8e63f37");
 
 				response = httpClient.execute(httpPost, localContext);
-				
-				int status = response.getStatusLine().getStatusCode();
-				Log.d("Response HTTP", status +"");
-		
-				handler.sendMessage(Message.obtain(handler,
-						status));
+
+				Log.i("RESPONS", response + "");
+
 				break;
 			case PUT:
 				HttpPut httpPut = new HttpPut(url);

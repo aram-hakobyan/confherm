@@ -38,9 +38,6 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_login);
 
-		username = (EditText) findViewById(R.id.loginRow);
-		password = (EditText) findViewById(R.id.passwordRow);
-
 		Button loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -71,15 +68,18 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
 		RequestCreator creator = new RequestCreator();
 
-		final String uname = username.getText().toString().trim();
-		final String pass = password.getText().toString().trim();
+		final String uname = "Test";// username.getText().toString().trim();
+		final String pass = "Test";// password.getText().toString().trim();
 
 		if (!uname.isEmpty() && !pass.isEmpty()) {
 			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
-					"Logging into Hermes..."); 
+					"Logging into Hermes...");
 
 			Map<String, String> params = creator.createAppropriateMapRequest(
-			 "username", uname, "password",pass);
+
+			Constants.AUTH_TOKEN, authToken, "armen_mkrtchyan",
+					"armen_mkrtchyan", "Student1!", "Student1!", "commit",
+					"Log In");
 
 			// ----------------------- Construct POST DATA
 			// ---------------------------//
@@ -103,8 +103,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	public void didFinishRequestProcessing() {
 
 		/***** Share Preferences Save */
-		// String nameText = username.getText().toString();
-		// String surnameText = password.getText().toString();
+	//	String nameText = username.getText().toString();
+		//String surnameText = password.getText().toString();
 
 		// if (nameText != null)
 		// Utilities.writeString(this, Utilities.LOGIN, nameText);

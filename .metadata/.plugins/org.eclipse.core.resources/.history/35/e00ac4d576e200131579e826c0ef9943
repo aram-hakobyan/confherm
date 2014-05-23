@@ -76,10 +76,12 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 		if (!uname.isEmpty() && !pass.isEmpty()) {
 			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
-					"Logging into Hermes..."); 
+					"Logging into Hermes...");
 
 			Map<String, String> params = creator.createAppropriateMapRequest(
-			 "username", uname, "password",pass);
+
+			Constants.AUTH_TOKEN, authToken, "USERNAME", uname, "PASSWORD",
+					pass, "commit", "Log In");
 
 			// ----------------------- Construct POST DATA
 			// ---------------------------//

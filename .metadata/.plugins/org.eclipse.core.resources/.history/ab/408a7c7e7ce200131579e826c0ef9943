@@ -51,7 +51,7 @@ public class BaseNetworkManager {
 					case HttpConnection.DID_START:
 						Log.d("Request", startingMessage);
 						break;
-					case 200:
+					case HttpConnection.DID_SUCCEED:
 						Log.d("Response Recieved", successMessage);
 						handleFinishResponse();
 						break;
@@ -61,9 +61,10 @@ public class BaseNetworkManager {
 
 						break;
 
-					case 400:
-						//Exception ex = (Exception) msg.obj;
-						Log.d("Exception occured while hitting response!","400");
+					case HttpConnection.DID_ERROR:
+						Exception ex = (Exception) msg.obj;
+						Log.d("Exception occured while hitting response!",
+								ex.getMessage());
 						handleFailResponse();
 						break;
 

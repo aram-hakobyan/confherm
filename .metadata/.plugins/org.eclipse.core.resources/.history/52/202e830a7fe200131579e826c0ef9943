@@ -79,7 +79,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 					"Logging into Hermes..."); 
 
 			Map<String, String> params = creator.createAppropriateMapRequest(
-			 "username", uname, "password",pass);
+
+			Constants.AUTH_TOKEN, authToken, "USERNAME", uname, "PASSWORD",
+					pass, "commit", "Log In");
 
 			// ----------------------- Construct POST DATA
 			// ---------------------------//

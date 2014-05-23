@@ -35,7 +35,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
-import android.util.Log;
 import fr.conferencehermes.confhermexam.util.CookieStorage;
 
 /**
@@ -161,12 +160,6 @@ public class HttpConnection implements Runnable {
 				// "_SchEnt2_session=740c8dc090d32826155e8eb8b8e63f37");
 
 				response = httpClient.execute(httpPost, localContext);
-				
-				int status = response.getStatusLine().getStatusCode();
-				Log.d("Response HTTP", status +"");
-		
-				handler.sendMessage(Message.obtain(handler,
-						status));
 				break;
 			case PUT:
 				HttpPut httpPut = new HttpPut(url);
@@ -176,7 +169,18 @@ public class HttpConnection implements Runnable {
 			case DELETE:
 				response = httpClient.execute(new HttpDelete(url));
 				break;
-
+			case BITMAP:
+				response = httpClient.execute(new HttpGet(url));
+				processBitmapEntity(response.getEntity());
+				break;
+			case FILE:
+				HttpGet httpFile = new HttpGet(url);
+				if (cookieString != null) {
+					httpFile.setHeader("Cookie", cookieString);
+				}
+				response = httpClient.execute(httpFile);
+				processFileEntity(response.getEntity());
+				break;
 			}
 			if (method < BITMAP)
 				processEntity(response, cookieStore);
@@ -226,5 +230,47 @@ public class HttpConnection implements Runnable {
 		Message message = Message.obtain(handler, DID_SUCCEED, result);
 		handler.sendMessage(message);
 	}
+
+	private void processBitmapEntity(HttpEntity entity) throws IOException {
+		BufferedHttpEntity bufHttpEntity = new BufferedHttpEntity(entity);
+		Bitmap bm = BitmapFactory.decodeStream(bufHttpEntity.getContent());
+		handler.sendMessage(Message.obtain(handler, DID_SUCCEED, bm));
+	}
+
+	private void processFileEntity(HttpEntity entity) {
+		final long fileLength = entity.getContentLength();
+
+		try {
+			InputStream input = new BufferedInputStream(entity.getContent());
+			OutputStream output = new FileOutputStream(
+					"/sdcard/CURRENT_REPORT.pdf");
+
+			byte data[] = new byte[1024];
+			long total = 0;
+			int count;
+			while ((count = input.read(data)) != -1) {
+				total += count;
+				// publishing the progress....
+				Integer currentProgress = (int) (total * 100 / fileLength);
+				handler.sendMessage(Message.obtain(handler, PUBLISH_SUCCESS,
+						currentProgress));
+				output.write(data, 0, count);
+			}
+
+			output.flush();
+			output.close();
+			input.close();
+
+		} catch (IllegalStateException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+
+
 
 }

@@ -62,8 +62,9 @@ public class BaseNetworkManager {
 						break;
 
 					case 400:
-						//Exception ex = (Exception) msg.obj;
-						Log.d("Exception occured while hitting response!","400");
+						Exception ex = (Exception) msg.obj;
+						Log.d("Exception occured while hitting response!",
+								ex.getMessage());
 						handleFailResponse();
 						break;
 

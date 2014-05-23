@@ -165,8 +165,7 @@ public class HttpConnection implements Runnable {
 				int status = response.getStatusLine().getStatusCode();
 				Log.d("Response HTTP", status +"");
 		
-				handler.sendMessage(Message.obtain(handler,
-						status));
+
 				break;
 			case PUT:
 				HttpPut httpPut = new HttpPut(url);
