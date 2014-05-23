@@ -4,9 +4,24 @@
     android:layout_height="match_parent"
     android:background="@android:color/white" >
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/app_main_color" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/logo_with_text" >
+        </ImageView>
+    </RelativeLayout>
+
     <LinearLayout
         android:id="@+id/notesHeadMenu"
-        android:layout_width="wrap_content"
+        android:layout_width="700dp"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_marginLeft="80dp"
@@ -15,8 +30,8 @@
         android:orientation="horizontal" >
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:background="@drawable/ic_target" />
 
         <TextView
@@ -24,34 +39,114 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:text="Target me"
-            android:textColor="@color/app_main_color" />
+            android:textColor="@color/app_main_color"
+            android:textSize="20sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="120dp"
             android:text="Moyenne : 290"
-            android:textColor="@color/app_main_color" />
+            android:textColor="@color/app_main_color"
+            android:textSize="20sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:text="| Median : 280"
-            android:textColor="@color/app_main_color" />
+            android:textColor="@color/app_main_color"
+            android:textSize="20sp" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="100dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="70dp"
             android:background="@drawable/ic_people" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginLeft="10dp"
             android:background="@drawable/ic_globe" />
     </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/listHeader"
+        android:layout_width="700dp"
+        android:layout_height="40dp"
+        android:layout_alignLeft="@+id/notesHeadMenu"
+        android:layout_below="@+id/notesHeadMenu"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:orientation="horizontal" >
+
+            <TextView
+                android:id="@+id/noteRang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:text="RANG"
+                android:textSize="15sp" />
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:background="@android:color/white" />
+
+            <TextView
+                android:id="@+id/noteName"
+                android:layout_width="380dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:gravity="center_vertical"
+                android:padding="5dp"
+                android:text="NOM"
+                android:textSize="15sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="30dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
+
+            <View
+                android:layout_width="2dp"
+                android:layout_height="wrap_content"
+                android:background="@android:color/white" />
+
+            <TextView
+                android:id="@+id/noteScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:text="NOTE"
+                android:textSize="15sp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+    <ListView
+        android:id="@+id/notesListView"
+        android:layout_width="700dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/listHeader"
+        android:layout_marginBottom="40dp"
+        android:layout_marginLeft="70dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="2dp" >
+    </ListView>
 
     <TextView
         android:id="@+id/teacherName"
@@ -62,7 +157,8 @@
         android:layout_marginRight="100dp"
         android:layout_marginTop="110dp"
         android:text="Teacher Mr. Shirman"
-        android:textColor="@color/app_main_color" />
+        android:textColor="@color/app_main_color"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/examName"
@@ -72,17 +168,8 @@
         android:layout_below="@+id/teacherName"
         android:layout_marginRight="100dp"
         android:text="Exam Nom_002"
-        android:textColor="@color/app_main_color" />
-
-    <ListView
-        android:id="@+id/notesListView"
-        android:layout_width="700dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/notesHeadMenu"
-        android:layout_marginBottom="40dp"
-        android:layout_marginLeft="70dp"
-        android:layout_marginTop="20dp" >
-    </ListView>
+        android:textColor="@color/app_main_color"
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/globalTest"
@@ -95,10 +182,11 @@
         android:gravity="center"
         android:padding="5dp"
         android:text="GLOBAL TEST"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textSize="23sp" />
 
     <ListView
-        android:id="@+id/exercizesListView"
+        android:id="@+id/exercizesListViewNotes"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"

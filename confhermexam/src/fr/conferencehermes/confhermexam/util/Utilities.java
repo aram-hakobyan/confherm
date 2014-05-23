@@ -23,7 +23,7 @@ import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
 import fr.conferencehermes.confhermexam.fragments.ExamineFragment;
 import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
-import fr.conferencehermes.confhermexam.fragments.NotesFragment;
+import fr.conferencehermes.confhermexam.fragments.ExerciseFragment;
 import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
 
@@ -95,7 +95,7 @@ public class Utilities {
 			fr = new ExamineFragment();
 			break;
 		case 3:
-			fr = new NotesFragment();
+			fr = new ExerciseFragment();
 			break;
 		case 4:
 			fr = new ResultatFragment();
