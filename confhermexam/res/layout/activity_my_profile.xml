@@ -73,8 +73,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="20dp"
-        android:layout_marginLeft="10dp"
+        android:layout_margin="40dp"
         android:text="@string/lorem_ipsum"
         android:textColor="#0d5c7c"
         android:textSize="12sp" />
