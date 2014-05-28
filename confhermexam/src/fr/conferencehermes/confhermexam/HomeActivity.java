@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.LinearLayout;
+import fr.conferencehermes.confhermexam.connection.HttpAsyncPost;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class HomeActivity extends Activity implements OnClickListener {
@@ -31,6 +32,7 @@ public class HomeActivity extends Activity implements OnClickListener {
 		((LinearLayout) findViewById(R.id.homeButton6))
 				.setOnClickListener(this);
 
+		new HttpAsyncPost().execute();
 	}
 
 	@Override
