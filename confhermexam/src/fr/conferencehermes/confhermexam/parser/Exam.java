@@ -4,7 +4,7 @@ public class Exam {
 	private int id;
 	private String name;
 	private String availableDate;
-	private int status;
+	private String status;
 	private String timeOpen;
 	private String timeClose;
 	private String timeModified;
@@ -38,11 +38,11 @@ public class Exam {
 		this.availableDate = availableDate;
 	}
 
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
 
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 

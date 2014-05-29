@@ -9,12 +9,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.parser.Exam;
 
 public class ExamsAdapter extends BaseAdapter {
-	private ArrayList<String> mListItems;
+	private ArrayList<Exam> mListItems;
 	private LayoutInflater mLayoutInflater;
 
-	public ExamsAdapter(Context context, ArrayList<String> arrayList) {
+	public ExamsAdapter(Context context, ArrayList<Exam> arrayList) {
 		mListItems = arrayList;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -50,12 +51,13 @@ public class ExamsAdapter extends BaseAdapter {
 			holder = (ViewHolder) view.getTag();
 		}
 
-		String stringItem = (String) mListItems.get(position);
-		if (stringItem != null) {
+		Exam exam = (Exam) mListItems.get(position);
+		if (exam != null) {
 			if (holder.name != null) {
-				holder.name.setText(stringItem);
-				holder.desc.setText("Available from:" + position);
-				holder.status.setText("Non disponible");
+				holder.name.setText(exam.getName());
+				holder.desc.setText(exam.getAvailableDate());
+				holder.status.setText("Status: "
+						+ String.valueOf(exam.getStatus()));
 			}
 		}
 
