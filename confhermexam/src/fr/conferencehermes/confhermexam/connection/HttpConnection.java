@@ -1,12 +1,8 @@
 package fr.conferencehermes.confhermexam.connection;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.http.Header;
@@ -15,27 +11,24 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.cookie.Cookie;
-import org.apache.http.entity.BufferedHttpEntity;
-import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.CookieStorage;
 
 /**
@@ -83,9 +76,7 @@ public class HttpConnection implements Runnable {
 		ConnectionManager.getInstance().push(this);
 	}
 
-	public void publish(String url, String data) {
-		create(FILE, url, data, null);
-	}
+
 
 	public void get(String url, String data) {
 		create(GET, url, data, null);
@@ -95,17 +86,9 @@ public class HttpConnection implements Runnable {
 		create(POST, url, data, nameValuePairs);
 	}
 
-	public void put(String url, String data) {
-		create(PUT, url, data, null);
-	}
 
-	public void delete(String url) {
-		create(DELETE, url, null, null);
-	}
 
-	public void bitmap(String url) {
-		create(BITMAP, url, null, null);
-	}
+
 
 	@Override
 	public void run() {
@@ -157,24 +140,19 @@ public class HttpConnection implements Runnable {
 				httpPost.setHeader("Content-Type",
 						"application/x-www-form-urlencoded");
 
-				// httpPost.addHeader("Cookie",
-				// "_SchEnt2_session=740c8dc090d32826155e8eb8b8e63f37");
-
 				response = httpClient.execute(httpPost, localContext);
-				
+				ResponseHandler<String> responseHandler = new BasicResponseHandler();
+
+				String responses = httpClient
+						.execute(httpPost, responseHandler);
+  
 				int status = response.getStatusLine().getStatusCode();
-				Log.d("Response HTTP", status +"");
-		
-				handler.sendMessage(Message.obtain(handler,
-						status));
-				break;
-			case PUT:
-				HttpPut httpPut = new HttpPut(url);
-				httpPut.setEntity(new StringEntity(data));
-				response = httpClient.execute(httpPut);
-				break;
-			case DELETE:
-				response = httpClient.execute(new HttpDelete(url));
+				Log.d("Response HTTP", status + "");
+				Log.d("RESPONS", responses + "");
+				JSONParser.parseLoginData(responses);
+				handler.sendMessage(Message.obtain(handler, status));
+				// JSONParserCategories.parseJSONData(result)
+
 				break;
 
 			}
@@ -221,10 +199,16 @@ public class HttpConnection implements Runnable {
 		BufferedReader br = new BufferedReader(new InputStreamReader(
 				entity.getContent(), "UTF-8"), 8);
 		String line, result = "";
+
 		while ((line = br.readLine()) != null)
 			result += line;
 		Message message = Message.obtain(handler, DID_SUCCEED, result);
 		handler.sendMessage(message);
 	}
 
+	
+	
+		
+	
+	
 }

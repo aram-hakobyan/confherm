@@ -21,7 +21,6 @@ import fr.conferencehermes.confhermexam.connection.BaseNetworkManager;
 import fr.conferencehermes.confhermexam.connectionhelper.ActionDelegate;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestCreator;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestHelper;
-import fr.conferencehermes.confhermexam.util.Base64Coder;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.Utilities;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
@@ -67,19 +66,19 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	public void loginAction() {
 
 		// ------------------- Setting up login request here -------------- //
-		authToken = Base64Coder.encodeRandomBase64();
+
 		BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
 		RequestCreator creator = new RequestCreator();
 
-		final String uname = username.getText().toString().trim();
-		final String pass = password.getText().toString().trim();
+		final String uname = "armen_mkrtchyan";// username.getText().toString().trim();
+		final String pass = "Student1!";// password.getText().toString().trim();
 
 		if (!uname.isEmpty() && !pass.isEmpty()) {
 			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
-					"Logging into Hermes..."); 
+					"Logging into Hermes...");
 
 			Map<String, String> params = creator.createAppropriateMapRequest(
-			 "username", uname, "password",pass);
+					"username", uname, "password", pass);
 
 			// ----------------------- Construct POST DATA
 			// ---------------------------//
