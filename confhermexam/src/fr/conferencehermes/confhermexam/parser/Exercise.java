@@ -11,10 +11,13 @@ public class Exercise {
 	private String timeLimit;
 	private String timeModified;
 	private int reviewoverallfeedback;
-	private ArrayList<Integer> questions;
+	private ArrayList<Integer> questionIDs;
+	private String password;
+	private ArrayList<Question> questions;
 
 	public Exercise() {
-		setQuestions(new ArrayList<Integer>());
+		setQuestionIds(new ArrayList<Integer>());
+		setQuestions(new ArrayList<Question>());
 	}
 
 	public int getId() {
@@ -73,12 +76,12 @@ public class Exercise {
 		this.reviewoverallfeedback = reviewoverallfeedback;
 	}
 
-	public ArrayList<Integer> getQuestions() {
-		return questions;
+	public ArrayList<Integer> getQuestionsId() {
+		return questionIDs;
 	}
 
-	public void setQuestions(ArrayList<Integer> questions) {
-		this.questions = questions;
+	public void setQuestionIds(ArrayList<Integer> questionids) {
+		this.questionIDs = questionids;
 	}
 
 	public String getTimeModified() {
@@ -87,6 +90,22 @@ public class Exercise {
 
 	public void setTimeModified(String timeModified) {
 		this.timeModified = timeModified;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public ArrayList<Question> getQuestions() {
+		return questions;
+	}
+
+	public void setQuestions(ArrayList<Question> questions) {
+		this.questions = questions;
 	}
 
 }

@@ -60,7 +60,7 @@ public class ExamineFragment extends Fragment {
 		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
 			@Override
 			public void callback(String url, JSONObject json, AjaxStatus status) {
-				System.out.println(json.toString());
+
 				try {
 					if (json.has(Constants.KEY_STATUS)
 							&& json.get(Constants.KEY_STATUS) != null) {

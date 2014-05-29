@@ -9,12 +9,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.parser.Question;
 
 public class QuestionsAdapter extends BaseAdapter {
-	private ArrayList<String> mListItems;
+	private ArrayList<Question> mListItems;
 	private LayoutInflater mLayoutInflater;
 
-	public QuestionsAdapter(Context context, ArrayList<String> arrayList) {
+	public QuestionsAdapter(Context context, ArrayList<Question> arrayList) {
 		mListItems = arrayList;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -50,7 +51,8 @@ public class QuestionsAdapter extends BaseAdapter {
 		}
 
 		if (holder.name != null) {
-			holder.name.setText("QUESTION " + (position + 1));
+			holder.name.setText("QUESTION "
+					+ (mListItems.get(position).getId()));
 		}
 
 		return view;

@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import android.util.Log;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 
 public class JSONParser {
 
@@ -60,6 +61,7 @@ public class JSONParser {
 			e.printStackTrace();
 		}
 
+		DataHolder.getInstance().setExams(exams);
 		return exams;
 	}
 
@@ -71,8 +73,71 @@ public class JSONParser {
 
 	}
 
-	public static void parseExercises() {
+	public static Exercise parseExercises(JSONObject json) {
 
+		Exercise exercise = new Exercise();
+		ArrayList<Question> questionsList = new ArrayList<Question>();
+		ArrayList<Integer> questionIds = new ArrayList<Integer>();
+
+		try {
+			if (json.has(Constants.KEY_DATA)
+					&& json.get(Constants.KEY_DATA) != null) {
+				questionsList = new ArrayList<Question>();
+
+				JSONObject data = (JSONObject) json.getJSONObject("data");
+				JSONObject exam = (JSONObject) data.getJSONObject("exam");
+				JSONObject questions = (JSONObject) data
+						.getJSONObject("questions");
+
+				exercise.setId(exam.getInt("id"));
+				exercise.setName(exam.getString("name"));
+				exercise.setIntro(exam.getString("intro"));
+				exercise.setTimeOpen(exam.getString("timeopen"));
+				exercise.setTimeClose(exam.getString("timeclose"));
+				exercise.setTimeLimit(exam.getString("timelimit"));
+				exercise.setTimeModified(exam.getString("timemodified"));
+				exercise.setReviewoverallfeedback(exam
+						.getInt("reviewoverallfeedback"));
+
+				for (int k = 1; k <= 3; k++) {
+					Question q = new Question();
+					JSONObject qObj = (JSONObject) questions
+							.getJSONObject(String.valueOf(k));
+					q.setId(qObj.getInt("id"));
+					q.setName(qObj.getString("name"));
+					q.setType(qObj.getString("qtype"));
+					q.setCreatedBy(qObj.getString("createdby"));
+					q.setQuestionText(qObj.getString("questiontext"));
+
+					JSONArray answers = (JSONArray) qObj
+							.getJSONArray("answers");
+					ArrayList<Answer> answersArrayList = new ArrayList<Answer>();
+					for (int i = 0; i < answers.length(); i++) {
+						JSONObject ans = (JSONObject) answers.get(i);
+						Answer answer = new Answer();
+						answer.setAnswer(ans.getString("answer"));
+						answer.setAsnwerFormat(ans.getInt("answerformat"));
+						answer.setFeedback(ans.getString("feedback"));
+						answer.setFeedbackFormat(ans.getInt("feedbackformat"));
+						answer.setFraction(ans.getDouble("fraction"));
+						answer.setId(ans.getInt("id"));
+						answer.setQuestionId(ans.getInt("question"));
+						answersArrayList.add(answer);
+					}
+
+					q.setAnswers(answersArrayList);
+					questionsList.add(q);
+				}
+
+				exercise.setQuestionIds(questionIds);
+				exercise.setQuestions(questionsList);
+
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return exercise;
 	}
 
 	public static void parseTrainings() {
