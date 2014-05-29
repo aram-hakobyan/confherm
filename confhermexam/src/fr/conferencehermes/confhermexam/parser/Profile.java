@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class Profile {
 	private int id;
-	private String firstName;
-	private String lastName;
+	private static String firstName;
+	private static String lastName;
 	private ArrayList<String> groups;
 
 	public Profile() {
@@ -20,7 +20,7 @@ public class Profile {
 		this.id = id;
 	}
 
-	public String getFirstName() {
+	public static String getFirstName() {
 		return firstName;
 	}
 
@@ -28,7 +28,7 @@ public class Profile {
 		this.firstName = firstName;
 	}
 
-	public String getLastName() {
+	public static String getLastName() {
 		return lastName;
 	}
 

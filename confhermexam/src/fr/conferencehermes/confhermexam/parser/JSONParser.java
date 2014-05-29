@@ -1,6 +1,7 @@
 package fr.conferencehermes.confhermexam.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -63,11 +64,75 @@ public class JSONParser {
 		return exams;
 	}
 
-	public static void parseProfileData() {
+	public static ArrayList<Profile> parseProfileData(JSONObject uJson) {
+
+		ArrayList<Profile> uData = null;
+
+		try {
+			if (uJson.has(Constants.KEY_DATA)
+					&& uJson.get(Constants.KEY_DATA) != null) {
+				JSONObject obj = uJson.getJSONObject(Constants.KEY_DATA);
+				uData = new ArrayList<Profile>();
+				ArrayList<String> groups = new ArrayList<String>();
+
+				if (obj.length() != 0) {
+
+					Profile pData = new Profile();
+
+					// JSONObject gObj = obj.getJSONObject("groups");
+					// groups.add(gObj.getString(""));
+
+					// pData.setGroups(groups);
+					pData.setId(obj.getInt("userId"));
+					pData.setFirstName(obj.getString("firstname"));
+					pData.setLastName(obj.getString("lastname"));
+
+					uData.add(pData);
+
+					// Log.i("PDATA", pData + "");
+
+				}
+
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return uData;
 
 	}
 
-	public static void parseResults() {
+	public static void parseResults(JSONObject rJson) {
+
+		try {
+			if (rJson.has(Constants.KEY_DATA)
+					&& rJson.get(Constants.KEY_DATA) != null) {
+				JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
+				// rJson = new ArrayList<Profile>();
+				ArrayList<String> groups = new ArrayList<String>();
+
+				if (obj.length() != 0) {
+
+					Profile pData = new Profile();
+
+					// JSONObject gObj = obj.getJSONObject("groups");
+					// groups.add(gObj.getString(""));
+
+					// pData.setGroups(groups);
+					int a = obj.getInt("examId");
+					String a3 = obj.getString("title");
+					String a1 = obj.getString("availableDate");
+					String a2 = obj.getString("examStatus");
+					// uData.add(pData);
+
+					// Log.i("PDATA", pData + "");
+
+				}
+
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 
 	}
 
