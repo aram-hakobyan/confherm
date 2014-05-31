@@ -34,29 +34,21 @@ public class JSONParser {
 	public static ArrayList<Exam> parseExams(JSONObject json) {
 		ArrayList<Exam> exams = null;
 		try {
-			if (json.has(Constants.KEY_DATA)
-					&& json.get(Constants.KEY_DATA) != null) {
-				JSONArray content = json.getJSONArray(Constants.KEY_DATA);
-				exams = new ArrayList<Exam>();
+			JSONArray content = json.getJSONArray(Constants.KEY_DATA);
+			exams = new ArrayList<Exam>();
 
-				if (content.length() != 0) {
-					for (int i = 0; i < content.length(); i++) {
-						JSONObject obj = (JSONObject) content.get(i);
-						Exam e = new Exam();
-						e.setName(obj.getString("title"));
-						e.setAvailableDate(obj.getString("availableDate"));
-						e.setId(obj.getInt("examId"));
-						e.setIsActive(obj.getInt("is_active"));
-						e.setPassword(obj.getString("password"));
-						e.setStatus(obj.getString("examStatus"));
-						e.setTimeClose(obj.getString("timeopen"));
-						e.setTimeClose(obj.getString("timeclose"));
-						e.setTimeClose(obj.getString("timemodified"));
-						exams.add(e);
-					}
-
+			if (content.length() != 0) {
+				for (int i = 0; i < content.length(); i++) {
+					JSONObject obj = (JSONObject) content.get(i);
+					Exam e = new Exam();
+					e.setId(obj.getInt("examId"));
+					e.setTitle(obj.getString("title"));
+					e.setShortTitle("shrt_title");
+					e.setCategoryType("categry_type");
+					e.setStartDate("startdate");
+					e.setDescription("description");
+					exams.add(e);
 				}
-
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -66,20 +58,15 @@ public class JSONParser {
 		return exams;
 	}
 
-	public static ArrayList<Profile> parseProfileData(JSONObject uJson) {
-
-		ArrayList<Profile> uData = null;
-
+	public static Profile parseProfileData(JSONObject uJson) {
+		Profile pData = new Profile();
 		try {
 			if (uJson.has(Constants.KEY_DATA)
 					&& uJson.get(Constants.KEY_DATA) != null) {
 				JSONObject obj = uJson.getJSONObject(Constants.KEY_DATA);
-				uData = new ArrayList<Profile>();
 				ArrayList<String> groups = new ArrayList<String>();
 
 				if (obj.length() != 0) {
-
-					Profile pData = new Profile();
 
 					// JSONObject gObj = obj.getJSONObject("groups");
 					// groups.add(gObj.getString(""));
@@ -88,19 +75,13 @@ public class JSONParser {
 					pData.setId(obj.getInt("userId"));
 					pData.setFirstName(obj.getString("firstname"));
 					pData.setLastName(obj.getString("lastname"));
-
-					uData.add(pData);
-
-					// Log.i("PDATA", pData + "");
-
 				}
-
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-		return uData;
+		return pData;
 
 	}
 
@@ -164,35 +145,39 @@ public class JSONParser {
 				exercise.setReviewoverallfeedback(exam
 						.getInt("reviewoverallfeedback"));
 
-				for (int k = 1; k <= 3; k++) {
-					Question q = new Question();
-					JSONObject qObj = (JSONObject) questions
-							.getJSONObject(String.valueOf(k));
-					q.setId(qObj.getInt("id"));
-					q.setName(qObj.getString("name"));
-					q.setType(qObj.getString("qtype"));
-					q.setCreatedBy(qObj.getString("createdby"));
-					q.setQuestionText(qObj.getString("questiontext"));
+				int id = 13;
 
-					JSONArray answers = (JSONArray) qObj
-							.getJSONArray("answers");
-					ArrayList<Answer> answersArrayList = new ArrayList<Answer>();
-					for (int i = 0; i < answers.length(); i++) {
-						JSONObject ans = (JSONObject) answers.get(i);
-						Answer answer = new Answer();
-						answer.setAnswer(ans.getString("answer"));
-						answer.setAsnwerFormat(ans.getInt("answerformat"));
-						answer.setFeedback(ans.getString("feedback"));
-						answer.setFeedbackFormat(ans.getInt("feedbackformat"));
-						answer.setFraction(ans.getDouble("fraction"));
-						answer.setId(ans.getInt("id"));
-						answer.setQuestionId(ans.getInt("question"));
-						answersArrayList.add(answer);
-					}
-
-					q.setAnswers(answersArrayList);
-					questionsList.add(q);
+				for (int j = 0; j < 20; j++) {
+					if (questions.has(String.valueOf(j)))
+						id = j;
 				}
+
+				Question q = new Question();
+				JSONObject qObj = (JSONObject) questions.getJSONObject(String
+						.valueOf(id));
+				q.setId(qObj.getInt("id"));
+				q.setName(qObj.getString("name"));
+				q.setType(qObj.getString("qtype"));
+				q.setCreatedBy(qObj.getString("createdby"));
+				q.setQuestionText(qObj.getString("questiontext"));
+
+				JSONArray answers = (JSONArray) qObj.getJSONArray("answers");
+				ArrayList<Answer> answersArrayList = new ArrayList<Answer>();
+				for (int i = 0; i < answers.length(); i++) {
+					JSONObject ans = (JSONObject) answers.get(i);
+					Answer answer = new Answer();
+					answer.setAnswer(ans.getString("answer"));
+					answer.setAsnwerFormat(ans.getInt("answerformat"));
+					answer.setFeedback(ans.getString("feedback"));
+					answer.setFeedbackFormat(ans.getInt("feedbackformat"));
+					answer.setFraction(ans.getDouble("fraction"));
+					answer.setId(ans.getInt("id"));
+					answer.setQuestionId(ans.getInt("question"));
+					answersArrayList.add(answer);
+				}
+
+				q.setAnswers(answersArrayList);
+				questionsList.add(q);
 
 				exercise.setQuestionIds(questionIds);
 				exercise.setQuestions(questionsList);

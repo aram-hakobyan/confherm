@@ -47,6 +47,7 @@ public class ExamineFragment extends Fragment {
 					int position, long id) {
 				Intent intent = new Intent(getActivity(),
 						QuestionResponseActivity.class);
+				intent.putExtra("id", exams.get(position).getId());
 				startActivity(intent);
 			}
 
@@ -62,18 +63,16 @@ public class ExamineFragment extends Fragment {
 			public void callback(String url, JSONObject json, AjaxStatus status) {
 
 				try {
-					if (json.has(Constants.KEY_STATUS)
-							&& json.get(Constants.KEY_STATUS) != null) {
-						if (json.getInt("status") == 200) {
-							exams = JSONParser.parseExams(json);
-							if (adapter == null) {
-								adapter = new ExamsAdapter(getActivity(), exams);
-							} else {
-								adapter.notifyDataSetChanged();
-							}
-							listview.setAdapter(adapter);
+					if (json.has("data") && json.get("data") != null) {
+						exams = JSONParser.parseExams(json);
+						if (adapter == null) {
+							adapter = new ExamsAdapter(getActivity(), exams);
+						} else {
+							adapter.notifyDataSetChanged();
 						}
+						listview.setAdapter(adapter);
 					}
+
 				} catch (JSONException e) {
 					e.printStackTrace();
 

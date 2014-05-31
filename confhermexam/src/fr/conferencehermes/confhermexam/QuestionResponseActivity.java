@@ -69,26 +69,25 @@ public class QuestionResponseActivity extends Activity implements
 			public void callback(String url, JSONObject json, AjaxStatus status) {
 
 				try {
-					if (json.has(Constants.KEY_STATUS)
-							&& json.get(Constants.KEY_STATUS) != null) {
-						if (json.getInt("status") == 200) {
-							exercise = JSONParser.parseExercises(json);
-							questions = exercise.getQuestions();
-							if (!questions.isEmpty()) {
-								selectQuestion(questions.get(0));
-							}
-							if (adapter == null) {
-								adapter = new QuestionsAdapter(
-										QuestionResponseActivity.this, exercise
-												.getQuestions());
-							} else {
-								adapter.notifyDataSetChanged();
-							}
-							listview.setAdapter(adapter);
-							TextView temps = (TextView) findViewById(R.id.temps2);
-							temps.setText("Temps exercice - "
-									+ exercise.getTimeOpen());
+					if (json.has("data") && json.get("data") != null) {
+
+						exercise = JSONParser.parseExercises(json);
+						questions = exercise.getQuestions();
+						if (!questions.isEmpty()) {
+							selectQuestion(questions.get(0));
 						}
+						if (adapter == null) {
+							adapter = new QuestionsAdapter(
+									QuestionResponseActivity.this, exercise
+											.getQuestions());
+						} else {
+							adapter.notifyDataSetChanged();
+						}
+						listview.setAdapter(adapter);
+						TextView temps = (TextView) findViewById(R.id.temps2);
+						temps.setText("Temps exercice - "
+								+ exercise.getTimeOpen());
+
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();

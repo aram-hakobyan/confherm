@@ -1,6 +1,5 @@
 package fr.conferencehermes.confhermexam.fragments;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.json.JSONException;
@@ -8,7 +7,6 @@ import org.json.JSONObject;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,7 +23,7 @@ import fr.conferencehermes.confhermexam.util.Constants;
 
 public class MyProfileFragment extends Fragment {
 
-	private ArrayList<Profile> pData;
+	private Profile pData;
 	private TextView pFirsName, pLastName;
 
 	@Override
@@ -44,17 +42,12 @@ public class MyProfileFragment extends Fragment {
 		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
 			@Override
 			public void callback(String url, JSONObject json, AjaxStatus status) {
-				System.out.println(json.toString());
 				try {
-					if (json.has(Constants.KEY_STATUS)
-							&& json.get(Constants.KEY_STATUS) != null) {
-						if (json.getInt("status") == 200) {
-							pData = JSONParser.parseProfileData(json);
-							// Profile uProf = new Profile();
-							pFirsName.setText(Profile.getFirstName());
-							pLastName.setText(Profile.getLastName());
-
-						}
+					if (json.has("data") && json.get("data") != null) {
+						pData = JSONParser.parseProfileData(json);
+						// Profile uProf = new Profile();
+						pFirsName.setText(pData.getFirstName());
+						pLastName.setText(pData.getLastName());
 					}
 				} catch (JSONException e) {
 					e.printStackTrace();

@@ -54,10 +54,10 @@ public class ExamsAdapter extends BaseAdapter {
 		Exam exam = (Exam) mListItems.get(position);
 		if (exam != null) {
 			if (holder.name != null) {
-				holder.name.setText(exam.getName());
-				holder.desc.setText(exam.getAvailableDate());
+				holder.name.setText(exam.getTitle());
+				holder.desc.setText(exam.getStartDate());
 				holder.status.setText("Status: "
-						+ String.valueOf(exam.getStatus()));
+						+ String.valueOf(exam.getCategoryType()));
 			}
 		}
 
