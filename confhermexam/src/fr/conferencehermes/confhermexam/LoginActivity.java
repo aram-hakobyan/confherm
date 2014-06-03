@@ -66,8 +66,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
 		RequestCreator creator = new RequestCreator();
 
-		final String uname = username.getText().toString().trim();
-		final String pass = password.getText().toString().trim();
+		final String uname = "armen_mkrtchyan";// username.getText().toString().trim();
+		final String pass = "Student1!"; // password.getText().toString().trim();
 
 		if (!uname.isEmpty() && !pass.isEmpty()) {
 			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,

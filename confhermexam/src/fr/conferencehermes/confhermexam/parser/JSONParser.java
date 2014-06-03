@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.graphics.Paint.Join;
 import android.util.Log;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
@@ -64,14 +65,28 @@ public class JSONParser {
 			if (uJson.has(Constants.KEY_DATA)
 					&& uJson.get(Constants.KEY_DATA) != null) {
 				JSONObject obj = uJson.getJSONObject(Constants.KEY_DATA);
-				ArrayList<String> groups = new ArrayList<String>();
+				
+				HashMap<String, String> groups = new HashMap<String, String>();
 
 				if (obj.length() != 0) {
 
-					// JSONObject gObj = obj.getJSONObject("groups");
-					// groups.add(gObj.getString(""));
+					JSONArray groupArr = uJson.getJSONArray("groups");
 
-					// pData.setGroups(groups);
+					for (int i = 0; i < groupArr.length(); i++) {
+						JSONObject gObj = groupArr.getJSONObject(i);
+
+						String gID = gObj.getString("groupId");
+						String gName = gObj.getString("name");
+
+						groups.put("GroudID", gID);
+
+						groups.put("GroupName", gName);
+
+					}
+
+					// groups.add(gObj.getString(""));
+					Log.d("Groups", groups + "");
+					pData.setGroups(groups);
 					pData.setId(obj.getInt("userId"));
 					pData.setFirstName(obj.getString("firstname"));
 					pData.setLastName(obj.getString("lastname"));

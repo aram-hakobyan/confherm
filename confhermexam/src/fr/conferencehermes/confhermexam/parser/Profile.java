@@ -1,15 +1,15 @@
 package fr.conferencehermes.confhermexam.parser;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Profile {
 	private int id;
 	private String firstName;
 	private String lastName;
-	private ArrayList<String> groups;
+	private HashMap<String,String> groups;
 
 	public Profile() {
-		setGroups(new ArrayList<String>());
+		setGroups(new HashMap<String,String>());
 	}
 
 	public int getId() {
@@ -36,11 +36,11 @@ public class Profile {
 		this.lastName = lastName;
 	}
 
-	public ArrayList<String> getGroups() {
+	public HashMap<String,String> getGroups() {
 		return groups;
 	}
 
-	public void setGroups(ArrayList<String> groups) {
+	public void setGroups(HashMap<String,String> groups) {
 		this.groups = groups;
 	}
 
