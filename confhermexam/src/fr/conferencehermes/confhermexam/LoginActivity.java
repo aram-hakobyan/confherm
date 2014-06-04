@@ -135,7 +135,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	@Override
 	public void didFailRequestProcessing() {
 		Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
-				"Logging into Hermes...");
+				"Something went wrong...");
 		Toast.makeText(getApplicationContext(), "Request Failed",
 				Toast.LENGTH_SHORT).show();
 

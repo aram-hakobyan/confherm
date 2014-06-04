@@ -1,12 +1,7 @@
 package fr.conferencehermes.confhermexam.connection;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.List;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
@@ -18,17 +13,19 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.params.ClientPNames;
 import org.apache.http.client.params.CookiePolicy;
 import org.apache.http.client.protocol.ClientContext;
-import org.apache.http.cookie.Cookie;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
+import org.json.JSONObject;
 
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
+import fr.conferencehermes.confhermexam.parser.Profile;
 import fr.conferencehermes.confhermexam.util.CookieStorage;
 
 /**
@@ -45,10 +42,8 @@ public class HttpConnection implements Runnable {
 
 	private static final int GET = 0;
 	private static final int POST = 1;
-	private static final int PUT = 2;
-	private static final int DELETE = 3;
-	private static final int BITMAP = 4;
-	private static final int FILE = 5;
+
+
 
 	private String cookieString = "";
 	private String url;
@@ -76,8 +71,6 @@ public class HttpConnection implements Runnable {
 		ConnectionManager.getInstance().push(this);
 	}
 
-
-
 	public void get(String url, String data) {
 		create(GET, url, data, null);
 	}
@@ -85,10 +78,6 @@ public class HttpConnection implements Runnable {
 	public void post(String url, final List<NameValuePair> nameValuePairs) {
 		create(POST, url, data, nameValuePairs);
 	}
-
-
-
-
 
 	@Override
 	public void run() {
@@ -145,19 +134,22 @@ public class HttpConnection implements Runnable {
 
 				String responses = httpClient
 						.execute(httpPost, responseHandler);
-  
+
 				int status = response.getStatusLine().getStatusCode();
 				Log.d("Response HTTP", status + "");
 				Log.d("RESPONS", responses + "");
 				JSONParser.parseLoginData(responses);
+
+				JSONObject jsonObj = new JSONObject(responses);
+				Profile profileData= JSONParser.parseProfileData(jsonObj);
+				MyProfileFragment.setProfileData(profileData);
 				handler.sendMessage(Message.obtain(handler, status));
 				// JSONParserCategories.parseJSONData(result)
 
 				break;
 
 			}
-			if (method < BITMAP)
-				processEntity(response, cookieStore);
+	
 		} catch (Exception e) {
 			handler.sendMessage(Message.obtain(handler,
 					HttpConnection.DID_ERROR, e));
@@ -165,50 +157,4 @@ public class HttpConnection implements Runnable {
 		ConnectionManager.getInstance().didComplete(this);
 	}
 
-	private void processEntity(HttpResponse response, CookieStore cookieStore)
-			throws IllegalStateException, IOException {
-
-		// -------------------- Analyze Headers ------------------------//
-
-		Header[] headers = response.getAllHeaders();
-		List<Cookie> cookies = cookieStore.getCookies();
-
-		for (Cookie s : cookies) {
-			if (s.getName().equals("user_credentials")) {
-				cookieString += s.getName() + "=" + s.getValue() + "; ";
-			}
-
-			if (s.getName().equals("_SchEnt2_session")) {
-				cookieString += s.getName() + "=" + s.getValue();
-			}
-		}
-
-		if (CookieStorage.getInstance().getArrayList().isEmpty()
-				&& cookieString != null) {
-			CookieStorage
-					.getInstance()
-					.getArrayList()
-					.add(cookieString
-							+ "; ys-job_historiesGrid=o%3Acolumns%3Da%253Ao%25253Aid%25253Ds%2525253A"
-							+ "; ys-job_start_job_new = o%3Awidth%3Dn%253A530%5Eheight%3Dn%253A540");
-		}
-
-		// -------------------- Analyze Content ------------------------//
-		HttpEntity entity = response.getEntity();
-
-		BufferedReader br = new BufferedReader(new InputStreamReader(
-				entity.getContent(), "UTF-8"), 8);
-		String line, result = "";
-
-		while ((line = br.readLine()) != null)
-			result += line;
-		Message message = Message.obtain(handler, DID_SUCCEED, result);
-		handler.sendMessage(message);
-	}
-
-	
-	
-		
-	
-	
 }

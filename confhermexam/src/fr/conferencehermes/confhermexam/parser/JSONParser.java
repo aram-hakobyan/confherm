@@ -24,7 +24,7 @@ public class JSONParser {
 			JSONObject data = jsonObj.getJSONObject("data");
 			String userId = data.getString("userId");
 			AUTH_KEY = data.getString("auth_key");
-			Log.d("AUTH_KEY", AUTH_KEY + "");
+			//Log.d("AUTH_KEY", AUTH_KEY + "");
 
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -70,26 +70,26 @@ public class JSONParser {
 
 				if (obj.length() != 0) {
 
-					JSONArray groupArr = uJson.getJSONArray("groups");
+					JSONArray groupArr = obj.getJSONArray("groups");
 
 					for (int i = 0; i < groupArr.length(); i++) {
 						JSONObject gObj = groupArr.getJSONObject(i);
 
 						String gID = gObj.getString("groupId");
 						String gName = gObj.getString("name");
-
 						groups.put("GroudID", gID);
-
 						groups.put("GroupName", gName);
 
 					}
 
-					// groups.add(gObj.getString(""));
-					Log.d("Groups", groups + "");
+				
+				
 					pData.setGroups(groups);
 					pData.setId(obj.getInt("userId"));
 					pData.setFirstName(obj.getString("firstname"));
 					pData.setLastName(obj.getString("lastname"));
+	
+		
 				}
 			}
 		} catch (JSONException e) {
