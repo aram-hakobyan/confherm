@@ -7,8 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.graphics.Paint.Join;
-import android.util.Log;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 
@@ -20,11 +18,9 @@ public class JSONParser {
 
 		try {
 			JSONObject jsonObj = new JSONObject(pData);
-
 			JSONObject data = jsonObj.getJSONObject("data");
 			String userId = data.getString("userId");
 			AUTH_KEY = data.getString("auth_key");
-			// Log.d("AUTH_KEY", AUTH_KEY + "");
 
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -146,8 +142,8 @@ public class JSONParser {
 
 				JSONObject data = (JSONObject) json.getJSONObject("data");
 				JSONObject exam = (JSONObject) data.getJSONObject("exam");
-				JSONObject questions = (JSONObject) data
-						.getJSONObject("questions");
+				JSONArray questions = (JSONArray) data
+						.getJSONArray("questions");
 
 				exercise.setId(exam.getInt("id"));
 				exercise.setName(exam.getString("name"));
@@ -156,43 +152,41 @@ public class JSONParser {
 				exercise.setTimeClose(exam.getString("timeclose"));
 				exercise.setTimeLimit(exam.getString("timelimit"));
 				exercise.setTimeModified(exam.getString("timemodified"));
-				exercise.setReviewoverallfeedback(exam
-						.getInt("reviewoverallfeedback"));
 
-				int id = 13;
+				for (int k = 0; k < questions.length(); k++) {
 
-				for (int j = 0; j < 20; j++) {
-					if (questions.has(String.valueOf(j)))
-						id = j;
+					Question q = new Question();
+					JSONObject qObj = (JSONObject) questions.get(k);
+					q.setId(qObj.getInt("id"));
+					q.setName(qObj.getString("name"));
+					q.setType(qObj.getString("qtype"));
+					q.setCreatedBy(qObj.getString("createdby"));
+					q.setQuestionText(qObj.getString("questiontext"));
+					if (qObj.has("multyple_choice_type")) {
+						q.setMcType(qObj.getString("multyple_choice_type"));
+					} else {
+						q.setMcType("2");
+					}
+
+					JSONArray answers = (JSONArray) qObj
+							.getJSONArray("answers");
+					ArrayList<Answer> answersArrayList = new ArrayList<Answer>();
+					for (int i = 0; i < answers.length(); i++) {
+						JSONObject ans = (JSONObject) answers.get(i);
+						Answer answer = new Answer();
+						answer.setAnswer(ans.getString("answer"));
+						answer.setAsnwerFormat(ans.getInt("answerformat"));
+						answer.setFeedback(ans.getString("feedback"));
+						answer.setFeedbackFormat(ans.getInt("feedbackformat"));
+						answer.setFraction(ans.getDouble("fraction"));
+						answer.setId(ans.getInt("id"));
+						answer.setQuestionId(ans.getInt("question"));
+						answersArrayList.add(answer);
+					}
+
+					q.setAnswers(answersArrayList);
+					questionsList.add(q);
 				}
-
-				Question q = new Question();
-				JSONObject qObj = (JSONObject) questions.getJSONObject(String
-						.valueOf(id));
-				q.setId(qObj.getInt("id"));
-				q.setName(qObj.getString("name"));
-				q.setType(qObj.getString("qtype"));
-				q.setCreatedBy(qObj.getString("createdby"));
-				q.setQuestionText(qObj.getString("questiontext"));
-
-				JSONArray answers = (JSONArray) qObj.getJSONArray("answers");
-				ArrayList<Answer> answersArrayList = new ArrayList<Answer>();
-				for (int i = 0; i < answers.length(); i++) {
-					JSONObject ans = (JSONObject) answers.get(i);
-					Answer answer = new Answer();
-					answer.setAnswer(ans.getString("answer"));
-					answer.setAsnwerFormat(ans.getInt("answerformat"));
-					answer.setFeedback(ans.getString("feedback"));
-					answer.setFeedbackFormat(ans.getInt("feedbackformat"));
-					answer.setFraction(ans.getDouble("fraction"));
-					answer.setId(ans.getInt("id"));
-					answer.setQuestionId(ans.getInt("question"));
-					answersArrayList.add(answer);
-				}
-
-				q.setAnswers(answersArrayList);
-				questionsList.add(q);
-
 				exercise.setQuestionIds(questionIds);
 				exercise.setQuestions(questionsList);
 
@@ -201,6 +195,8 @@ public class JSONParser {
 			e.printStackTrace();
 		}
 
+		DataHolder.getInstance().getExercises().clear();
+		DataHolder.getInstance().getExercises().add(exercise);
 		return exercise;
 	}
 

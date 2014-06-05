@@ -5,7 +5,6 @@ import android.net.ParseException;
 import android.util.Log;
 import fr.conferencehermes.confhermexam.connectionhelper.ActionDelegate;
 import fr.conferencehermes.confhermexam.util.Constants;
-import fr.conferencehermes.confhermexam.util.Parser;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
 
 /**
@@ -31,7 +30,7 @@ public class BaseResponseAnalyzer {
 
 		if (serviceName.equals(Constants.SERVER_URL)) {
 			try {
-				Parser.parseData(responseData);
+				//Parser.parseData(responseData);
 
 				final ActionDelegate del = (ActionDelegate) ViewTracker
 						.getInstance().getCurrentContext();
