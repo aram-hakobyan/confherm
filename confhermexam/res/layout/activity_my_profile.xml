@@ -32,28 +32,28 @@
             android:textSize="25sp" />
 
         <TextView
+            android:id="@+id/pUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="40dp"
-            android:text="Login : myLogin"
             android:textColor="#0d5c7c"
             android:textSize="25sp" />
 
         <TextView
+            android:id="@+id/pEmail"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Mail : my@example.fr"
             android:textColor="#0d5c7c"
             android:textSize="25sp" />
 
         <TextView
+            android:id="@+id/pGroups"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="40dp"
-            android:text="Groupe : \nGroupe A2 \nGroupe B13 "
             android:textColor="#0d5c7c"
             android:textSize="25sp" />
     </LinearLayout>
