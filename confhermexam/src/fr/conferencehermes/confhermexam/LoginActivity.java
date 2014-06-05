@@ -67,8 +67,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		RequestCreator creator = new RequestCreator();
 
 		final String uname = "armen_mkrtchyan";// username.getText().toString().trim();
-		final String pass = "Student1!"; // password.getText().toString().trim();
-
+												//
+		final String pass = "Student1!"; // password.getText().toString().trim();//
 		if (!uname.isEmpty() && !pass.isEmpty()) {
 			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
 					"Logging into Hermes...");

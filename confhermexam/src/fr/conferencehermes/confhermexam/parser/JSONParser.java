@@ -24,7 +24,7 @@ public class JSONParser {
 			JSONObject data = jsonObj.getJSONObject("data");
 			String userId = data.getString("userId");
 			AUTH_KEY = data.getString("auth_key");
-			//Log.d("AUTH_KEY", AUTH_KEY + "");
+			// Log.d("AUTH_KEY", AUTH_KEY + "");
 
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -65,7 +65,7 @@ public class JSONParser {
 			if (uJson.has(Constants.KEY_DATA)
 					&& uJson.get(Constants.KEY_DATA) != null) {
 				JSONObject obj = uJson.getJSONObject(Constants.KEY_DATA);
-				
+
 				HashMap<String, String> groups = new HashMap<String, String>();
 
 				if (obj.length() != 0) {
@@ -82,14 +82,13 @@ public class JSONParser {
 
 					}
 
-				
-				
+					pData.setEmailAdress(obj.getString("email"));
+					pData.setUserName(obj.getString("username"));
 					pData.setGroups(groups);
 					pData.setId(obj.getInt("userId"));
 					pData.setFirstName(obj.getString("firstname"));
 					pData.setLastName(obj.getString("lastname"));
-	
-		
+
 				}
 			}
 		} catch (JSONException e) {

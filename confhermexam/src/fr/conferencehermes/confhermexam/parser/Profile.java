@@ -6,10 +6,12 @@ public class Profile {
 	private int id;
 	private String firstName;
 	private String lastName;
-	private HashMap<String,String> groups;
+	private HashMap<String, String> groups;
+	private String email;
+	private String userName;
 
 	public Profile() {
-		setGroups(new HashMap<String,String>());
+		setGroups(new HashMap<String, String>());
 	}
 
 	public int getId() {
@@ -28,6 +30,22 @@ public class Profile {
 		this.firstName = firstName;
 	}
 
+	public String getEmailAdress() {
+		return email;
+	}
+
+	public void setEmailAdress(String email) {
+		this.email = email;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
 	public String getLastName() {
 		return lastName;
 	}
@@ -36,11 +54,11 @@ public class Profile {
 		this.lastName = lastName;
 	}
 
-	public HashMap<String,String> getGroups() {
+	public HashMap<String, String> getGroups() {
 		return groups;
 	}
 
-	public void setGroups(HashMap<String,String> groups) {
+	public void setGroups(HashMap<String, String> groups) {
 		this.groups = groups;
 	}
 
