@@ -13,7 +13,7 @@ import android.view.Window;
 import fr.conferencehermes.confhermexam.connection.LogoutRequest;
 import fr.conferencehermes.confhermexam.fragments.ExamineFragment;
 import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
-import fr.conferencehermes.confhermexam.fragments.ExerciseFragment;
+import fr.conferencehermes.confhermexam.fragments.TrainingsFragment;
 import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
 import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
@@ -49,7 +49,7 @@ public class MyFragmentActivity extends FragmentActivity implements
 			fr = new ExamineFragment();
 			break;
 		case 3:
-			fr = new ExerciseFragment();
+			fr = new TrainingsFragment();
 			break;
 		case 4:
 			fr = new ResultatFragment();

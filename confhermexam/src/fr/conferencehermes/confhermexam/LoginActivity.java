@@ -67,7 +67,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		RequestCreator creator = new RequestCreator();
 
 		final String uname = "armen_mkrtchyan";// username.getText().toString().trim();
-												//
+		// key f24a1647499b645a37cb46baaebb005b2b491777										//
 		final String pass = "Student1!"; // password.getText().toString().trim();//
 		if (!uname.isEmpty() && !pass.isEmpty()) {
 			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,

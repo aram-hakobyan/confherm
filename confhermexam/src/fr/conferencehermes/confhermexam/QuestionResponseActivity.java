@@ -1,34 +1,30 @@
 package fr.conferencehermes.confhermexam;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Html;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AdapterView;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
-
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.parser.Exercise;
-import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
-import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 
 public class QuestionResponseActivity extends Activity implements
 		OnClickListener {
@@ -37,6 +33,7 @@ public class QuestionResponseActivity extends Activity implements
 	QuestionsAdapter adapter;
 	Exercise exercise;
 	ArrayList<Question> questions;
+	LinearLayout answersLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +44,7 @@ public class QuestionResponseActivity extends Activity implements
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		int id = getIntent().getIntExtra("id", 1);
-
+		answersLayout = (LinearLayout) findViewById(R.id.answersLayout);
 		listview = (ListView) findViewById(R.id.questionsListView);
 		listview.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -58,65 +55,81 @@ public class QuestionResponseActivity extends Activity implements
 
 		});
 
-		AQuery aq = new AQuery(QuestionResponseActivity.this);
-		String url = "http://ecni.conference-hermes.fr/api/exercise.php";
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
-		params.put("id", id);
-
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
-
-				try {
-					if (json.has("data") && json.get("data") != null) {
-
-						exercise = JSONParser.parseExercises(json);
-						questions = exercise.getQuestions();
-						if (!questions.isEmpty()) {
-							selectQuestion(questions.get(0));
-						}
-						if (adapter == null) {
-							adapter = new QuestionsAdapter(
-									QuestionResponseActivity.this, exercise
-											.getQuestions());
-						} else {
-							adapter.notifyDataSetChanged();
-						}
-						listview.setAdapter(adapter);
-						TextView temps = (TextView) findViewById(R.id.temps2);
-						temps.setText("Temps exercice - "
-								+ exercise.getTimeOpen());
-
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-
-				}
-			}
-		});
+		exercise = DataHolder.getInstance().getExercises().get(0);
+		questions = exercise.getQuestions();
+		if (!questions.isEmpty()) {
+			selectQuestion(questions.get(0));
+		}
+		if (adapter == null) {
+			adapter = new QuestionsAdapter(QuestionResponseActivity.this,
+					exercise.getQuestions());
+		} else {
+			adapter.notifyDataSetChanged();
+		}
+		listview.setAdapter(adapter);
+		TextView temps1 = (TextView) findViewById(R.id.temps1);
+		TextView temps2 = (TextView) findViewById(R.id.temps2);
+		temps1.setText(exercise.getTimeOpen());
+		temps2.setText(exercise.getTimeClose());
 
 	}
 
 	private void selectQuestion(Question q) {
+		answersLayout.removeAllViews();
 		TextView title = (TextView) findViewById(R.id.questionTitle);
 		TextView txt = (TextView) findViewById(R.id.question);
 		TextView ennouncer = (TextView) findViewById(R.id.temps1);
 		title.setText("QUESTION " + q.getId());
-		txt.setText(q.getQuestionText());
+		txt.setText(Html.fromHtml(q.getQuestionText()));
 		ennouncer.setText(q.getCreatedBy());
 
-		TextView answer1 = (TextView) findViewById(R.id.answer1);
-		TextView answer2 = (TextView) findViewById(R.id.answer2);
-		TextView answer3 = (TextView) findViewById(R.id.answer3);
-		TextView answer4 = (TextView) findViewById(R.id.answer4);
-		TextView answer5 = (TextView) findViewById(R.id.answer5);
+		int answersCount = q.getAnswers().size();
 
-		answer1.setText("1. " + q.getAnswers().get(0).getAnswer());
-		answer2.setText("2. " + q.getAnswers().get(1).getAnswer());
-		answer3.setText("3. " + q.getAnswers().get(2).getAnswer());
-		answer4.setText("4. " + q.getAnswers().get(3).getAnswer());
-		answer5.setText("5. " + q.getAnswers().get(4).getAnswer());
+		// Single choice answer
+		if (q.getMcType().equalsIgnoreCase("0")) {
+			RadioGroup mRadioGroup = new RadioGroup(
+					QuestionResponseActivity.this);
+			mRadioGroup.setOrientation(RadioGroup.VERTICAL);
+			for (int i = 0; i < answersCount; i++) {
+				RadioButton newRadioButton = new RadioButton(this);
+				newRadioButton.setText(q.getAnswers().get(i).getAnswer());
+				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
+				LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
+						RadioGroup.LayoutParams.WRAP_CONTENT,
+						RadioGroup.LayoutParams.WRAP_CONTENT);
+				mRadioGroup.addView(newRadioButton, 0, layoutParams);
+			}
+			answersLayout.addView(mRadioGroup);
+		} else // Multichoice answer
+		if (q.getMcType().equalsIgnoreCase("1")) {
+			for (int i = 0; i < answersCount; i++) {
+				LinearLayout checkBoxLayout = new LinearLayout(
+						QuestionResponseActivity.this);
+				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
+				CheckBox checkBox = new CheckBox(QuestionResponseActivity.this);
+				checkBox.setGravity(Gravity.CENTER_VERTICAL);
+				TextView text = new TextView(QuestionResponseActivity.this);
+				text.setText(q.getAnswers().get(i).getAnswer());
+				text.setGravity(Gravity.CENTER_VERTICAL);
+				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+						LinearLayout.LayoutParams.WRAP_CONTENT,
+						LinearLayout.LayoutParams.WRAP_CONTENT);
+				// layoutParams.setMargins(50, 20, 30, 20);
+				checkBoxLayout.addView(checkBox);
+				checkBoxLayout.addView(text, layoutParams);
+				answersLayout.addView(checkBoxLayout);
+			}
+
+		} else // Essay answer
+		if (q.getMcType().equalsIgnoreCase("2")) {
+			EditText editText = new EditText(QuestionResponseActivity.this);
+			editText.setGravity(Gravity.CENTER_VERTICAL);
+			editText.setHint("Type your answer here.");
+			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+					LinearLayout.LayoutParams.MATCH_PARENT,
+					LinearLayout.LayoutParams.WRAP_CONTENT);
+			answersLayout.addView(editText, layoutParams);
+		}
 
 	}
 

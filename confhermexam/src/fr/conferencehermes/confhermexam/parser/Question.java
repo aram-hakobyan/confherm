@@ -9,6 +9,7 @@ public class Question {
 	private String type;
 	private String createdBy;
 	private ArrayList<Answer> answers;
+	private String mcType;
 
 	public Question() {
 		setAnswers(new ArrayList<Answer>());
@@ -60,6 +61,14 @@ public class Question {
 
 	public void setAnswers(ArrayList<Answer> answers) {
 		this.answers = answers;
+	}
+
+	public String getMcType() {
+		return mcType;
+	}
+
+	public void setMcType(String string) {
+		this.mcType = string;
 	}
 
 }
