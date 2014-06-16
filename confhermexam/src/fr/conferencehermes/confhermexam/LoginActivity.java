@@ -84,7 +84,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 			baseNetworkManager.constructConnectionAndHitPOST(
 					"Login Successful", "Login Request Started", paramsList,
-
+  
 					this, "LogView", "LogService");
 		} else {
 			Toast.makeText(LoginActivity.this,
