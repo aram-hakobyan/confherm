@@ -2,12 +2,16 @@ package fr.conferencehermes.confhermexam.fragments;
 
 import java.util.Map;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import fr.conferencehermes.confhermexam.LoginActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.Profile;
 
@@ -15,6 +19,7 @@ public class MyProfileFragment extends Fragment {
 
 	private static Profile pData;
 	private TextView pFirsName, pLastName, pUserName, pEmailAdress, pGroups;
+	private Button logout;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -26,6 +31,18 @@ public class MyProfileFragment extends Fragment {
 		pUserName = (TextView) pFragment.findViewById(R.id.pUsername);
 		pEmailAdress = (TextView) pFragment.findViewById(R.id.pEmail);
 		pGroups = (TextView) pFragment.findViewById(R.id.pGroups);
+		logout = (Button) pFragment.findViewById(R.id.logout);
+		logout.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent i = new Intent(getActivity(), LoginActivity.class);
+				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+						| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+				startActivity(i);
+
+				getActivity().finish();
+			}
+		});
 
 		// pData = new Profile();
 
@@ -40,7 +57,7 @@ public class MyProfileFragment extends Fragment {
 				pEmailAdress.setText("Email : " + pData.getEmailAdress());
 
 				if (pData.getGroups().size() == 0) {
-					pGroups.setText("Groups : " + "no any groups");
+					pGroups.setText("Groups : " + "no groups available");
 				} else {
 					for (Map.Entry<String, String> entry : pData.getGroups()
 							.entrySet()) {

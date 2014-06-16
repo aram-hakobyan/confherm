@@ -66,9 +66,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
 		RequestCreator creator = new RequestCreator();
 
-		final String uname = "armen_mkrtchyan";// username.getText().toString().trim();
-		// key f24a1647499b645a37cb46baaebb005b2b491777										//
-		final String pass = "Student1!"; // password.getText().toString().trim();//
+		final String uname = "STUDENT";// username.getText().toString().trim();
+		// key a3410730776675ae461e5ab32e9b8279f862dcb5 //
+		final String pass = "123456"; // password.getText().toString().trim();//
 		if (!uname.isEmpty() && !pass.isEmpty()) {
 			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
 					"Logging into Hermes...");

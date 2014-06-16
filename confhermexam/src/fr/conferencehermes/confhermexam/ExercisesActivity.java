@@ -1,5 +1,6 @@
 package fr.conferencehermes.confhermexam;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,8 +28,8 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
-import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
+import fr.conferencehermes.confhermexam.parser.TrainingExercise;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class ExercisesActivity extends FragmentActivity implements
@@ -36,16 +37,15 @@ public class ExercisesActivity extends FragmentActivity implements
 	LayoutInflater inflater;
 	GridView gvMain;
 	ArrayAdapter<String> adapter;
-	Exercise exercise;
-	String[] data = new String[1];
-	int examId;
+	ArrayList<TrainingExercise> exercises;
+	int training_id;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_exersice);
-		examId = getIntent().getIntExtra("examId", 0);
+		training_id = getIntent().getIntExtra("training_id", 0);
 
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
@@ -54,19 +54,20 @@ public class ExercisesActivity extends FragmentActivity implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
+				int e_id = exercises.get(position).getExercise_id();
 				if (getIntent().getBooleanExtra("exam", false))
-					showPasswordAlert();
+					showPasswordAlert(e_id);
 				else
-					openExam();
+					openExam(e_id);
 			}
 
 		});
 
 		AQuery aq = new AQuery(ExercisesActivity.this);
-		String url = "http://ecni.conference-hermes.fr/api/traningexercise.php";
+		String url = "http://ecni.conference-hermes.fr/api/training";
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
-		params.put("id", examId);
+		params.put("training_id", training_id);
 
 		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
 
@@ -75,8 +76,12 @@ public class ExercisesActivity extends FragmentActivity implements
 
 				try {
 					if (json.has("data") && json.get("data") != null) {
-						exercise = JSONParser.parseExercises(json);
-						data[0] = exercise.getName();
+						exercises = JSONParser.parseTrainingExercises(json);
+						String[] data = new String[exercises.size()];
+						for (int i = 0; i < exercises.size(); i++) {
+							data[i] = exercises.get(i).getTitle();
+						}
+
 						adapter = new ArrayAdapter<String>(
 								ExercisesActivity.this, R.layout.item,
 								R.id.tvText, data);
@@ -101,14 +106,14 @@ public class ExercisesActivity extends FragmentActivity implements
 		gvMain.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
 	}
 
-	private void openExam() {
+	private void openExam(int id) {
 		Intent intent = new Intent(ExercisesActivity.this,
 				QuestionResponseActivity.class);
-		intent.putExtra("examId", examId);
+		intent.putExtra("exercise_id", id);
 		startActivity(intent);
 	}
 
-	private void showPasswordAlert() {
+	private void showPasswordAlert(final int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Enter Password");
 
@@ -121,7 +126,7 @@ public class ExercisesActivity extends FragmentActivity implements
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				if (!input.getText().toString().trim().isEmpty()) {
-					openExam();
+					openExam(id);
 				}
 			}
 		});

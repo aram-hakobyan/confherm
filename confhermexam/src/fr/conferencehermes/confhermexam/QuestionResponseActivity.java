@@ -1,6 +1,11 @@
 package fr.conferencehermes.confhermexam;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,10 +26,16 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
+
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.parser.Exercise;
+import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
-import fr.conferencehermes.confhermexam.util.DataHolder;
+import fr.conferencehermes.confhermexam.util.Constants;
 
 public class QuestionResponseActivity extends Activity implements
 		OnClickListener {
@@ -34,6 +45,7 @@ public class QuestionResponseActivity extends Activity implements
 	Exercise exercise;
 	ArrayList<Question> questions;
 	LinearLayout answersLayout;
+	int exercise_id;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +55,7 @@ public class QuestionResponseActivity extends Activity implements
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		int id = getIntent().getIntExtra("id", 1);
+		exercise_id = getIntent().getIntExtra("exercise_id", 1);
 		answersLayout = (LinearLayout) findViewById(R.id.answersLayout);
 		listview = (ListView) findViewById(R.id.questionsListView);
 		listview.setOnItemClickListener(new OnItemClickListener() {
@@ -55,22 +67,44 @@ public class QuestionResponseActivity extends Activity implements
 
 		});
 
-		exercise = DataHolder.getInstance().getExercises().get(0);
-		questions = exercise.getQuestions();
-		if (!questions.isEmpty()) {
-			selectQuestion(questions.get(0));
-		}
-		if (adapter == null) {
-			adapter = new QuestionsAdapter(QuestionResponseActivity.this,
-					exercise.getQuestions());
-		} else {
-			adapter.notifyDataSetChanged();
-		}
-		listview.setAdapter(adapter);
-		TextView temps1 = (TextView) findViewById(R.id.temps1);
-		TextView temps2 = (TextView) findViewById(R.id.temps2);
-		temps1.setText(exercise.getTimeOpen());
-		temps2.setText(exercise.getTimeClose());
+		AQuery aq = new AQuery(QuestionResponseActivity.this);
+		String url = "http://ecni.conference-hermes.fr/api/traningexercise";
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put("exercise_id", exercise_id);
+
+		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+
+			@Override
+			public void callback(String url, JSONObject json, AjaxStatus status) {
+
+				try {
+					if (json.has("data") && json.get("data") != null) {
+						exercise = JSONParser.parseExercise(json);
+
+						questions = exercise.getQuestions();
+						if (!questions.isEmpty()) {
+							selectQuestion(questions.get(0));
+						}
+						if (adapter == null) {
+							adapter = new QuestionsAdapter(
+									QuestionResponseActivity.this, exercise
+											.getQuestions());
+						} else {
+							adapter.notifyDataSetChanged();
+						}
+						listview.setAdapter(adapter);
+						TextView temps1 = (TextView) findViewById(R.id.temps1);
+						TextView temps2 = (TextView) findViewById(R.id.temps2);
+						temps1.setText(exercise.getTimeOpen());
+						temps2.setText(exercise.getTimeClose());
+					}
+				} catch (JSONException e) {
+					e.printStackTrace();
+
+				}
+			}
+		});
 
 	}
 

@@ -1,21 +1,20 @@
 package fr.conferencehermes.confhermexam.parser;
 
 public class Training {
-	private int examId;
+	private int id;
 	private String title;
-	private String availableDate;
-	private int status;
+	private String categoryType;
 
 	public Training() {
 
 	}
 
-	public int getExamId() {
-		return examId;
+	public int getId() {
+		return id;
 	}
 
-	public void setExamId(int examId) {
-		this.examId = examId;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public String getTitle() {
@@ -26,20 +25,12 @@ public class Training {
 		this.title = title;
 	}
 
-	public String getAvailableDate() {
-		return availableDate;
+	public String getCategoryType() {
+		return categoryType;
 	}
 
-	public void setAvailableDate(String availableDate) {
-		this.availableDate = availableDate;
-	}
-
-	public int getStatus() {
-		return status;
-	}
-
-	public void setStatus(int status) {
-		this.status = status;
+	public void setCategoryType(String categoryType) {
+		this.categoryType = categoryType;
 	}
 
 }
