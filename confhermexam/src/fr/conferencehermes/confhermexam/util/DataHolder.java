@@ -5,18 +5,21 @@ import java.util.ArrayList;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.Training;
+import fr.conferencehermes.confhermexam.parser.TrainingExercise;
 
 public class DataHolder {
 	private static DataHolder instance;
-	
+
 	private ArrayList<Exam> exams;
 	private ArrayList<Exercise> exercises;
+	private ArrayList<TrainingExercise> trainingExercises;
 	private ArrayList<Training> trainings;
 
 	private DataHolder() {
 		setExams(new ArrayList<Exam>());
 		setExercises(new ArrayList<Exercise>());
 		setTrainings(new ArrayList<Training>());
+		setTrainingExercises(new ArrayList<TrainingExercise>());
 	}
 
 	public static DataHolder getInstance() {
@@ -49,6 +52,15 @@ public class DataHolder {
 
 	public void setTrainings(ArrayList<Training> trainings) {
 		this.trainings = trainings;
+	}
+
+	public ArrayList<TrainingExercise> getTrainingExercises() {
+		return trainingExercises;
+	}
+
+	public void setTrainingExercises(
+			ArrayList<TrainingExercise> trainingExercises) {
+		this.trainingExercises = trainingExercises;
 	}
 
 }

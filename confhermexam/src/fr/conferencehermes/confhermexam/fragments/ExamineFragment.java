@@ -23,16 +23,16 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.ExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
-import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
-import fr.conferencehermes.confhermexam.parser.Exam;
+import fr.conferencehermes.confhermexam.adapters.TrainingsAdapter;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
+import fr.conferencehermes.confhermexam.parser.Training;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class ExamineFragment extends Fragment {
 	LayoutInflater inflater;
 	ListView listview;
-	ExamsAdapter adapter;
-	ArrayList<Exam> exams;
+	TrainingsAdapter adapter;
+	ArrayList<Training> trainings;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -47,7 +47,7 @@ public class ExamineFragment extends Fragment {
 					int position, long id) {
 				Intent intent = new Intent(getActivity(),
 						ExercisesActivity.class);
-				intent.putExtra("examId", exams.get(position).getId());
+				intent.putExtra("training_id", trainings.get(position).getId());
 				intent.putExtra("exam", true);
 				startActivity(intent);
 			}
@@ -55,7 +55,7 @@ public class ExamineFragment extends Fragment {
 		});
 
 		AQuery aq = new AQuery(getActivity());
-		String url = "http://ecni.conference-hermes.fr/api/exams.php";
+		String url = "http://ecni.conference-hermes.fr/api/traininglist";
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
 
@@ -65,9 +65,10 @@ public class ExamineFragment extends Fragment {
 
 				try {
 					if (json.has("data") && json.get("data") != null) {
-						exams = JSONParser.parseExams(json);
+						trainings = JSONParser.parseTrainings(json);
 						if (adapter == null) {
-							adapter = new ExamsAdapter(getActivity(), exams);
+							adapter = new TrainingsAdapter(getActivity(),
+									trainings);
 						} else {
 							adapter.notifyDataSetChanged();
 						}

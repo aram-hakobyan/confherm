@@ -38,7 +38,7 @@ public class BaseNetworkManager {
 	public void constructConnectionAndHitPOST(final String successMessage,
 			final String startingMessage, final List<NameValuePair> paramsList,
 			final Object managerObject, final String classString,
-			final String serviceName) {
+			final String serviceName,final String loginOrAuth) {
 
 		if (NetworkReachability.isReachable()) {
 
@@ -56,15 +56,21 @@ public class BaseNetworkManager {
 						handleFinishResponse();
 						break;
 
-					case HttpConnection.PUBLISH_SUCCESS:
-						final Integer progress = (Integer) msg.obj;
+					case 403:
+						Log.d("Access denied. Please login",
+								"404");
 
 						break;
 
 					case 400:
-						//Exception ex = (Exception) msg.obj;
-						Log.d("Exception occured while hitting response!","400");
+						Log.d("Exception occured while hitting response!",
+								"400");
 						handleFailResponse();
+						break;
+						
+					case 500:
+						Log.d("Something went wrong. Please try again later",
+								"500");				
 						break;
 
 					}
@@ -76,9 +82,11 @@ public class BaseNetworkManager {
 
 			// ------------------- Construct Service Url ------------------//
 
-			builder.append(Constants.SERVER_URL);
-			builder.append(Constants.RIGHT_SLASH);
-			builder.append(serviceName);
+			if (loginOrAuth.equalsIgnoreCase(Constants.SERVER_URL_AUTH)){
+				builder.append(Constants.SERVER_URL_AUTH);
+			}else{
+				builder.append(Constants.SERVER_URL);
+			}
 			final String httpRequestUrl = builder.toString();
 
 			connection.post(httpRequestUrl, paramsList);
@@ -89,73 +97,8 @@ public class BaseNetworkManager {
 		}
 	}
 
-	/**
-	 * Main HTTP Service requests GET method
-	 * 
-	 * @param successMessage
-	 * @param startingMessage
-	 * @param paramsList
-	 * @param managerObject
-	 * @param classString
-	 * @param serviceName
-	 */
-//	public void constructConnectionAndHitGET(final String successMessage,
-//			final String startingMessage, final String urlAndParamsList,
-//			final Object managerObject, final String classString,
-//			final String serviceName) {
-//
-//		final Handler handler = new Handler() {
-//
-//			@Override
-//			public void handleMessage(Message msg) {
-//				super.handleMessage(msg);
-//
-//				switch (msg.what) {
-//
-//				case HttpConnection.DID_START:
-//					Log.d("Request", startingMessage);
-//					break;
-//				case HttpConnection.DID_SUCCEED:
-//					Log.d("Response Recieved", msg.obj.toString());
-//					
-//
-//					break;
-//				case HttpConnection.DID_ERROR:
-//					Exception ex = (Exception) msg.obj;
-//					// handleProblematicResponse();
-//					handleFailResponse();
-//					Log.d("Exception occured while hitting response!",
-//							ex.getMessage());
-//
-//					break;
-//
-//				}
-//			}
-//		};
-//
-//		final HttpConnection connection = new HttpConnection(handler);
-//
-//		connection.get(urlAndParamsList, null);
-//		// connection.get("http://belbooner.site40.net/drakonich", null);
-//
-//	}
 
-	/**
-	 * @param responseHtml
-	 */
-	/*
-	 * private void chainOfResponsibilities(String responseHtml, final String
-	 * classString, final Object managerObject, final String requestType, final
-	 * List<NameValuePair> paramsList, final String urlAndParamsList) {
-	 * 
-	 * if (responseHtml != null) { BackgroundResponseAnalizer
-	 * backgroundRespAnalyzer = new BackgroundResponseAnalizer( requestType,
-	 * responseHtml, urlAndParamsList, paramsList);
-	 * 
-	 * backgroundRespAnalyzer.start(); }
-	 * 
-	 * }
-	 */
+
 
 	/**
 	 * Hides Activity Indicator
@@ -166,7 +109,7 @@ public class BaseNetworkManager {
 
 		del.didFinishRequestProcessing();
 	}
-	
+
 	private void handleFailResponse() {
 		ActionDelegate del = (ActionDelegate) ViewTracker.getInstance()
 				.getCurrentContext();

@@ -25,7 +25,7 @@ public class HttpAsyncPost extends AsyncTask<Void, Void, JSONObject> {
 		try {
 			HttpClient httpclient = new DefaultHttpClient();
 			HttpPost httppost = new HttpPost(
-					"http://moodle.outsourcearmenia.com/api/authenticate.php");
+					"http://ecni.conference-hermes.fr/api/authenticate");
 
 			// Add your data
 			List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);

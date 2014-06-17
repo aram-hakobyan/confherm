@@ -5,6 +5,8 @@ import java.util.ArrayList;
 public class Exercise {
 	private int id;
 	private String name;
+	private String type;
+	private String text;
 	private String intro;
 	private String timeOpen;
 	private String timeClose;
@@ -106,6 +108,22 @@ public class Exercise {
 
 	public void setQuestions(ArrayList<Question> questions) {
 		this.questions = questions;
+	}
+
+	public String getText() {
+		return text;
+	}
+
+	public void setText(String text) {
+		this.text = text;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 }

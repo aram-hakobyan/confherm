@@ -8,7 +8,8 @@ public class Constants {
 	public static int RESULTATS_FRAGMENT = 4;
 	public static int TELECHARG_FRAGMENT = 5;
 
-	public static String SERVER_URL = "http://ecni.conference-hermes.fr/api/login.php";
+	public static String SERVER_URL = "http://ecni.conference-hermes.fr/api/login";
+	public static String SERVER_URL_AUTH = "http://ecni.conference-hermes.fr/api/authenticate";
 	public static String AUTH_TOKEN = "auth_key";
 	public static final String RIGHT_SLASH = "/";
 	public static final String EQUAL = "=";
@@ -16,7 +17,8 @@ public class Constants {
 	public static final String PARAMETER_SEPARATOR = "&";
 	public static final String LOGIN_VIEW = "LoginView";
 	public static final String LOGOUT_VIEW = "LogoutView";
-
+	public static final String AUTHKEY_SHAREDPREFS_KEY = "fr.conferencehermes.confhermexam_AUTHKEY";
+	
 	public static String KEY_STATUS = "status";
 	public static String KEY_DATA = "data";
 

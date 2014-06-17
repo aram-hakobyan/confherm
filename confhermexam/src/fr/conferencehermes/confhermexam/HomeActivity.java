@@ -32,7 +32,7 @@ public class HomeActivity extends Activity implements OnClickListener {
 		((LinearLayout) findViewById(R.id.homeButton6))
 				.setOnClickListener(this);
 
-		new HttpAsyncPost().execute();
+		// new HttpAsyncPost().execute();
 	}
 
 	@Override
