@@ -30,7 +30,7 @@ import fr.conferencehermes.confhermexam.util.Utilities;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
 
 public class LoginActivity extends Activity implements ActionDelegate {
-	private static Profile pData;
+	private static Profile lData;
 	private EditText username;
 	private EditText password;
 	private ProgressBar progressBarLogin;
@@ -44,8 +44,11 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_login);
+
+
 		ViewTracker.getInstance().setCurrentContext(this);
 		ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
+		
 		username = (EditText) findViewById(R.id.loginRow);
 		password = (EditText) findViewById(R.id.passwordRow);
 		loginContentLayout =(LinearLayout) findViewById(R.id.loginContentLayout);
@@ -53,9 +56,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		
 		authKeyEditor = getPreferences(MODE_PRIVATE).edit();
 		
-		if (pData != null){
+		if (lData != null){
 		authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
-				pData.getAuthKey());
+				lData.getAuthKey());
 		}
 		authKeyEditor.commit();
 		loginAction();
@@ -128,7 +131,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		}
 
 	}
-	  
+	
 	
 
 	@Override
@@ -146,8 +149,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 			Utilities.writeString(this, Utilities.IS_LOGGED_IN, "YES");
 		}
 
-		Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
-				"Logging into Hermes...");
+		//Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
+				//"Logging into Hermes...");
 
 		startActivity(hIntent);
 		finish();
@@ -177,4 +180,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		return false;
 	}
 
+	
+	
+	public static void setLoginData(Profile loginData) {
+		lData = loginData;
+	}
 }
