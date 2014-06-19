@@ -16,11 +16,11 @@ import fr.conferencehermes.confhermexam.adapters.ExerciseAdapter;
 import fr.conferencehermes.confhermexam.adapters.NotesAdapter;
 
 public class NotesActivity extends Activity {
-	LayoutInflater inflater;
-	ListView listview;
-	NotesAdapter adapter;
-	ListView listviewEx;
-	ExerciseAdapter adapterEx;
+	private LayoutInflater inflater;
+	private ListView listview;
+	private NotesAdapter adapter;
+	private ListView listviewEx;
+	private ExerciseAdapter adapterEx;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

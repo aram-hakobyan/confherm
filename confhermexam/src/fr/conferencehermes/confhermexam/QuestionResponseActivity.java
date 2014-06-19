@@ -39,13 +39,13 @@ import fr.conferencehermes.confhermexam.util.Constants;
 
 public class QuestionResponseActivity extends Activity implements
 		OnClickListener {
-	LayoutInflater inflater;
-	ListView listview;
-	QuestionsAdapter adapter;
-	Exercise exercise;
-	ArrayList<Question> questions;
-	LinearLayout answersLayout;
-	int exercise_id;
+	private LayoutInflater inflater;
+	private ListView listview;
+	private QuestionsAdapter adapter;
+	private Exercise exercise;
+	private ArrayList<Question> questions;
+	private LinearLayout answersLayout;
+	private int exercise_id;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

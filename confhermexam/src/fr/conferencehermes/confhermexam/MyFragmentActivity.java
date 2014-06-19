@@ -1,6 +1,5 @@
 package fr.conferencehermes.confhermexam;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -10,13 +9,12 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import fr.conferencehermes.confhermexam.connection.LogoutRequest;
+import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
 import fr.conferencehermes.confhermexam.fragments.ExamineFragment;
 import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
-import fr.conferencehermes.confhermexam.fragments.TrainingsFragment;
 import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
-import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
+import fr.conferencehermes.confhermexam.fragments.TrainingsFragment;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
