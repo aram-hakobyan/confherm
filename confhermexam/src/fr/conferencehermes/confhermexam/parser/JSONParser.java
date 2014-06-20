@@ -123,37 +123,32 @@ public class JSONParser {
 
 	}
 
-	public static void parseResults(JSONObject rJson) {
-
+	public static ArrayList<Result> parseResults(JSONObject rJson) {
+		ArrayList<Result> examsResult = new ArrayList<Result>();
 		try {
 			if (rJson.has(Constants.KEY_DATA)
 					&& rJson.get(Constants.KEY_DATA) != null) {
 				JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
-				// rJson = new ArrayList<Profile>();
-				ArrayList<String> groups = new ArrayList<String>();
 
 				if (obj.length() != 0) {
 
-					Profile pData = new Profile();
+					JSONArray data = rJson.getJSONArray("data");
 
-					// JSONObject gObj = obj.getJSONObject("groups");
-					// groups.add(gObj.getString(""));
+					for (int i = 0; i < data.length(); i++) {
+						Result r = new Result();
+						// JSONObject obj = data.getJSONObject(i);
 
-					// pData.setGroups(groups);
-					int a = obj.getInt("examId");
-					String a3 = obj.getString("title");
-					String a1 = obj.getString("availableDate");
-					String a2 = obj.getString("examStatus");
-					// uData.add(pData);
+						r.setExamId(obj.getInt("exam_id"));
+						r.setExamName(obj.getString("exam_name"));
 
-					// Log.i("PDATA", pData + "");
-
+						examsResult.add(r);
+					}
 				}
-
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
+		return examsResult;
 
 	}
 
