@@ -128,27 +128,94 @@ public class JSONParser {
 		try {
 			if (rJson.has(Constants.KEY_DATA)
 					&& rJson.get(Constants.KEY_DATA) != null) {
-				JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
-
-				if (obj.length() != 0) {
-
-					JSONArray data = rJson.getJSONArray("data");
+				// JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
+				JSONArray data = rJson.getJSONArray(Constants.KEY_DATA);
+				if (data.length() != 0) {
 
 					for (int i = 0; i < data.length(); i++) {
-						Result r = new Result();
-						// JSONObject obj = data.getJSONObject(i);
+						JSONObject gObj = data.getJSONObject(i);
 
-						r.setExamId(obj.getInt("exam_id"));
-						r.setExamName(obj.getString("exam_name"));
+						Result r = new Result();
+
+						r.setExamId(gObj.getInt("exam_id"));
+						r.setExamName(gObj.getString("exam_name"));
 
 						examsResult.add(r);
 					}
+
 				}
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 		return examsResult;
+
+	}
+
+	public static ArrayList<NotesResult> parseExerciseResult(JSONObject exRJson) {
+		ArrayList<NotesResult> exerciseResult = new ArrayList<NotesResult>();
+		try {
+			if (exRJson.has(Constants.KEY_DATA)
+					&& exRJson.get(Constants.KEY_DATA) != null) {
+				// JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
+				JSONArray data = exRJson.getJSONArray(Constants.KEY_DATA);
+
+				if (data.length() != 0) {
+
+					for (int i = 0; i < data.length(); i++) {
+						JSONObject gObj = data.getJSONObject(i);
+
+						NotesResult exR = new NotesResult();
+
+						exR.setStudentId(gObj.getInt("student_id"));
+						exR.setRank(gObj.getInt("rank"));
+						exR.setStudentName(gObj.getString("name"));
+						exR.setScore(gObj.getInt("score"));
+
+						exerciseResult.add(exR);
+					}
+
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return exerciseResult;
+
+	}
+
+	public static ArrayList<ExamExercise> parseExamExercise(JSONObject exEJson) {
+		ArrayList<ExamExercise> examExercise = new ArrayList<ExamExercise>();
+		try {
+			if (exEJson.has(Constants.KEY_DATA)
+					&& exEJson.get(Constants.KEY_DATA) != null) {
+
+				ExamExercise exR = new ExamExercise();
+				JSONObject obj = exEJson.getJSONObject(Constants.KEY_DATA);
+
+				exR.setCreatedBy(obj.getString("creted_by"));
+				exR.setExamName(obj.getString("exam_name"));
+
+				JSONArray dataExercises = obj.getJSONArray("exercises");
+
+				if (dataExercises.length() != 0) {
+
+					for (int i = 0; i < dataExercises.length(); i++) {
+						JSONObject gObj = dataExercises.getJSONObject(i);
+
+						exR.setExerciseId(gObj.getInt("exercise_id"));
+						exR.setExamName(gObj.getString("exercise_name"));
+						exR.setPastExersice(gObj.getBoolean("past_exercise"));
+
+						examExercise.add(exR);
+					}
+
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return examExercise;
 
 	}
 

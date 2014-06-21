@@ -9,13 +9,14 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.parser.ExamExercise;
 
 public class ExerciseAdapter extends BaseAdapter {
-	private ArrayList<String> mListItems;
+	private ArrayList<ExamExercise> mListItems;
 	private LayoutInflater mLayoutInflater;
 
-	public ExerciseAdapter(Context context, ArrayList<String> arrayList) {
-		mListItems = arrayList;
+	public ExerciseAdapter(Context context, ArrayList<ExamExercise> listEx) {
+		mListItems = listEx;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
@@ -50,7 +51,7 @@ public class ExerciseAdapter extends BaseAdapter {
 		}
 
 		if (holder.name != null) {
-			holder.name.setText(mListItems.get(position));
+			holder.name.setText(mListItems.get(position).getExamName());
 		}
 
 		return view;

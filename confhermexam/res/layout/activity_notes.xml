@@ -156,7 +156,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="100dp"
         android:layout_marginTop="110dp"
-        android:text="Teacher Mr. Shirman"
+      
         android:textColor="@color/app_main_color"
         android:textSize="20sp" />
 
@@ -167,7 +167,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/teacherName"
         android:layout_marginRight="100dp"
-        android:text="Exam Nom_002"
+
         android:textColor="@color/app_main_color"
         android:textSize="20sp" />
 

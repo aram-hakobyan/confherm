@@ -94,18 +94,18 @@ public class HomeActivity extends Activity implements OnClickListener {
 
 	protected void onPause() {
 		super.onPause();
-		Log.d("onPause", isApplicationBroughtToBackground(HomeActivity.this) + "");
+		//Log.d("onPause", isApplicationBroughtToBackground(HomeActivity.this) + "");
 		
 	}
 
 	protected void onResume() {
 		super.onResume();
-		Log.d("onResume", isApplicationBroughtToBackground(HomeActivity.this) + "");
+		//Log.d("onResume", isApplicationBroughtToBackground(HomeActivity.this) + "");
 	}
 
 	protected void onStop() {
 		super.onStop();
-		Log.d("onStop", isApplicationBroughtToBackground(HomeActivity.this) + "");
+		//Log.d("onStop", isApplicationBroughtToBackground(HomeActivity.this) + "");
 	}
 
 	protected void onStart() {

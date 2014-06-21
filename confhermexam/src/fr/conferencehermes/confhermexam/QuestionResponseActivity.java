@@ -68,43 +68,45 @@ public class QuestionResponseActivity extends Activity implements
 		});
 
 		AQuery aq = new AQuery(QuestionResponseActivity.this);
-		String url = "http://ecni.conference-hermes.fr/api/traningexercise";
+
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 		params.put("exercise_id", exercise_id);
 
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+		aq.ajax(Constants.TRAINING_EXERCISE_URL, params, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
 
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
 
-				try {
-					if (json.has("data") && json.get("data") != null) {
-						exercise = JSONParser.parseExercise(json);
+						try {
+							if (json.has("data") && json.get("data") != null) {
+								exercise = JSONParser.parseExercise(json);
 
-						questions = exercise.getQuestions();
-						if (!questions.isEmpty()) {
-							selectQuestion(questions.get(0));
+								questions = exercise.getQuestions();
+								if (!questions.isEmpty()) {
+									selectQuestion(questions.get(0));
+								}
+								if (adapter == null) {
+									adapter = new QuestionsAdapter(
+											QuestionResponseActivity.this,
+											exercise.getQuestions());
+								} else {
+									adapter.notifyDataSetChanged();
+								}
+								listview.setAdapter(adapter);
+								TextView temps1 = (TextView) findViewById(R.id.temps1);
+								TextView temps2 = (TextView) findViewById(R.id.temps2);
+								temps1.setText(exercise.getTimeOpen());
+								temps2.setText(exercise.getTimeClose());
+							}
+						} catch (JSONException e) {
+							e.printStackTrace();
+
 						}
-						if (adapter == null) {
-							adapter = new QuestionsAdapter(
-									QuestionResponseActivity.this, exercise
-											.getQuestions());
-						} else {
-							adapter.notifyDataSetChanged();
-						}
-						listview.setAdapter(adapter);
-						TextView temps1 = (TextView) findViewById(R.id.temps1);
-						TextView temps2 = (TextView) findViewById(R.id.temps2);
-						temps1.setText(exercise.getTimeOpen());
-						temps2.setText(exercise.getTimeClose());
 					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-
-				}
-			}
-		});
+				});
 
 	}
 

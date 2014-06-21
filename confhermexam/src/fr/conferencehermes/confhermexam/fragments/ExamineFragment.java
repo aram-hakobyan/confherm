@@ -55,32 +55,34 @@ public class ExamineFragment extends Fragment {
 		});
 
 		AQuery aq = new AQuery(getActivity());
-		String url = "http://ecni.conference-hermes.fr/api/traininglist";
+
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
+		aq.ajax(Constants.TRAINING_LIST_URL, params, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
 
-				try {
-					if (json.has("data") && json.get("data") != null) {
-						trainings = JSONParser.parseTrainings(json);
-						if (adapter == null) {
-							adapter = new TrainingsAdapter(getActivity(),
-									trainings);
-						} else {
-							adapter.notifyDataSetChanged();
+						try {
+							if (json.has("data") && json.get("data") != null) {
+								trainings = JSONParser.parseTrainings(json);
+								if (adapter == null) {
+									adapter = new TrainingsAdapter(
+											getActivity(), trainings);
+								} else {
+									adapter.notifyDataSetChanged();
+								}
+								listview.setAdapter(adapter);
+							}
+
+						} catch (JSONException e) {
+							e.printStackTrace();
+
 						}
-						listview.setAdapter(adapter);
 					}
-
-				} catch (JSONException e) {
-					e.printStackTrace();
-
-				}
-			}
-		});
+				});
 
 		return fragment;
 	}

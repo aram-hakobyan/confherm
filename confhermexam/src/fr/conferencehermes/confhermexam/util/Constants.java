@@ -8,9 +8,29 @@ public class Constants {
 	public static int RESULTATS_FRAGMENT = 4;
 	public static int TELECHARG_FRAGMENT = 5;
 
+	/********************************* URLs ***********************************/
+
 	public static String SERVER_URL = "http://ecni.conference-hermes.fr/api/login";
 	public static String SERVER_URL_AUTH = "http://ecni.conference-hermes.fr/api/authenticate";
-	public static String AUTH_TOKEN = "auth_key";
+	public static String EXERCISE_RESULT_URL = "http://ecni.conference-hermes.fr/api/exerciseresult";
+	public static String RESULT_LIST_URL = "http://ecni.conference-hermes.fr/api/resultlist";
+	public static String TRAINING_URL = "http://ecni.conference-hermes.fr/api/training";
+	public static String TRAINING_EXERCISE_URL = "http://ecni.conference-hermes.fr/api/traningexercise";
+	public static String TRAINING_LIST_URL = "http://ecni.conference-hermes.fr/api/traininglist";
+	public static String LOG_OUT_URL = "http://ecni.conference-hermes.fr/api/logout.php";
+	public static String CURRENT_EXAM_URL = "http://ecni.conference-hermes.fr/api/result";
+
+	/********************************* Json Keys ***********************************/
+
+	public static String KEY_AUTH_TOKEN = "auth_key";
+	public static String KEY_STATUS = "status";
+	public static String KEY_DATA = "data";
+	public static String KEY_EXERCSICE_ID = "exercise_id";
+	public static String KEY_EXAM_ID = "exam_id";
+	public static String KEY_GLOBAL_TEST = "global_test";
+	public static String KEY_GROUPS = "groups";
+
+	/********************************* Other ***********************************/
 	public static final String RIGHT_SLASH = "/";
 	public static final String EQUAL = "=";
 	public static final String FIRST_PARAM_SEPARATOR = "?";
@@ -18,8 +38,5 @@ public class Constants {
 	public static final String LOGIN_VIEW = "LoginView";
 	public static final String LOGOUT_VIEW = "LogoutView";
 	public static final String AUTHKEY_SHAREDPREFS_KEY = "fr.conferencehermes.confhermexam_AUTHKEY";
-	
-	public static String KEY_STATUS = "status";
-	public static String KEY_DATA = "data";
 
 }

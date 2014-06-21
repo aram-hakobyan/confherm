@@ -46,8 +46,7 @@ public class MyProfileFragment extends Fragment {
 
 
 
-		getActivity().runOnUiThread(new Runnable() {
-			public void run() {
+		
 				pFirsName.setText(pData.getFirstName());
 				pLastName.setText(pData.getLastName());
 				pUserName.setText("Username : " + pData.getUserName());
@@ -63,9 +62,8 @@ public class MyProfileFragment extends Fragment {
 						pGroups.append("Groups : " + gValue.toString());
 					}
 				}
-			}
-		});
-
+			
+		
 		return pFragment;
 	}
 

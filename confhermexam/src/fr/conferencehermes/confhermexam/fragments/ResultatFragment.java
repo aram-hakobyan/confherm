@@ -41,43 +41,46 @@ public class ResultatFragment extends Fragment {
 
 		listview = (ListView) fragment.findViewById(R.id.listViewResultat);
 
-		listview.setAdapter(adapter);
-
 		AQuery aq = new AQuery(getActivity());
-		String url = "http://ecni.conference-hermes.fr/api/resultlist";
+
 		HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
-				System.out.println(json.toString());
-				try {
-					if (json.has(Constants.KEY_STATUS)
-							&& json.get(Constants.KEY_STATUS) != null) {
-						if (json.getInt("status") == 200) {
-							// pData = JSONParser.parseProfileData(json);
-							// Profile uProf = new Profile();
-							rList = JSONParser.parseResults(json);
+		aq.ajax(Constants.RESULT_LIST_URL, params, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
+						System.out.println(json.toString());
+						try {
+							if (json.has(Constants.KEY_STATUS)
+									&& json.get(Constants.KEY_STATUS) != null) {
+								if (json.getInt("status") == 200) {
+									// pData =
+									// JSONParser.parseProfileData(json);
+									// Profile uProf = new Profile();
+									rList = JSONParser.parseResults(json);
 
-							if (rList.size() != 0) {
-								adapter = new ResultsAdapter(getActivity(),
-										rList);
-							} else {
-								Toast.makeText(
-										getActivity().getApplicationContext(),
-										"No Any Result", Toast.LENGTH_SHORT)
-										.show();
+									if (rList.size() != 0) {
+										adapter = new ResultsAdapter(
+												getActivity(), rList);
+										listview.setAdapter(adapter);
+									} else {
+										Toast.makeText(
+												getActivity()
+														.getApplicationContext(),
+												"No Any Result",
+												Toast.LENGTH_SHORT).show();
 
+									}
+								}
 							}
+						} catch (JSONException e) {
+							e.printStackTrace();
+
 						}
 					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-
-				}
-			}
-		});
+				});
 
 		return fragment;
 	}

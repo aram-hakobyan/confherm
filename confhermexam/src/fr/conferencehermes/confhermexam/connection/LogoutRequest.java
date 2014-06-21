@@ -20,29 +20,32 @@ public class LogoutRequest {
 	public static void logOut(Activity activity) {
 
 		AQuery aq = new AQuery(activity);
-		String url = "http://ecni.conference-hermes.fr/api/logout.php";
-		HashMap<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
-				System.out.println(json.toString());
-				try {
-					if (json.has(Constants.KEY_STATUS)
-							&& json.get(Constants.KEY_STATUS) != null) {
-						if (json.getInt("status") == 200) {
-							// pData = JSONParser.parseProfileData(json);
-							// Profile uProf = new Profile();
-							Log.i("logout", json + "");
+		HashMap<String, Object> params = new HashMap<String, Object>();
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+
+		aq.ajax(Constants.LOG_OUT_URL, params, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
+						System.out.println(json.toString());
+						try {
+							if (json.has(Constants.KEY_STATUS)
+									&& json.get(Constants.KEY_STATUS) != null) {
+								if (json.getInt("status") == 200) {
+									// pData =
+									// JSONParser.parseProfileData(json);
+									// Profile uProf = new Profile();
+									Log.i("logout", json + "");
+								}
+							}
+						} catch (JSONException e) {
+							e.printStackTrace();
+
 						}
 					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-
-				}
-			}
-		});
+				});
 	}
 
 }

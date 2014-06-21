@@ -44,7 +44,7 @@ public class ResultsAdapter extends BaseAdapter {
 	@Override
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		ViewHolder holder;
-
+		final int itemID = (int) mListItems.get(position).getExamId();
 		if (view == null) {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.resultat_rowview, null);
@@ -55,6 +55,7 @@ public class ResultsAdapter extends BaseAdapter {
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(c, NotesActivity.class);
+					intent.putExtra("exam_id", itemID);
 					c.startActivity(intent);
 				}
 			});
@@ -62,9 +63,8 @@ public class ResultsAdapter extends BaseAdapter {
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
-
 		String stringItem = (String) mListItems.get(position).getExamName();
-		int itemID = (int) mListItems.get(position).getExamId();
+		
 		if (stringItem != null) {
 			if (holder.name != null) {
 				holder.name.setText(stringItem);
@@ -72,6 +72,7 @@ public class ResultsAdapter extends BaseAdapter {
 				holder.status.setText("Note & Stats");
 			}
 		}
+
 
 		return view;
 

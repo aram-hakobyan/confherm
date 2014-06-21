@@ -64,37 +64,40 @@ public class ExercisesActivity extends FragmentActivity implements
 		});
 
 		AQuery aq = new AQuery(ExercisesActivity.this);
-		String url = "http://ecni.conference-hermes.fr/api/training";
+
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 		params.put("training_id", training_id);
 
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+		aq.ajax(Constants.TRAINING_URL, params, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
 
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
 
-				try {
-					if (json.has("data") && json.get("data") != null) {
-						exercises = JSONParser.parseTrainingExercises(json);
-						String[] data = new String[exercises.size()];
-						for (int i = 0; i < exercises.size(); i++) {
-							data[i] = exercises.get(i).getTitle();
+						try {
+							if (json.has("data") && json.get("data") != null) {
+								exercises = JSONParser
+										.parseTrainingExercises(json);
+								String[] data = new String[exercises.size()];
+								for (int i = 0; i < exercises.size(); i++) {
+									data[i] = exercises.get(i).getTitle();
+								}
+
+								adapter = new ArrayAdapter<String>(
+										ExercisesActivity.this, R.layout.item,
+										R.id.tvText, data);
+								gvMain = (GridView) findViewById(R.id.gvMain);
+								gvMain.setAdapter(adapter);
+
+							}
+						} catch (JSONException e) {
+							e.printStackTrace();
+
 						}
-
-						adapter = new ArrayAdapter<String>(
-								ExercisesActivity.this, R.layout.item,
-								R.id.tvText, data);
-						gvMain = (GridView) findViewById(R.id.gvMain);
-						gvMain.setAdapter(adapter);
-
 					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-
-				}
-			}
-		});
+				});
 
 	}
 
