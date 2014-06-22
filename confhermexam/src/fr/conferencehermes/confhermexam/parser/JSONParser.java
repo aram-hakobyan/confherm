@@ -7,8 +7,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Context;
-import android.content.SharedPreferences;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 
@@ -268,6 +266,34 @@ public class JSONParser {
 				exercise.setName(data.getString("name"));
 				exercise.setType(data.getString("type"));
 				exercise.setText(data.getString("text"));
+				exercise.setTeacher(data.getString("created_by"));
+
+				HashMap<String, String> eFiles = new HashMap<String, String>();
+				JSONObject filesExercise = (JSONObject) data
+						.getJSONObject("exercise_files");
+				JSONArray imgArrayExercise = (JSONArray) filesExercise
+						.getJSONArray("image");
+				if (imgArrayExercise.length() != 0) {
+					JSONObject imgObjExercise = (JSONObject) imgArrayExercise
+							.get(0);
+					eFiles.put("image", imgObjExercise.getString("file"));
+				}
+				JSONArray soundArrayExercise = (JSONArray) filesExercise
+						.getJSONArray("sound");
+				if (soundArrayExercise.length() != 0) {
+					JSONObject soundObjExercise = (JSONObject) soundArrayExercise
+							.get(0);
+					eFiles.put("sound", soundObjExercise.getString("file"));
+				}
+				JSONArray videoArrayExercise = (JSONArray) filesExercise
+						.getJSONArray("image");
+				if (videoArrayExercise.length() != 0) {
+					JSONObject videoObjExercise = (JSONObject) videoArrayExercise
+							.get(0);
+					eFiles.put("video", videoObjExercise.getString("file"));
+				}
+
+				exercise.setFiles(eFiles);
 
 				for (int k = 0; k < questions.length(); k++) {
 
@@ -276,7 +302,61 @@ public class JSONParser {
 					q.setId(qObj.getInt("question_id"));
 					q.setType(qObj.getString("question_type"));
 					q.setQuestionText(qObj.getString("question_text"));
-					q.setMcType(qObj.getString("correction"));
+					q.setCorrection(qObj.getString("correction"));
+					q.setInputCount(qObj.getString("input_count"));
+
+					HashMap<String, String> qFiles = new HashMap<String, String>();
+					JSONObject files = (JSONObject) qObj
+							.getJSONObject("question_files");
+					JSONArray imgArray = (JSONArray) files
+							.getJSONArray("image");
+					if (imgArray.length() != 0) {
+						JSONObject imgObj = (JSONObject) imgArray.get(0);
+						qFiles.put("image", imgObj.getString("file"));
+					}
+					JSONArray soundArray = (JSONArray) files
+							.getJSONArray("sound");
+					if (soundArray.length() != 0) {
+						JSONObject soundObj = (JSONObject) soundArray.get(0);
+						qFiles.put("sound", soundObj.getString("file"));
+					}
+					JSONArray videoArray = (JSONArray) files
+							.getJSONArray("image");
+					if (videoArray.length() != 0) {
+						JSONObject videoObj = (JSONObject) videoArray.get(0);
+						qFiles.put("video", videoObj.getString("file"));
+					}
+
+					q.setFiles(qFiles);
+
+					HashMap<String, String> qFilesCorrection = new HashMap<String, String>();
+					JSONObject correctionFiles = (JSONObject) qObj
+							.getJSONObject("question_correction_files");
+					JSONArray imgArrayCorrection = (JSONArray) correctionFiles
+							.getJSONArray("image");
+					if (imgArrayCorrection.length() != 0) {
+						JSONObject imgObjCorrection = (JSONObject) imgArrayCorrection
+								.get(0);
+						qFiles.put("image", imgObjCorrection.getString("file"));
+					}
+					JSONArray soundArrayCorrection = (JSONArray) files
+							.getJSONArray("sound");
+					if (soundArrayCorrection.length() != 0) {
+						JSONObject soundObjCorrection = (JSONObject) soundArrayCorrection
+								.get(0);
+						qFiles.put("sound",
+								soundObjCorrection.getString("file"));
+					}
+					JSONArray videoArrayCorrection = (JSONArray) files
+							.getJSONArray("image");
+					if (videoArrayCorrection.length() != 0) {
+						JSONObject videoObjCorrection = (JSONObject) videoArrayCorrection
+								.get(0);
+						qFiles.put("video",
+								videoObjCorrection.getString("file"));
+					}
+
+					q.setCorrectionFiles(qFilesCorrection);
 
 					JSONArray answers = (JSONArray) qObj
 							.getJSONArray("answers");

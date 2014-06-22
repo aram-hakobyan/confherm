@@ -51,8 +51,7 @@ public class QuestionsAdapter extends BaseAdapter {
 		}
 
 		if (holder.name != null) {
-			holder.name.setText("QUESTION "
-					+ (mListItems.get(position).getId()));
+			holder.name.setText("QUESTION " + (String.valueOf(position + 1)));
 		}
 
 		return view;

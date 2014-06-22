@@ -48,7 +48,7 @@ public class TrainingsFragment extends Fragment {
 				Intent intent = new Intent(getActivity(),
 						ExercisesActivity.class);
 				intent.putExtra("training_id", trainings.get(position).getId());
-				intent.putExtra("exam", true);
+				intent.putExtra("exam", false);
 				startActivity(intent);
 			}
 

@@ -1,6 +1,7 @@
 package fr.conferencehermes.confhermexam.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Exercise {
 	private int id;
@@ -8,6 +9,7 @@ public class Exercise {
 	private String type;
 	private String text;
 	private String intro;
+	private String teacher;
 	private String timeOpen;
 	private String timeClose;
 	private String timeLimit;
@@ -16,10 +18,12 @@ public class Exercise {
 	private ArrayList<Integer> questionIDs;
 	private String password;
 	private ArrayList<Question> questions;
+	private HashMap<String, String> files;
 
 	public Exercise() {
 		setQuestionIds(new ArrayList<Integer>());
 		setQuestions(new ArrayList<Question>());
+		setFiles(new HashMap<String, String>());
 	}
 
 	public int getId() {
@@ -124,6 +128,22 @@ public class Exercise {
 
 	public void setType(String type) {
 		this.type = type;
+	}
+
+	public String getTeacher() {
+		return teacher;
+	}
+
+	public void setTeacher(String teacher) {
+		this.teacher = teacher;
+	}
+
+	public HashMap<String, String> getFiles() {
+		return files;
+	}
+
+	public void setFiles(HashMap<String, String> files) {
+		this.files = files;
 	}
 
 }

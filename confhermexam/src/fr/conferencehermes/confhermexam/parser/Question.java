@@ -1,6 +1,7 @@
 package fr.conferencehermes.confhermexam.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Question {
 	private int id;
@@ -9,10 +10,15 @@ public class Question {
 	private String type;
 	private String createdBy;
 	private ArrayList<Answer> answers;
-	private String mcType;
+	private String correction;
+	private String inputCount;
+	private HashMap<String, String> files;
+	private HashMap<String, String> correctionFiles;
 
 	public Question() {
 		setAnswers(new ArrayList<Answer>());
+		setFiles(new HashMap<String, String>());
+		setCorrectionFiles(new HashMap<String, String>());
 	}
 
 	public int getId() {
@@ -63,12 +69,36 @@ public class Question {
 		this.answers = answers;
 	}
 
-	public String getMcType() {
-		return mcType;
+	public String getCorrection() {
+		return correction;
 	}
 
-	public void setMcType(String string) {
-		this.mcType = string;
+	public void setCorrection(String string) {
+		this.correction = string;
+	}
+
+	public String getInputCount() {
+		return inputCount;
+	}
+
+	public void setInputCount(String inputCount) {
+		this.inputCount = inputCount;
+	}
+
+	public HashMap<String, String> getFiles() {
+		return files;
+	}
+
+	public void setFiles(HashMap<String, String> files) {
+		this.files = files;
+	}
+
+	public HashMap<String, String> getCorrectionFiles() {
+		return correctionFiles;
+	}
+
+	public void setCorrectionFiles(HashMap<String, String> correctionFiles) {
+		this.correctionFiles = correctionFiles;
 	}
 
 }
