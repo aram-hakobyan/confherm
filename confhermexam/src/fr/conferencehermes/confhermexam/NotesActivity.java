@@ -78,7 +78,7 @@ public class NotesActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				exerciseResult(NotesActivity.this, 0, examID, true, true);
+				exerciseResult(NotesActivity.this, 0, examID, 1, 1);
 				// progressBarNotes.setVisibility(View.VISIBLE);
 				// listviewEx.setVisibility(View.GONE);
 
@@ -170,7 +170,7 @@ public class NotesActivity extends Activity {
 	}
 
 	public void exerciseResult(Context context, int exerscieID, int examID,
-			boolean globalTest, boolean groups) {
+			int globalTest, int groups) {
 		AQuery aqNotes = new AQuery(context);
 
 		HashMap<String, Object> paramsNotes = new HashMap<String, Object>();
