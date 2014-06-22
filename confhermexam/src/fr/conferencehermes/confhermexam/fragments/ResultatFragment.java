@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.androidquery.AQuery;
@@ -30,6 +31,7 @@ public class ResultatFragment extends Fragment {
 	private ResultsAdapter adapter;
 	// private ArrayList<Res> pData;
 	ArrayList<Result> rList;
+	ProgressBar progressBar;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -38,6 +40,8 @@ public class ResultatFragment extends Fragment {
 				false);
 
 		rList = new ArrayList<Result>();
+
+		progressBar = (ProgressBar) fragment.findViewById(R.id.resultProgress);
 
 		listview = (ListView) fragment.findViewById(R.id.listViewResultat);
 
@@ -65,6 +69,7 @@ public class ResultatFragment extends Fragment {
 										adapter = new ResultsAdapter(
 												getActivity(), rList);
 										listview.setAdapter(adapter);
+										progressBar.setVisibility(View.GONE);
 									} else {
 										Toast.makeText(
 												getActivity()

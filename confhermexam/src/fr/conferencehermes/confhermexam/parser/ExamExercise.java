@@ -1,8 +1,8 @@
 package fr.conferencehermes.confhermexam.parser;
 
 public class ExamExercise {
-	private String created_by;
-	private String exam_name;
+	public static String created_by;
+	public static String exam_name;
 	private int exercise_id;
 	private String exercise_name;
 	private boolean past_exercise;

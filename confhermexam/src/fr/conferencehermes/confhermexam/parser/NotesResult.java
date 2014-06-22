@@ -5,8 +5,8 @@ public class NotesResult {
 	private String name;
 	private int score;
 	private int rank;
-	private int moyenne_score;
-	private int median_score;
+	public static int moyenne_score;
+	public static int median_score;
 
 	public NotesResult() {
 
