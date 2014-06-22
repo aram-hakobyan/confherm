@@ -63,12 +63,13 @@ public class JSONParser {
 				for (int i = 0; i < content.length(); i++) {
 					JSONObject obj = (JSONObject) content.get(i);
 					Exam e = new Exam();
-					e.setId(obj.getInt("examId"));
-					e.setTitle(obj.getString("title"));
-					e.setShortTitle("shrt_title");
-					e.setCategoryType("categry_type");
-					e.setStartDate("startdate");
-					e.setDescription("description");
+					e.setId(obj.getInt("exam_id"));
+					e.setEventId(obj.getInt("event_id"));
+					e.setTitle(obj.getString("exam_name"));
+					e.setCategoryType(obj.getString("category_type"));
+					e.setStartDate(obj.getInt("start_date"));
+					e.setEndDate(obj.getInt("end_date"));
+					e.setStatus(obj.getInt("status"));
 					exams.add(e);
 				}
 			}
@@ -78,6 +79,32 @@ public class JSONParser {
 
 		DataHolder.getInstance().setExams(exams);
 		return exams;
+	}
+
+	public static ArrayList<DownloadInstance> parseDownloads(JSONObject json) {
+		ArrayList<DownloadInstance> downloads = null;
+		try {
+			JSONArray content = json.getJSONArray(Constants.KEY_DATA);
+			downloads = new ArrayList<DownloadInstance>();
+
+			if (content.length() != 0) {
+				for (int i = 0; i < content.length(); i++) {
+					JSONObject obj = (JSONObject) content.get(i);
+					DownloadInstance d = new DownloadInstance();
+					d.setEventId(obj.getInt("event_id"));
+					d.setName(obj.getString("exam_name"));
+					d.setDownloadUrl(obj.getString("download_url"));
+					d.setRemoveUrl(obj.getString("remove_url"));
+					d.setStatus(obj.getInt("status"));
+					downloads.add(d);
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		DataHolder.getInstance().setDownloads(downloads);
+		return downloads;
 	}
 
 	public static Profile parseProfileData(JSONObject uJson) {
@@ -158,19 +185,17 @@ public class JSONParser {
 				NotesResult exR = new NotesResult();
 
 				JSONObject obj = exRJson.getJSONObject(Constants.KEY_DATA);
-				
-				 
-				 exR.setMedianScore(obj.getInt("median_score"));
-				 exR.setMonenneScore(obj.getInt("moyenne_score"));
-				 
-				 JSONArray data = obj.getJSONArray(Constants.KEY_RESULTS);
+
+				exR.setMedianScore(obj.getInt("median_score"));
+				exR.setMonenneScore(obj.getInt("moyenne_score"));
+
+				JSONArray data = obj.getJSONArray(Constants.KEY_RESULTS);
 
 				if (data.length() != 0) {
 
 					for (int i = 0; i < data.length(); i++) {
 						JSONObject gObj = data.getJSONObject(i);
 
-						
 						exR.setStudentId(gObj.getInt("student_id"));
 						exR.setRank(gObj.getInt("rank"));
 						exR.setStudentName(gObj.getString("name"));

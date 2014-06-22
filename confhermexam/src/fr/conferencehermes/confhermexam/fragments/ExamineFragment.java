@@ -23,16 +23,16 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.ExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
-import fr.conferencehermes.confhermexam.adapters.TrainingsAdapter;
+import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
+import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
-import fr.conferencehermes.confhermexam.parser.Training;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class ExamineFragment extends Fragment {
 	LayoutInflater inflater;
 	ListView listview;
-	TrainingsAdapter adapter;
-	ArrayList<Training> trainings;
+	ExamsAdapter adapter;
+	ArrayList<Exam> exams;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,11 +45,7 @@ public class ExamineFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Intent intent = new Intent(getActivity(),
-						ExercisesActivity.class);
-				intent.putExtra("training_id", trainings.get(position).getId());
-				intent.putExtra("exam", true);
-				startActivity(intent);
+
 			}
 
 		});
@@ -59,7 +55,7 @@ public class ExamineFragment extends Fragment {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		aq.ajax(Constants.TRAINING_LIST_URL, params, JSONObject.class,
+		aq.ajax(Constants.EXAM_LIST_URL, params, JSONObject.class,
 				new AjaxCallback<JSONObject>() {
 					@Override
 					public void callback(String url, JSONObject json,
@@ -67,10 +63,10 @@ public class ExamineFragment extends Fragment {
 
 						try {
 							if (json.has("data") && json.get("data") != null) {
-								trainings = JSONParser.parseTrainings(json);
+								exams = JSONParser.parseExams(json);
 								if (adapter == null) {
-									adapter = new TrainingsAdapter(
-											getActivity(), trainings);
+									adapter = new ExamsAdapter(getActivity(),
+											exams);
 								} else {
 									adapter.notifyDataSetChanged();
 								}

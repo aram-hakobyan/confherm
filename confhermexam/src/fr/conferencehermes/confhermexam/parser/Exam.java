@@ -2,10 +2,13 @@ package fr.conferencehermes.confhermexam.parser;
 
 public class Exam {
 	private int id;
+	private int eventId;
 	private String title;
 	private String shortTitle;
 	private String categoryType;
-	private String startDate;
+	private int startDate;
+	private int endDate;
+	private int status;
 	private String description;
 
 	public Exam() {
@@ -43,11 +46,11 @@ public class Exam {
 		this.categoryType = categoryType;
 	}
 
-	public String getStartDate() {
+	public int getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(String startDate) {
+	public void setStartDate(int startDate) {
 		this.startDate = startDate;
 	}
 
@@ -57,5 +60,29 @@ public class Exam {
 
 	public void setDescription(String description) {
 		this.description = description;
+	}
+
+	public int getEventId() {
+		return eventId;
+	}
+
+	public void setEventId(int eventId) {
+		this.eventId = eventId;
+	}
+
+	public int getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(int endDate) {
+		this.endDate = endDate;
+	}
+
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
 	}
 }
