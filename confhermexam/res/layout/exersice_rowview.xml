@@ -4,7 +4,8 @@
     android:layout_height="match_parent"
     android:layout_margin="20dp"
     android:background="#86adbd"
-    android:gravity="center"
+    android:gravity="right"
+    android:layout_gravity="right"
     android:minHeight="30dp"
     android:orientation="horizontal" >
 
@@ -14,7 +15,7 @@
         android:layout_height="match_parent"
         android:layout_margin="10dp"
         android:gravity="center"
-        android:text=""
+       
         android:textColor="#fff"
         android:textSize="20sp" />
 

@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
@@ -20,6 +21,8 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -36,17 +39,24 @@ import fr.conferencehermes.confhermexam.util.Constants;
 
 public class NotesActivity extends Activity {
 	private LayoutInflater inflater;
-	private ListView listviewNt;
-	private NotesAdapter adapterNt;
+	private static ListView listviewNt;
+	// private NotesAdapter adapterNt;
 	private ListView listviewEx;
 	private ExerciseAdapter adapterEx;
-	private int examID;
-	private ArrayList<NotesResult> listNt;
-	private TextView teacherName, examName, medianScore, moyenneScore;
+
+	private static TextView teacherName, examName, medianScore, moyenneScore;
 	private ArrayList<ExamExercise> listEx;
 	private ExamExercise ex;
-	private ProgressBar progressBarNotes;
+	private static ProgressBar progressBarNotes;
 	private ImageView targetMe;
+
+	static NotesAdapter adapterNt;
+	private TextView globalTest;
+	int paramExersiceId = -1;
+	int paramExamId = -1;
+	int paramGlobalTest = 1;
+
+	int paramGroups = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,32 +68,67 @@ public class NotesActivity extends Activity {
 
 		teacherName = (TextView) findViewById(R.id.teacherName);
 		examName = (TextView) findViewById(R.id.examName);
-
+		globalTest = (TextView) findViewById(R.id.globalTest);
 		medianScore = (TextView) findViewById(R.id.medianScore);
 		moyenneScore = (TextView) findViewById(R.id.moyenneScore);
 		targetMe = (ImageView) findViewById(R.id.targetMe);
 		progressBarNotes = (ProgressBar) findViewById(R.id.progressBarNotes);
 		try {
 			Intent intent = getIntent();
-			examID = intent.getIntExtra("exam_id", 0);
+			paramExamId = intent.getIntExtra("exam_id", 0);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+	
+		exerciseResult(NotesActivity.this);
 
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
 
-		listviewEx.setOnItemClickListener(new OnItemClickListener() {
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view,
-					int position, long id) {
+		/*
+		 * listviewEx.setOnItemClickListener(new OnItemClickListener() {
+		 * 
+		 * @Override public void onItemClick(AdapterView<?> parent, View view,
+		 * int position, long id) { globalOrExercise = -1; //
+		 * exerciseResult(NotesActivity.this, -1, examID, // globalOrExercise,
+		 * 1); progressBarNotes.setVisibility(View.VISIBLE);
+		 * listviewNt.setVisibility(View.GONE);
+		 * 
+		 * }
+		 * 
+		 * });
+		 */
+		globalTest.setOnClickListener(new OnClickListener() {
 
-				exerciseResult(NotesActivity.this, 0, examID, 1, 1);
-				// progressBarNotes.setVisibility(View.VISIBLE);
-				// listviewEx.setVisibility(View.GONE);
+			@Override
+			public void onClick(View v) {
+				paramExersiceId = -1;
+				paramGlobalTest = 1;
+				exerciseResult(NotesActivity.this);
+			}
+		});
+
+		RadioGroup radioGroup = (RadioGroup) findViewById(R.id.radioGroupPG);
+		radioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			public void onCheckedChanged(RadioGroup group, int checkedId) {
+
+				if (checkedId == R.id.radio_globe) {
+
+					paramGroups = 0;
+					exerciseResult(NotesActivity.this);
+					Toast.makeText(getApplicationContext(), "radio_globe",
+							Toast.LENGTH_SHORT).show();
+
+				} else if (checkedId == R.id.radio_people) {
+					paramGroups = 1;
+					exerciseResult(NotesActivity.this);
+					Toast.makeText(getApplicationContext(), "radio_people",
+							Toast.LENGTH_SHORT).show();
+
+				}
 
 			}
-
 		});
 
 		targetMe.setOnClickListener(new OnClickListener() {
@@ -109,7 +154,7 @@ public class NotesActivity extends Activity {
 
 		paramsExersice.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		paramsExersice.put(Constants.KEY_EXAM_ID, examID);
+		paramsExersice.put(Constants.KEY_EXAM_ID, paramExamId);
 
 		aqExersice.ajax(Constants.CURRENT_EXAM_URL, paramsExersice,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
@@ -169,17 +214,18 @@ public class NotesActivity extends Activity {
 		return false;
 	}
 
-	public void exerciseResult(Context context, int exerscieID, int examID,
-			int globalTest, int groups) {
+	public void exerciseResult(final Context context) {
 		AQuery aqNotes = new AQuery(context);
 
 		HashMap<String, Object> paramsNotes = new HashMap<String, Object>();
 
 		paramsNotes.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
-		paramsNotes.put(Constants.KEY_EXERCSICE_ID, exerscieID);
-		paramsNotes.put(Constants.KEY_EXAM_ID, examID);
-		paramsNotes.put(Constants.KEY_GLOBAL_TEST, globalTest);
-		paramsNotes.put(Constants.KEY_GROUPS, groups);
+		paramsNotes.put(Constants.KEY_EXERCSICE_ID, paramExersiceId);
+		paramsNotes.put(Constants.KEY_EXAM_ID, paramExamId);
+		paramsNotes.put(Constants.KEY_GLOBAL_TEST, paramGlobalTest);
+		paramsNotes.put(Constants.KEY_GROUPS, paramGroups);
+
+		Log.i("Request*****", paramsNotes + "");
 
 		aqNotes.ajax(Constants.EXERCISE_RESULT_URL, paramsNotes,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
@@ -194,26 +240,26 @@ public class NotesActivity extends Activity {
 									&& json.get(Constants.KEY_STATUS) != null) {
 								if (json.getInt("status") == 200) {
 									// pData =
+									ArrayList<NotesResult> listNt;
 									listNt = JSONParser
 											.parseExerciseResult(json);
 
 									if (listNt.size() != 0) {
-										adapterNt = new NotesAdapter(
-												NotesActivity.this, listNt);
+										adapterNt = new NotesAdapter(context,
+												listNt);
 										listviewNt.setAdapter(adapterNt);
 
 										medianScore.setText("Median :"
 												+ String.valueOf(NotesResult.median_score));
 										moyenneScore.setText("Moyenne :"
 												+ String.valueOf(NotesResult.moyenne_score));
-										// progressBarNotes
-										// .setVisibility(View.GONE);
-										// listviewEx.setVisibility(View.VISIBLE);
+										progressBarNotes
+												.setVisibility(View.GONE);
+										listviewNt.setVisibility(View.VISIBLE);
 									} else {
 
 										Toast.makeText(
-												NotesActivity.this
-														.getApplicationContext(),
+												context.getApplicationContext(),
 												"No Any Result",
 												Toast.LENGTH_SHORT).show();
 									}
@@ -221,8 +267,7 @@ public class NotesActivity extends Activity {
 								} else {
 
 									Toast.makeText(
-											NotesActivity.this
-													.getApplicationContext(),
+											context.getApplicationContext(),
 											json.getInt("status"),
 											Toast.LENGTH_SHORT).show();
 
@@ -235,6 +280,22 @@ public class NotesActivity extends Activity {
 					};
 				});
 
+	}
+
+	public int getParamExersiceId() {
+		return paramExersiceId;
+	}
+
+	public void setParamExersiceId(int paramExersiceId) {
+		this.paramExersiceId = paramExersiceId;
+	}
+
+	public int getParamGlobalTest() {
+		return paramGlobalTest;
+	}
+
+	public void setParamGlobalTest(int paramGlobalTest) {
+		this.paramGlobalTest = paramGlobalTest;
 	}
 
 }
