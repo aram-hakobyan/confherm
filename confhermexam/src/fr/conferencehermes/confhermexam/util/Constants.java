@@ -25,6 +25,7 @@ public class Constants {
 	public static String KEY_AUTH_TOKEN = "auth_key";
 	public static String KEY_STATUS = "status";
 	public static String KEY_DATA = "data";
+	public static String KEY_RESULTS = "results";
 	public static String KEY_EXERCSICE_ID = "exercise_id";
 	public static String KEY_EXAM_ID = "exam_id";
 	public static String KEY_GLOBAL_TEST = "global_test";

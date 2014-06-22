@@ -5,6 +5,7 @@
     android:background="@android:color/white" >
 
     <RelativeLayout
+        android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentTop="true"
@@ -43,18 +44,18 @@
             android:textSize="20sp" />
 
         <TextView
+            android:id="@+id/moyenneScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="120dp"
-            android:text="Moyenne : 290"
             android:textColor="@color/app_main_color"
             android:textSize="20sp" />
 
         <TextView
+            android:id="@+id/medianScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="| Median : 280"
             android:textColor="@color/app_main_color"
             android:textSize="20sp" />
 
@@ -156,7 +157,6 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="100dp"
         android:layout_marginTop="110dp"
-      
         android:textColor="@color/app_main_color"
         android:textSize="20sp" />
 
@@ -167,7 +167,6 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/teacherName"
         android:layout_marginRight="100dp"
-
         android:textColor="@color/app_main_color"
         android:textSize="20sp" />
 
@@ -196,5 +195,14 @@
         android:layout_marginTop="10dp"
         android:choiceMode="singleChoice" >
     </ListView>
+
+    <ProgressBar
+        android:id="@+id/progressBarNotes"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:visibility="gone" />
 
 </RelativeLayout>

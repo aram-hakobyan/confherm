@@ -157,16 +157,22 @@ public class JSONParser {
 		try {
 			if (exRJson.has(Constants.KEY_DATA)
 					&& exRJson.get(Constants.KEY_DATA) != null) {
-				// JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
-				JSONArray data = exRJson.getJSONArray(Constants.KEY_DATA);
+				NotesResult exR = new NotesResult();
+
+				JSONObject obj = exRJson.getJSONObject(Constants.KEY_DATA);
+				
+				 
+				 exR.setMedianScore(obj.getInt("median_score"));
+				 exR.setMonenneScore(obj.getInt("moyenne_score"));
+				 
+				 JSONArray data = obj.getJSONArray(Constants.KEY_RESULTS);
 
 				if (data.length() != 0) {
 
 					for (int i = 0; i < data.length(); i++) {
 						JSONObject gObj = data.getJSONObject(i);
 
-						NotesResult exR = new NotesResult();
-
+						
 						exR.setStudentId(gObj.getInt("student_id"));
 						exR.setRank(gObj.getInt("rank"));
 						exR.setStudentName(gObj.getString("name"));
@@ -193,7 +199,7 @@ public class JSONParser {
 				ExamExercise exR = new ExamExercise();
 				JSONObject obj = exEJson.getJSONObject(Constants.KEY_DATA);
 
-				exR.setCreatedBy(obj.getString("creted_by"));
+				exR.setCreatedBy(obj.getString("created_by"));
 				exR.setExamName(obj.getString("exam_name"));
 
 				JSONArray dataExercises = obj.getJSONArray("exercises");

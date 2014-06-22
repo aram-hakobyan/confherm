@@ -17,6 +17,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,9 +40,10 @@ public class NotesActivity extends Activity {
 	private ExerciseAdapter adapterEx;
 	private int examID;
 	private ArrayList<NotesResult> listNt;
-	private TextView teacherName, examName;
+	private TextView teacherName, examName, medianScore, moyenneScore;
 	private ArrayList<ExamExercise> listEx;
 	private ExamExercise ex;
+	private ProgressBar progressBarNotes;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +56,10 @@ public class NotesActivity extends Activity {
 		teacherName = (TextView) findViewById(R.id.teacherName);
 		examName = (TextView) findViewById(R.id.examName);
 
+		medianScore = (TextView) findViewById(R.id.medianScore);
+		moyenneScore = (TextView) findViewById(R.id.moyenneScore);
+
+		progressBarNotes = (ProgressBar) findViewById(R.id.progressBarNotes);
 		try {
 			Intent intent = getIntent();
 			examID = intent.getIntExtra("exam_id", 0);
@@ -69,66 +75,13 @@ public class NotesActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
+				exerciseResult(NotesActivity.this, 0, examID, true, true);
+				// progressBarNotes.setVisibility(View.VISIBLE);
+				// listviewEx.setVisibility(View.GONE);
+
 			}
 
 		});
-
-		AQuery aqNotes = new AQuery(NotesActivity.this);
-
-		HashMap<String, Object> paramsNotes = new HashMap<String, Object>();
-
-		paramsNotes.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
-		// params.put(Constants.KEY_EXERCSICE_ID, JSONParser.AUTH_KEY);
-		paramsNotes.put(Constants.KEY_EXAM_ID, examID);
-		paramsNotes.put(Constants.KEY_GLOBAL_TEST, true);
-		paramsNotes.put(Constants.KEY_GROUPS, true);
-
-		aqNotes.ajax(Constants.EXERCISE_RESULT_URL, paramsNotes,
-				JSONObject.class, new AjaxCallback<JSONObject>() {
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
-						if (json.toString() == null)
-
-							System.out.println(json.toString());
-						try {
-							if (json.has(Constants.KEY_STATUS)
-									&& json.get(Constants.KEY_STATUS) != null) {
-								if (json.getInt("status") == 200) {
-									// pData =
-									listNt = JSONParser
-											.parseExerciseResult(json);
-
-									if (listNt.size() != 0) {
-										adapterNt = new NotesAdapter(
-												NotesActivity.this, listNt);
-										listviewNt.setAdapter(adapterNt);
-
-									} else {
-
-										Toast.makeText(
-												NotesActivity.this
-														.getApplicationContext(),
-												"No Any Result",
-												Toast.LENGTH_SHORT).show();
-									}
-
-								} else {
-
-									Toast.makeText(
-											NotesActivity.this
-													.getApplicationContext(),
-											json.getInt("status"),
-											Toast.LENGTH_SHORT).show();
-
-								}
-							}
-						} catch (JSONException e) {
-							e.printStackTrace();
-
-						}
-					};
-				});
 
 		AQuery aqExersice = new AQuery(NotesActivity.this);
 
@@ -158,8 +111,9 @@ public class NotesActivity extends Activity {
 												NotesActivity.this, listEx);
 										listviewEx.setAdapter(adapterEx);
 
-										teacherName.setText(ex.getCreatedBy());
-										//examName.setText(text);
+										teacherName
+												.setText(ExamExercise.created_by);
+										examName.setText(ExamExercise.exam_name);
 
 									} else {
 
@@ -193,6 +147,74 @@ public class NotesActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return false;
+	}
+
+	public void exerciseResult(Context context, int exerscieID, int examID,
+			boolean globalTest, boolean groups) {
+		AQuery aqNotes = new AQuery(context);
+
+		HashMap<String, Object> paramsNotes = new HashMap<String, Object>();
+
+		paramsNotes.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		paramsNotes.put(Constants.KEY_EXERCSICE_ID, exerscieID);
+		paramsNotes.put(Constants.KEY_EXAM_ID, examID);
+		paramsNotes.put(Constants.KEY_GLOBAL_TEST, globalTest);
+		paramsNotes.put(Constants.KEY_GROUPS, groups);
+
+		aqNotes.ajax(Constants.EXERCISE_RESULT_URL, paramsNotes,
+				JSONObject.class, new AjaxCallback<JSONObject>() {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
+						if (json.toString() == null)
+
+							System.out.println(json.toString());
+						try {
+							if (json.has(Constants.KEY_STATUS)
+									&& json.get(Constants.KEY_STATUS) != null) {
+								if (json.getInt("status") == 200) {
+									// pData =
+									listNt = JSONParser
+											.parseExerciseResult(json);
+
+									if (listNt.size() != 0) {
+										adapterNt = new NotesAdapter(
+												NotesActivity.this, listNt);
+										listviewNt.setAdapter(adapterNt);
+
+										medianScore.setText("Median :"
+												+ String.valueOf(NotesResult.median_score));
+										moyenneScore.setText("Moyenne :"
+												+ String.valueOf(NotesResult.moyenne_score));
+										// progressBarNotes
+										// .setVisibility(View.GONE);
+										// listviewEx.setVisibility(View.VISIBLE);
+									} else {
+
+										Toast.makeText(
+												NotesActivity.this
+														.getApplicationContext(),
+												"No Any Result",
+												Toast.LENGTH_SHORT).show();
+									}
+
+								} else {
+
+									Toast.makeText(
+											NotesActivity.this
+													.getApplicationContext(),
+											json.getInt("status"),
+											Toast.LENGTH_SHORT).show();
+
+								}
+							}
+						} catch (JSONException e) {
+							e.printStackTrace();
+
+						}
+					};
+				});
+
 	}
 
 }
