@@ -68,7 +68,7 @@ public class ResultsAdapter extends BaseAdapter {
 		if (stringItem != null) {
 			if (holder.name != null) {
 				holder.name.setText(stringItem);
-				holder.desc.setText("Voir la correction" + itemID);
+				holder.desc.setText("Voir la correction");
 				holder.status.setText("Note & Stats");
 			}
 		}

@@ -7,7 +7,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,7 +20,6 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
-import fr.conferencehermes.confhermexam.ExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
 import fr.conferencehermes.confhermexam.parser.Exam;
@@ -29,6 +27,7 @@ import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class ExamineFragment extends Fragment {
+
 	LayoutInflater inflater;
 	ListView listview;
 	ExamsAdapter adapter;

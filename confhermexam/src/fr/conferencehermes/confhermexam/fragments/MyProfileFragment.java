@@ -4,6 +4,7 @@ import java.util.Map;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,26 +45,31 @@ public class MyProfileFragment extends Fragment {
 			}
 		});
 
+		pFirsName.setText(pData.getFirstName());
+		pLastName.setText(pData.getLastName());
+		pUserName.setText("Username : " + pData.getUserName());
+		pEmailAdress.setText("Email : " + pData.getEmailAdress());
 
-
+		if (pData.getGroups().size() == 0) {
+			pGroups.setText("Groups : " + "no groups available");
+		} else {
+			Handler h = new Handler(getActivity().getMainLooper());
 		
-				pFirsName.setText(pData.getFirstName());
-				pLastName.setText(pData.getLastName());
-				pUserName.setText("Username : " + pData.getUserName());
-				pEmailAdress.setText("Email : " + pData.getEmailAdress());
+			pGroups.setText("Groups : ");
+			for (Map.Entry<String, String> entry : pData.getGroups().entrySet()) {
+				String gKey = entry.getKey();
+				final String gValue = entry.getValue();
 
-				if (pData.getGroups().size() == 0) {
-					pGroups.setText("Groups : " + "no groups available");
-				} else {
-					for (Map.Entry<String, String> entry : pData.getGroups()
-							.entrySet()) {
-						String gKey = entry.getKey();
-						String gValue = entry.getValue();
-						pGroups.append("Groups : " + gValue.toString());
+				h.post(new Runnable() {
+					@Override
+					public void run() {
+						pGroups.append("\n" +gValue.toString());
 					}
-				}
-			
-		
+				});
+
+			}
+		}
+
 		return pFragment;
 	}
 

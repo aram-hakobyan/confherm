@@ -13,9 +13,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,6 +46,7 @@ public class NotesActivity extends Activity {
 	private ArrayList<ExamExercise> listEx;
 	private ExamExercise ex;
 	private ProgressBar progressBarNotes;
+	private ImageView targetMe;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +61,7 @@ public class NotesActivity extends Activity {
 
 		medianScore = (TextView) findViewById(R.id.medianScore);
 		moyenneScore = (TextView) findViewById(R.id.moyenneScore);
-
+		targetMe = (ImageView) findViewById(R.id.targetMe);
 		progressBarNotes = (ProgressBar) findViewById(R.id.progressBarNotes);
 		try {
 			Intent intent = getIntent();
@@ -75,12 +78,29 @@ public class NotesActivity extends Activity {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				exerciseResult(NotesActivity.this, 0, examID, true, true);
+				exerciseResult(NotesActivity.this, 0, examID, 1, 1);
 				// progressBarNotes.setVisibility(View.VISIBLE);
 				// listviewEx.setVisibility(View.GONE);
 
 			}
 
+		});
+
+		targetMe.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Toast.makeText(NotesActivity.this, JSONParser.USER_ID,
+						Toast.LENGTH_SHORT).show();
+
+				// For a direct scroll:
+				// listviewNt.getListView().setSelection(21);
+
+				// For a smooth scroll:
+				// getListView().smoothScrollToPosition(21);
+
+			}
 		});
 
 		AQuery aqExersice = new AQuery(NotesActivity.this);
@@ -150,7 +170,7 @@ public class NotesActivity extends Activity {
 	}
 
 	public void exerciseResult(Context context, int exerscieID, int examID,
-			boolean globalTest, boolean groups) {
+			int globalTest, int groups) {
 		AQuery aqNotes = new AQuery(context);
 
 		HashMap<String, Object> paramsNotes = new HashMap<String, Object>();
