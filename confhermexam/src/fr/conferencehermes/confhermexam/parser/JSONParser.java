@@ -13,13 +13,15 @@ import fr.conferencehermes.confhermexam.util.DataHolder;
 public class JSONParser {
 
 	public static String AUTH_KEY;
-
+	public static String USER_ID;
+	
 	public static void parseLoginData(String pData) {
 
 		try {
 			JSONObject jsonObj = new JSONObject(pData);
 			JSONObject data = jsonObj.getJSONObject("data");
-			String userId = data.getString("user_id");
+			
+			USER_ID = data.getString("user_id");
 			AUTH_KEY = data.getString("auth_key");
 
 		} catch (JSONException e) {
@@ -95,11 +97,9 @@ public class JSONParser {
 
 					for (int i = 0; i < groupArr.length(); i++) {
 						JSONObject gObj = groupArr.getJSONObject(i);
-
 						String gID = gObj.getString("group_id");
 						String gName = gObj.getString("name");
-						groups.put("GroudID", gID);
-						groups.put("GroupName", gName);
+						groups.put(gID, gName);
 
 					}
 
@@ -158,19 +158,17 @@ public class JSONParser {
 				NotesResult exR = new NotesResult();
 
 				JSONObject obj = exRJson.getJSONObject(Constants.KEY_DATA);
-				
-				 
-				 exR.setMedianScore(obj.getInt("median_score"));
-				 exR.setMonenneScore(obj.getInt("moyenne_score"));
-				 
-				 JSONArray data = obj.getJSONArray(Constants.KEY_RESULTS);
+
+				exR.setMedianScore(obj.getInt("median_score"));
+				exR.setMonenneScore(obj.getInt("moyenne_score"));
+
+				JSONArray data = obj.getJSONArray(Constants.KEY_RESULTS);
 
 				if (data.length() != 0) {
 
 					for (int i = 0; i < data.length(); i++) {
 						JSONObject gObj = data.getJSONObject(i);
 
-						
 						exR.setStudentId(gObj.getInt("student_id"));
 						exR.setRank(gObj.getInt("rank"));
 						exR.setStudentName(gObj.getString("name"));

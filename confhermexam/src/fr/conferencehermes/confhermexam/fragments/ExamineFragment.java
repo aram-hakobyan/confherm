@@ -29,10 +29,10 @@ import fr.conferencehermes.confhermexam.parser.Training;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class ExamineFragment extends Fragment {
-	LayoutInflater inflater;
-	ListView listview;
-	TrainingsAdapter adapter;
-	ArrayList<Training> trainings;
+	private LayoutInflater inflater;
+	private ListView listview;
+	private TrainingsAdapter adapter;
+	private ArrayList<Training> trainings;  
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
