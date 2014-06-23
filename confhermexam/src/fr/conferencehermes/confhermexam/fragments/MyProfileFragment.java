@@ -2,16 +2,19 @@ package fr.conferencehermes.confhermexam.fragments;
 
 import java.util.Map;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import fr.conferencehermes.confhermexam.LoginActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.Profile;
 
-public class MyProfileFragment extends Fragment {
+public class MyProfileFragment extends Fragment implements OnClickListener {
 
 	private static Profile pData;
 	private TextView pFirsName, pLastName, pUserName, pEmailAdress, pGroups;
@@ -26,6 +29,8 @@ public class MyProfileFragment extends Fragment {
 		pUserName = (TextView) pFragment.findViewById(R.id.pUsername);
 		pEmailAdress = (TextView) pFragment.findViewById(R.id.pEmail);
 		pGroups = (TextView) pFragment.findViewById(R.id.pGroups);
+
+		pFragment.findViewById(R.id.logout).setOnClickListener(this);
 
 		// pData = new Profile();
 
@@ -57,5 +62,22 @@ public class MyProfileFragment extends Fragment {
 
 	public static void setProfileData(Profile profileData) {
 		pData = profileData;
+	}
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.logout:
+			Intent intent = new Intent(getActivity(), LoginActivity.class);
+			intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+					| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+			startActivity(intent);
+			getActivity().finish();
+			break;
+
+		default:
+			break;
+		}
+
 	}
 }

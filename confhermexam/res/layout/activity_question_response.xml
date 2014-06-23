@@ -79,21 +79,21 @@
         android:orientation="horizontal" >
 
         <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:background="@drawable/ic_camera" >
         </ImageView>
 
         <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_marginLeft="10dp"
             android:background="@drawable/ic_sound" >
         </ImageView>
 
         <ImageView
-            android:layout_width="15dp"
-            android:layout_height="15dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_marginLeft="10dp"
             android:background="@drawable/ic_video" >
         </ImageView>
@@ -111,6 +111,7 @@
             android:id="@+id/answersLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:orientation="vertical" >
         </LinearLayout>
     </ScrollView>
@@ -140,7 +141,11 @@
         android:layout_marginTop="10dp"
         android:choiceMode="singleChoice"
         android:divider="@android:color/transparent"
-        android:dividerHeight="1dp" >
+        android:dividerHeight="1dp"
+        android:drawSelectorOnTop="false"
+        android:fadingEdge="vertical"
+        android:smoothScrollbar="true"
+        android:soundEffectsEnabled="true" >
     </ListView>
 
     <TextView

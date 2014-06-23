@@ -3,10 +3,12 @@ package fr.conferencehermes.confhermexam.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.Question;
@@ -44,6 +46,8 @@ public class QuestionsAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.question_rowview, null);
 			holder.name = (TextView) view.findViewById(R.id.listQuestionTitle);
+			holder.layout = (LinearLayout) view
+					.findViewById(R.id.listQuestionRow);
 
 			view.setTag(holder);
 		} else {
@@ -55,12 +59,19 @@ public class QuestionsAdapter extends BaseAdapter {
 					+ (mListItems.get(position).getId()));
 		}
 
+		/*
+		 * if (position == 0)
+		 * holder.layout.setBackgroundColor(Color.parseColor("#0d5c7c")); else
+		 * holder.layout.setBackgroundColor(Color.parseColor("#86adbd"));
+		 */
+
 		return view;
 
 	}
 
 	private static class ViewHolder {
 		protected TextView name;
+		protected LinearLayout layout;
 
 	}
 }

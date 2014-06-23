@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Html;
 import android.view.Gravity;
@@ -51,6 +52,7 @@ public class QuestionResponseActivity extends Activity implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				selectQuestion(questions.get(position));
+				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 			}
 
 		});
@@ -67,6 +69,7 @@ public class QuestionResponseActivity extends Activity implements
 			adapter.notifyDataSetChanged();
 		}
 		listview.setAdapter(adapter);
+
 		TextView temps1 = (TextView) findViewById(R.id.temps1);
 		TextView temps2 = (TextView) findViewById(R.id.temps2);
 		temps1.setText(exercise.getTimeOpen());
@@ -78,10 +81,8 @@ public class QuestionResponseActivity extends Activity implements
 		answersLayout.removeAllViews();
 		TextView title = (TextView) findViewById(R.id.questionTitle);
 		TextView txt = (TextView) findViewById(R.id.question);
-		TextView ennouncer = (TextView) findViewById(R.id.temps1);
 		title.setText("QUESTION " + q.getId());
 		txt.setText(Html.fromHtml(q.getQuestionText()));
-		ennouncer.setText(q.getCreatedBy());
 
 		int answersCount = q.getAnswers().size();
 
@@ -108,8 +109,10 @@ public class QuestionResponseActivity extends Activity implements
 				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
 				CheckBox checkBox = new CheckBox(QuestionResponseActivity.this);
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
+				checkBox.setPadding(10, 10, 10, 10);
 				TextView text = new TextView(QuestionResponseActivity.this);
 				text.setText(q.getAnswers().get(i).getAnswer());
+				text.setPadding(10, 10, 10, 10);
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.WRAP_CONTENT,
