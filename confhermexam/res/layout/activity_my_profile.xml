@@ -5,78 +5,99 @@
     android:background="@android:color/white" >
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:id="@+id/profile_layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="120dp"
-        android:gravity="center_vertical"
-        android:orientation="vertical" >
+        android:layout_marginLeft="30dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal" >
 
-        <TextView
-            android:id="@+id/pFirsName"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text=""
-            android:textColor="#0d5c7c"
-            android:textSize="25sp" />
+            android:layout_weight="1"
+            android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/pLastName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text=""
-            android:textColor="#0d5c7c"
-            android:textSize="25sp" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/pUsername"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="40dp"
-            android:textColor="#0d5c7c"
-            android:textSize="25sp" />
+                <TextView
+                    android:id="@+id/pFirsName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text=""
+                    android:textColor="#0d5c7c"
+                    android:textSize="25sp" />
 
-        <TextView
-            android:id="@+id/pEmail"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:textColor="#0d5c7c"
-            android:textSize="25sp" />
+                <TextView
+                    android:id="@+id/pLastName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:text=""
+                    android:textColor="#0d5c7c"
+                    android:textSize="25sp" />
 
-        <TextView
-            android:id="@+id/pGroups"
-            android:layout_width="wrap_content"
+                <TextView
+                    android:id="@+id/pUsername"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="#0d5c7c"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/pEmail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="10dp"
+                    android:textColor="#0d5c7c"
+                    android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/pGroups"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="20dp"
+                    android:textColor="#0d5c7c"
+                    android:textSize="25sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="40dp"
-            android:textColor="#0d5c7c"
-            android:textSize="25sp" />
+            android:layout_weight="2"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/logout"
+                android:layout_width="250dp"
+                android:layout_height="wrap_content"
+    
+                android:layout_marginRight="170dp"
+                android:layout_marginTop="120dp"
+                android:background="@drawable/blue_bg"
+                android:drawableLeft="@drawable/key1"
+                android:gravity="center"
+                android:padding="15dp"
+                android:text="CHANGER DE COMPTE"
+                android:textColor="@android:color/white" />
+        </LinearLayout>
     </LinearLayout>
-
-    <Button
-        android:id="@+id/logout"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="170dp"
-        android:layout_marginTop="120dp"
-        android:background="@drawable/blue_bg"
-        android:drawableLeft="@drawable/key1"
-        android:gravity="center"
-        android:padding="15dp"
-        android:text="CHANGER DE COMPTE"
-        android:textColor="@android:color/white" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_margin="40dp"
+        android:layout_below="@+id/profile_layout"
+        android:layout_margin="20dp"
         android:text="@string/lorem_ipsum"
         android:textColor="#0d5c7c"
         android:textSize="12sp" />

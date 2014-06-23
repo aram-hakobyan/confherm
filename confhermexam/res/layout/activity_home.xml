@@ -24,7 +24,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_below="@+id/relativeLayout1"
         android:orientation="vertical" >
 
         <LinearLayout
@@ -37,7 +38,7 @@
                 android:id="@+id/homeButton1"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
+                android:layout_margin="10dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
@@ -60,7 +61,7 @@
                 android:id="@+id/homeButton2"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
+                android:layout_margin="10dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
@@ -83,7 +84,7 @@
                 android:id="@+id/homeButton3"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
+                android:layout_margin="10dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
@@ -114,7 +115,7 @@
                 android:id="@+id/homeButton4"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
+                android:layout_margin="10dp"
                 android:gravity="center"
                 android:orientation="vertical" >
 
@@ -136,7 +137,7 @@
                 android:id="@+id/homeButton5"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
+                android:layout_margin="10dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
@@ -159,7 +160,7 @@
                 android:id="@+id/homeButton6"
                 android:layout_width="280dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="30dp"
+                android:layout_margin="10dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
