@@ -54,7 +54,7 @@ public class MyProfileFragment extends Fragment {
 			pGroups.setText("Groups : " + "no groups available");
 		} else {
 			Handler h = new Handler(getActivity().getMainLooper());
-		
+
 			pGroups.setText("Groups : ");
 			for (Map.Entry<String, String> entry : pData.getGroups().entrySet()) {
 				String gKey = entry.getKey();
@@ -63,7 +63,7 @@ public class MyProfileFragment extends Fragment {
 				h.post(new Runnable() {
 					@Override
 					public void run() {
-						pGroups.append("\n" +gValue.toString());
+						pGroups.append("\n" + gValue.toString());
 					}
 				});
 

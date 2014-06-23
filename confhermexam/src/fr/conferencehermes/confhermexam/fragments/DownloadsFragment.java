@@ -23,6 +23,7 @@ import fr.conferencehermes.confhermexam.adapters.DownloadsAdapter;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class DownloadsFragment extends Fragment {
 	LayoutInflater inflater;
@@ -41,6 +42,7 @@ public class DownloadsFragment extends Fragment {
 
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put("device_id", Utilities.getDeviceId(getActivity()));
 
 		aq.ajax(Constants.DOWNLOADS_LIST_URL, params, JSONObject.class,
 				new AjaxCallback<JSONObject>() {

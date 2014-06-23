@@ -1,7 +1,16 @@
 package fr.conferencehermes.confhermexam.adapters;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
 
 import android.app.AlertDialog;
 import android.app.DownloadManager;
@@ -20,9 +29,13 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
+import fr.conferencehermes.confhermexam.parser.JSONParser;
+import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class DownloadsAdapter extends BaseAdapter {
 	private ArrayList<DownloadInstance> mListItems;
@@ -175,14 +188,14 @@ public class DownloadsAdapter extends BaseAdapter {
 		}
 	}
 
-	private void showDialog(int pos) {
+	private void showDialog(final int pos) {
 		AlertDialog.Builder b = new AlertDialog.Builder(c)
 				.setTitle("Delete files?")
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
-								// do something...
+								removeFile(mListItems.get(pos).getDownloadUrl());
 							}
 						})
 				.setNegativeButton("Cancel",
@@ -196,5 +209,29 @@ public class DownloadsAdapter extends BaseAdapter {
 		AlertDialog alertDialog = b.create();
 		alertDialog.setCancelable(true);
 		alertDialog.show();
+	}
+
+	private void removeFile(String url) {
+		AQuery aq = new AQuery(c);
+
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put("device_id", Utilities.getDeviceId(c));
+
+		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+			@Override
+			public void callback(String url, JSONObject json, AjaxStatus status) {
+
+				try {
+					if (json.has("data") && json.get("data") != null) {
+
+					}
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+
+				}
+			}
+		});
 	}
 }

@@ -139,6 +139,10 @@ public class QuestionResponseActivity extends Activity implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				selectQuestion(questions.get(position), position);
+				if (view != null) {
+					view.setBackgroundColor(getResources().getColor(
+							R.color.app_main_color));
+				}
 			}
 
 		});
@@ -164,13 +168,11 @@ public class QuestionResponseActivity extends Activity implements
 								if (!questions.isEmpty()) {
 									selectQuestion(questions.get(0), 0);
 								}
-								if (adapter == null) {
-									adapter = new QuestionsAdapter(
-											QuestionResponseActivity.this,
-											exercise.getQuestions());
-								} else {
-									adapter.notifyDataSetChanged();
-								}
+
+								adapter = new QuestionsAdapter(
+										QuestionResponseActivity.this, exercise
+												.getQuestions());
+
 								listview.setAdapter(adapter);
 								examName.setText(exercise.getName());
 								teacher.setText("Teacher "
@@ -198,7 +200,7 @@ public class QuestionResponseActivity extends Activity implements
 		int answersCount = q.getAnswers().size();
 
 		// Single choice answer
-		if (q.getType().equalsIgnoreCase("0")) {
+		if (q.getType().equalsIgnoreCase("2")) {
 			mRadioGroup = new RadioGroup(QuestionResponseActivity.this);
 			mRadioGroup.setOrientation(RadioGroup.VERTICAL);
 			for (int i = 0; i < answersCount; i++) {
@@ -252,13 +254,18 @@ public class QuestionResponseActivity extends Activity implements
 			}
 
 		} else // Essay answer
-		if (q.getType().equalsIgnoreCase("2")) {
-			editText = new EditText(QuestionResponseActivity.this);
-			editText.setGravity(Gravity.CENTER_VERTICAL);
-			LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-					LinearLayout.LayoutParams.MATCH_PARENT,
-					LinearLayout.LayoutParams.WRAP_CONTENT);
-			answersLayout.addView(editText, layoutParams);
+		if (q.getType().equalsIgnoreCase("3")) {
+			int count = Integer.valueOf(q.getInputCount());
+			for (int i = 0; i < count; i++) {
+				editText = new EditText(QuestionResponseActivity.this);
+				editText.setGravity(Gravity.CENTER_VERTICAL);
+				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+						LinearLayout.LayoutParams.MATCH_PARENT,
+						LinearLayout.LayoutParams.WRAP_CONTENT);
+				if (i != 0)
+					layoutParams.setMargins(0, 20, 0, 0);
+				answersLayout.addView(editText, layoutParams);
+			}
 		}
 
 	}

@@ -25,6 +25,7 @@ import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExamineFragment extends Fragment {
 
@@ -53,6 +54,7 @@ public class ExamineFragment extends Fragment {
 
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put("device_id", Utilities.getDeviceId(getActivity()));
 
 		aq.ajax(Constants.EXAM_LIST_URL, params, JSONObject.class,
 				new AjaxCallback<JSONObject>() {
