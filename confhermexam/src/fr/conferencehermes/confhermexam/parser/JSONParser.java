@@ -14,13 +14,13 @@ public class JSONParser {
 
 	public static String AUTH_KEY;
 	public static String USER_ID;
-	
+
 	public static void parseLoginData(String pData) {
 
 		try {
 			JSONObject jsonObj = new JSONObject(pData);
 			JSONObject data = jsonObj.getJSONObject("data");
-			
+
 			USER_ID = data.getString("user_id");
 			AUTH_KEY = data.getString("auth_key");
 
@@ -416,8 +416,37 @@ public class JSONParser {
 		return exercise;
 	}
 
-	public static void parseTrainings() {
+	public static int parseCorrections(JSONObject json) {
+		ArrayList<Correction> correctionsList = new ArrayList<Correction>();
+		int score = 0;
+		try {
+			if (json.has(Constants.KEY_DATA)
+					&& json.get(Constants.KEY_DATA) != null) {
 
+				JSONObject data = json.getJSONObject("data");
+				score = data.getInt("score");
+				JSONArray corrections = data
+						.getJSONArray("question_corrections");
+
+				for (int i = 0; i < corrections.length(); i++) {
+					Correction c = new Correction();
+					JSONObject obj = corrections.getJSONObject(i);
+					c.setQuestionId(obj.getString("question_id"));
+					c.setText(obj.getString("correction_text"));
+					ArrayList<String> answersArray = new ArrayList<String>();
+					JSONArray answers = obj.getJSONArray("answers");
+					for (int j = 0; j < answers.length(); j++) {
+						answersArray.add(String.valueOf(answers.get(j)));
+					}
+					c.setAnswersArray(answersArray);
+					correctionsList.add(c);
+				}
+				DataHolder.getInstance().setCorrections(correctionsList);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return score;
 	}
 
 }

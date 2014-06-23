@@ -1,7 +1,10 @@
 package fr.conferencehermes.confhermexam;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,7 +13,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
 
+import org.apache.http.Header;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -25,11 +38,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -58,10 +73,12 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
+import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class QuestionResponseActivity extends Activity implements
@@ -71,10 +88,10 @@ public class QuestionResponseActivity extends Activity implements
 	private QuestionsAdapter adapter;
 	private Exercise exercise;
 	private ArrayList<Question> questions;
-	private LinearLayout answersLayout;
+	private LinearLayout answersLayout, correctionsLayout;
 	private Button btnImage, btnAudio, btnVideo, abandonner, ennouncer,
 			valider;
-	private int exercise_id;
+	private int exercise_id, training_id;
 	private TextView temps1;
 	private TextView temps2;
 	private TextView teacher;
@@ -93,6 +110,7 @@ public class QuestionResponseActivity extends Activity implements
 	ArrayList<EditText> editTextsArray;
 
 	private boolean onPaused = false;
+	private boolean CORRECTED_ANSWERS = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +154,9 @@ public class QuestionResponseActivity extends Activity implements
 		customHandler.postDelayed(updateTimerThread, 0);
 
 		exercise_id = getIntent().getIntExtra("exercise_id", 1);
+		training_id = getIntent().getIntExtra("training_id", 1);
 		answersLayout = (LinearLayout) findViewById(R.id.answersLayout);
+		correctionsLayout = (LinearLayout) findViewById(R.id.correctionsLayout);
 		listview = (ListView) findViewById(R.id.questionsListView);
 		listview.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -196,6 +216,7 @@ public class QuestionResponseActivity extends Activity implements
 		currentQuestionId = position;
 		currentQuestion = q;
 		answersLayout.removeAllViews();
+		correctionsLayout.removeAllViews();
 		TextView title = (TextView) findViewById(R.id.questionTitle);
 		TextView txt = (TextView) findViewById(R.id.question);
 		title.setText("QUESTION " + String.valueOf(position + 1));
@@ -215,10 +236,31 @@ public class QuestionResponseActivity extends Activity implements
 						RadioGroup.LayoutParams.WRAP_CONTENT,
 						RadioGroup.LayoutParams.WRAP_CONTENT);
 				mRadioGroup.addView(newRadioButton, 0, layoutParams);
+
+				if (CORRECTED_ANSWERS) {
+					ImageView img = new ImageView(QuestionResponseActivity.this);
+					img.setBackgroundResource(R.drawable.correction_true);
+					LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+							30, 30);
+					if (i != 0)
+						imageParams.setMargins(0, 10, 0, 0);
+					correctionsLayout.addView(img, imageParams);
+				}
 			}
 			answersLayout.addView(mRadioGroup);
 		} else // Multichoice answer
 		if (q.getType().equalsIgnoreCase("1")) {
+			ArrayList<String> answers = null;
+			if (CORRECTED_ANSWERS) {
+				ArrayList<Correction> corrections = DataHolder.getInstance()
+						.getCorrections();
+				for (Correction c : corrections) {
+					if (q.getId() == Integer.valueOf(c.getQuestionId())) {
+						answers = c.getAnswersArray();
+					}
+				}
+			}
+
 			for (int i = 0; i < answersCount; i++) {
 				LinearLayout checkBoxLayout = new LinearLayout(
 						QuestionResponseActivity.this);
@@ -236,6 +278,23 @@ public class QuestionResponseActivity extends Activity implements
 				checkBoxLayout.addView(checkBox);
 				checkBoxLayout.addView(text, layoutParams);
 				answersLayout.addView(checkBoxLayout);
+
+				if (CORRECTED_ANSWERS) {
+					for (int j = 0; j < answers.size(); j++) {
+						if (q.getAnswers().get(i).getId() == Integer
+								.valueOf(answers.get(j))) {
+							ImageView img = new ImageView(
+									QuestionResponseActivity.this);
+							img.setBackgroundResource(R.drawable.correction_true);
+							LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+									30, 30);
+							if (i != 0)
+								imageParams.setMargins(0, 10, 0, 0);
+							correctionsLayout.addView(img, imageParams);
+						}
+					}
+
+				}
 
 				checkBox.setTag(q.getAnswers().get(i).getId());
 				checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -257,8 +316,8 @@ public class QuestionResponseActivity extends Activity implements
 				});
 			}
 
-		} else // Essay answer
-		if (q.getType().equalsIgnoreCase("3")) {
+		} else if (q.getType().equalsIgnoreCase("3")) {
+
 			int count = Integer.valueOf(q.getInputCount());
 			for (int i = 0; i < count; i++) {
 				EditText editText = new EditText(QuestionResponseActivity.this);
@@ -270,6 +329,16 @@ public class QuestionResponseActivity extends Activity implements
 					layoutParams.setMargins(0, 10, 0, 0);
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
+
+				if (CORRECTED_ANSWERS) {
+
+					ImageView img = new ImageView(QuestionResponseActivity.this);
+					img.setBackgroundResource(R.drawable.correction_true);
+					LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+							30, 30);
+					imageParams.setMargins(0, 17, 0, 0);
+					correctionsLayout.addView(img, imageParams);
+				}
 			}
 		}
 
@@ -289,23 +358,113 @@ public class QuestionResponseActivity extends Activity implements
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
 
-		data.put("training_id", 0);
+		data.put("training_id", training_id);
 		data.put("exercise_id", exercise.getId());
 		data.put("type", exercise.getType());
 
 		JSONArray answers = answersArray;
-		data.put("question_answers", answers.toString());
+		data.put("question_answers", answers);
 		object.put("auth_key", JSONParser.AUTH_KEY);
-		object.put("data", data.toString());
+		object.put("data", data);
 		params.put("data", object.toString());
 
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
+		JSONTransmitter transmitter = new JSONTransmitter();
+		transmitter.execute(object);
+
+		/*
+		 * aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>()
+		 * {
+		 * 
+		 * @Override public void callback(String url, JSONObject json,
+		 * AjaxStatus status) { Utilities.showOrHideActivityIndicator(
+		 * QuestionResponseActivity.this, 1, "Please wait..."); int score = 0;
+		 * if (json != null) { score = JSONParser.parseCorrections(json); }
+		 * TextView scoreText = (TextView) findViewById(R.id.score);
+		 * scoreText.setText("Score : " + String.valueOf(score));
+		 * makeCorrections(DataHolder.getInstance().getCorrections()); } });
+		 */
+	}
+
+	public class JSONTransmitter extends
+			AsyncTask<JSONObject, JSONObject, JSONObject> {
+
+		String url = "http://ecni.conference-hermes.fr/api/traninganswer";
+
+		@Override
+		protected JSONObject doInBackground(JSONObject... data) {
+			JSONObject json = data[0];
+			DefaultHttpClient httpclient = new DefaultHttpClient();
+			HttpPost httppostreq = new HttpPost(url);
+			StringEntity se;
+			try {
+				se = new StringEntity(json.toString());
+
+				se.setContentType("application/json;charset=UTF-8");
+				se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
+						"application/json;charset=UTF-8"));
+				httppostreq.setEntity(se);
+				HttpResponse httpresponse = httpclient.execute(httppostreq);
+
+				HttpEntity resultentity = httpresponse.getEntity();
+				InputStream inputstream = resultentity.getContent();
+				Header contentencoding = httpresponse
+						.getFirstHeader("Content-Encoding");
+				if (contentencoding != null
+						&& contentencoding.getValue().equalsIgnoreCase("gzip")) {
+					inputstream = new GZIPInputStream(inputstream);
+				}
+				String resultstring = convertStreamToString(inputstream);
+				inputstream.close();
+				Log.d("RESPONSE******************", resultstring);
+
+				JSONObject ob = null;
+				try {
+					ob = new JSONObject(resultstring);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+				if (ob != null) {
+					final int score = JSONParser.parseCorrections(ob);
+					runOnUiThread(new Runnable() {
+						public void run() {
+							makeCorrections(score, DataHolder.getInstance()
+									.getCorrections());
+						}
+					});
+
+				}
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			} catch (ClientProtocolException e) {
+				e.printStackTrace();
+			} catch (IOException e) {
+				e.printStackTrace();
+			} finally {
 				Utilities.showOrHideActivityIndicator(
 						QuestionResponseActivity.this, 1, "Please wait...");
 			}
-		});
+			return null;
+		}
+	}
+
+	private String convertStreamToString(InputStream is) {
+		String line = "";
+		StringBuilder total = new StringBuilder();
+		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
+		try {
+			while ((line = rd.readLine()) != null) {
+				total.append(line);
+			}
+		} catch (Exception e) {
+			Toast.makeText(this, "Stream Exception", Toast.LENGTH_SHORT).show();
+		}
+		return total.toString();
+	}
+
+	private void makeCorrections(int score, ArrayList<Correction> corrections) {
+		CORRECTED_ANSWERS = true;
+		TextView scoreText = (TextView) findViewById(R.id.score);
+		scoreText.setText("Score : " + String.valueOf(score));
 	}
 
 	private void saveQuestionAnswers() throws JSONException {

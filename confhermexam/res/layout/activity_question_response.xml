@@ -23,6 +23,14 @@
         </ImageView>
 
         <TextView
+            android:id="@+id/score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <TextView
             android:id="@+id/teacher"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -115,21 +123,45 @@
                 </Button>
             </LinearLayout>
 
-            <ScrollView
-                android:id="@+id/scrollView1"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="40dp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginTop="30dp" >
+                android:layout_marginTop="30dp"
+                android:orientation="horizontal"
+                android:weightSum="10" >
 
-                <LinearLayout
-                    android:id="@+id/answersLayout"
-                    android:layout_width="match_parent"
+                <ScrollView
+                    android:id="@+id/scrollView1"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" >
-                </LinearLayout>
-            </ScrollView>
+                    android:layout_marginLeft="70dp"
+                    android:layout_weight="7" >
+
+                    <LinearLayout
+                        android:id="@+id/answersLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" >
+                    </LinearLayout>
+                </ScrollView>
+
+                <ScrollView
+                    android:id="@+id/scrollView2"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="3" >
+
+                    <LinearLayout
+                        android:id="@+id/correctionsLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" >
+                    </LinearLayout>
+                </ScrollView>
+            </LinearLayout>
 
             <Button
                 android:id="@+id/validerBtn"

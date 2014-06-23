@@ -126,6 +126,7 @@ public class ExercisesActivity extends FragmentActivity implements
 		Intent intent = new Intent(ExercisesActivity.this,
 				QuestionResponseActivity.class);
 		intent.putExtra("exercise_id", id);
+		intent.putExtra("training_id", training_id);
 		startActivity(intent);
 	}
 

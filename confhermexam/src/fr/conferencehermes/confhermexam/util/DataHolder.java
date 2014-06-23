@@ -2,6 +2,7 @@ package fr.conferencehermes.confhermexam.util;
 
 import java.util.ArrayList;
 
+import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
@@ -16,6 +17,7 @@ public class DataHolder {
 	private ArrayList<TrainingExercise> trainingExercises;
 	private ArrayList<Training> trainings;
 	private ArrayList<DownloadInstance> downloads;
+	private ArrayList<Correction> corrections;
 
 	private DataHolder() {
 		setExams(new ArrayList<Exam>());
@@ -23,6 +25,7 @@ public class DataHolder {
 		setTrainings(new ArrayList<Training>());
 		setTrainingExercises(new ArrayList<TrainingExercise>());
 		setDownloads(new ArrayList<DownloadInstance>());
+		setCorrections(new ArrayList<Correction>());
 	}
 
 	public static DataHolder getInstance() {
@@ -72,6 +75,14 @@ public class DataHolder {
 
 	public void setDownloads(ArrayList<DownloadInstance> downloads) {
 		this.downloads = downloads;
+	}
+
+	public ArrayList<Correction> getCorrections() {
+		return corrections;
+	}
+
+	public void setCorrections(ArrayList<Correction> corrections) {
+		this.corrections = corrections;
 	}
 
 }
