@@ -19,7 +19,6 @@ public class Constants {
 	public static String TRAINING_LIST_URL = "http://ecni.conference-hermes.fr/api/traininglist";
 	public static String EXAM_LIST_URL = "http://ecni.conference-hermes.fr/api/exams";
 	public static String DOWNLOADS_LIST_URL = "http://ecni.conference-hermes.fr/api/download";
-	public static String REMOVE_URL = "http://ecni.conference-hermes.fr/api/downloadfile/index/175";
 	public static String LOG_OUT_URL = "http://ecni.conference-hermes.fr/api/logout.php";
 	public static String CURRENT_EXAM_URL = "http://ecni.conference-hermes.fr/api/result";
 

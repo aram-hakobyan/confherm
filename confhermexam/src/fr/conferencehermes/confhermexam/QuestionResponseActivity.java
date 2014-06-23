@@ -47,6 +47,7 @@ import android.widget.MediaController;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.androidquery.AQuery;
@@ -84,7 +85,9 @@ public class QuestionResponseActivity extends Activity implements
 	JSONArray answersArray;
 	private RadioGroup mRadioGroup;
 	private ArrayList<Integer> multipleAnswers;
-	private EditText editText;
+
+	int ANSWERED_QUESTIONS_COUNT = 0;
+	ArrayList<EditText> editTextsArray;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -97,6 +100,7 @@ public class QuestionResponseActivity extends Activity implements
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
 
+		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);
 		temps2 = (TextView) findViewById(R.id.temps2);
 		teacher = (TextView) findViewById(R.id.teacher);
@@ -252,7 +256,7 @@ public class QuestionResponseActivity extends Activity implements
 		if (q.getType().equalsIgnoreCase("3")) {
 			int count = Integer.valueOf(q.getInputCount());
 			for (int i = 0; i < count; i++) {
-				editText = new EditText(QuestionResponseActivity.this);
+				EditText editText = new EditText(QuestionResponseActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.MATCH_PARENT,
@@ -260,6 +264,7 @@ public class QuestionResponseActivity extends Activity implements
 				if (i != 0)
 					layoutParams.setMargins(0, 20, 0, 0);
 				answersLayout.addView(editText, layoutParams);
+				editTextsArray.add(editText);
 			}
 		}
 
@@ -276,6 +281,7 @@ public class QuestionResponseActivity extends Activity implements
 				"Please wait...");
 		String url = "http://ecni.conference-hermes.fr/api/traninganswer";
 		Map<String, String> params = new HashMap<String, String>();
+		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
 
 		data.put("training_id", 0);
@@ -284,9 +290,10 @@ public class QuestionResponseActivity extends Activity implements
 
 		JSONArray answers = answersArray;
 		data.put("question_answers", answers.toString());
+		object.put("auth_key", JSONParser.AUTH_KEY);
+		object.put("data", data.toString());
+		params.put("data", object.toString());
 
-		params.put("auth_key", JSONParser.AUTH_KEY);
-		params.put("data", data.toString());
 		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
 			@Override
 			public void callback(String url, JSONObject json, AjaxStatus status) {
@@ -304,7 +311,7 @@ public class QuestionResponseActivity extends Activity implements
 		JSONArray answers = new JSONArray();
 
 		try {
-			if (currentQuestion.getType().equalsIgnoreCase("0")) {
+			if (currentQuestion.getType().equalsIgnoreCase("2")) {
 
 				int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
 				View radioButton = mRadioGroup.findViewById(radioButtonID);
@@ -316,8 +323,14 @@ public class QuestionResponseActivity extends Activity implements
 				for (int i = 0; i < multipleAnswers.size(); i++) {
 					answers.put(multipleAnswers.get(i));
 				}
-			} else if (currentQuestion.getType().equalsIgnoreCase("2")) {
-				answers.put(editText.getText());
+				multipleAnswers.clear();
+			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
+				for (EditText editText : editTextsArray) {
+					if (editText.getText().length() != 0) {
+						answers.put(editText.getText());
+					}
+				}
+
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -326,30 +339,54 @@ public class QuestionResponseActivity extends Activity implements
 		answersArray.put(questionAnswer);
 	}
 
+	private boolean isValidAnswer() {
+		if (currentQuestion.getType().equalsIgnoreCase("2")) {
+			return mRadioGroup.getCheckedRadioButtonId() != -1;
+		} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
+			return !multipleAnswers.isEmpty();
+		} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
+			for (EditText editText : editTextsArray) {
+				if (editText.getText().length() != 0) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.validerBtn:
-			if (currentQuestionId < questions.size() - 1) {
-				try {
+			try {
+				if (isValidAnswer()) {
 					saveQuestionAnswers();
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				currentQuestionId++;
-				selectQuestion(questions.get(currentQuestionId),
-						currentQuestionId);
-			} else {
-				try {
-					sendAnswers();
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+					ANSWERED_QUESTIONS_COUNT++;
+					if (ANSWERED_QUESTIONS_COUNT == questions.size()) {
+						abandonner.setText("SUBMIT");
+					}
+
+					if (currentQuestionId < questions.size() - 1) {
+						currentQuestionId++;
+						selectQuestion(questions.get(currentQuestionId),
+								currentQuestionId);
+					}
+				} else
+					Toast.makeText(QuestionResponseActivity.this,
+							"Please select at least one answer.",
+							Toast.LENGTH_SHORT).show();
+			} catch (JSONException e) {
+				e.printStackTrace();
 			}
+
 			break;
 		case R.id.abandonner:
 			try {
-				sendAnswers();
+				if (ANSWERED_QUESTIONS_COUNT == questions.size()) {
+					sendAnswers();
+				} else {
+					finish();
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
