@@ -16,8 +16,10 @@ import fr.conferencehermes.confhermexam.parser.Question;
 public class QuestionsAdapter extends BaseAdapter {
 	private ArrayList<Question> mListItems;
 	private LayoutInflater mLayoutInflater;
+	private Context mContext;
 
 	public QuestionsAdapter(Context context, ArrayList<Question> arrayList) {
+		this.mContext = context;
 		mListItems = arrayList;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -55,15 +57,8 @@ public class QuestionsAdapter extends BaseAdapter {
 		}
 
 		if (holder.name != null) {
-			holder.name.setText("QUESTION "
-					+ (mListItems.get(position).getId()));
+			holder.name.setText("QUESTION " + (String.valueOf(position + 1)));
 		}
-
-		/*
-		 * if (position == 0)
-		 * holder.layout.setBackgroundColor(Color.parseColor("#0d5c7c")); else
-		 * holder.layout.setBackgroundColor(Color.parseColor("#86adbd"));
-		 */
 
 		return view;
 

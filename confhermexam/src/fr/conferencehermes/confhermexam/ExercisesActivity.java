@@ -1,7 +1,9 @@
 package fr.conferencehermes.confhermexam;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,6 +13,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
 import android.text.InputType;
 import android.view.LayoutInflater;
@@ -22,30 +25,34 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.TextView;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
-import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
+import fr.conferencehermes.confhermexam.parser.TrainingExercise;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExercisesActivity extends FragmentActivity implements
 		OnClickListener {
+
 	LayoutInflater inflater;
 	GridView gvMain;
 	ArrayAdapter<String> adapter;
-	Exercise exercise;
-	String[] data = new String[1];
-	int examId;
+	ArrayList<TrainingExercise> exercises;
+	int training_id;
+	TextView timerText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_exersice);
-		examId = getIntent().getIntExtra("examId", 0);
+		training_id = getIntent().getIntExtra("training_id", 0);
+		timerText = (TextView) findViewById(R.id.timerText);
 
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
@@ -54,43 +61,57 @@ public class ExercisesActivity extends FragmentActivity implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
+				int e_id = exercises.get(position).getExercise_id();
 				if (getIntent().getBooleanExtra("exam", false))
-					showPasswordAlert();
+					showPasswordAlert(e_id);
 				else
-					openExam();
+					openExam(e_id);
 			}
 
 		});
 
 		AQuery aq = new AQuery(ExercisesActivity.this);
-		String url = "http://ecni.conference-hermes.fr/api/traningexercise.php";
+
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
-		params.put("id", examId);
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put("training_id", training_id);
 
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+		aq.ajax(Constants.TRAINING_URL, params, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
 
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
 
-				try {
-					if (json.has("data") && json.get("data") != null) {
-						exercise = JSONParser.parseExercises(json);
-						data[0] = exercise.getName();
-						adapter = new ArrayAdapter<String>(
-								ExercisesActivity.this, R.layout.item,
-								R.id.tvText, data);
-						gvMain = (GridView) findViewById(R.id.gvMain);
-						gvMain.setAdapter(adapter);
+						try {
+							if (json.has("data") && json.get("data") != null) {
+								exercises = JSONParser
+										.parseTrainingExercises(json);
+								String[] data = new String[exercises.size()];
+								for (int i = 0; i < exercises.size(); i++) {
+									data[i] = exercises.get(i).getTitle();
+								}
 
+								adapter = new ArrayAdapter<String>(
+										ExercisesActivity.this, R.layout.item,
+										R.id.tvText, data);
+								gvMain = (GridView) findViewById(R.id.gvMain);
+								gvMain.setAdapter(adapter);
+								updateTimer();
+
+							}
+						} catch (JSONException e) {
+							e.printStackTrace();
+
+						}
 					}
-				} catch (JSONException e) {
-					e.printStackTrace();
+				});
 
-				}
-			}
-		});
+	}
 
+	private void updateTimer() {
+		final CounterClass timer = new CounterClass(7200000, 1000);
+		timer.start();
 	}
 
 	private void adjustGridView() {
@@ -101,14 +122,14 @@ public class ExercisesActivity extends FragmentActivity implements
 		gvMain.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
 	}
 
-	private void openExam() {
+	private void openExam(int id) {
 		Intent intent = new Intent(ExercisesActivity.this,
 				QuestionResponseActivity.class);
-		intent.putExtra("examId", examId);
+		intent.putExtra("exercise_id", id);
 		startActivity(intent);
 	}
 
-	private void showPasswordAlert() {
+	private void showPasswordAlert(final int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setTitle("Enter Password");
 
@@ -121,7 +142,7 @@ public class ExercisesActivity extends FragmentActivity implements
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				if (!input.getText().toString().trim().isEmpty()) {
-					openExam();
+					openExam(id);
 				}
 			}
 		});
@@ -141,4 +162,33 @@ public class ExercisesActivity extends FragmentActivity implements
 		// TODO Auto-generated method stub
 
 	}
+
+	public class CounterClass extends CountDownTimer {
+		public CounterClass(long millisInFuture, long countDownInterval) {
+			super(millisInFuture, countDownInterval);
+		}
+
+		@Override
+		public void onFinish() {
+			timerText.setText("Completed.");
+		}
+
+		@Override
+		public void onTick(long millisUntilFinished) {
+			long millis = millisUntilFinished;
+			Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished",
+					millisUntilFinished);
+			String hms = String.format(
+					"%02d:%02d:%02d",
+					TimeUnit.MILLISECONDS.toHours(millis),
+					TimeUnit.MILLISECONDS.toMinutes(millis)
+							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
+									.toHours(millis)),
+					TimeUnit.MILLISECONDS.toSeconds(millis)
+							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+									.toMinutes(millis)));
+			timerText.setText("Temps epreuve - " + hms);
+		}
+	}
+
 }

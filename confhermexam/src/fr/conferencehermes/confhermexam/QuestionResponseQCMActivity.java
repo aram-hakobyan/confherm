@@ -8,7 +8,7 @@ import android.view.Menu;
 import android.view.Window;
 
 public class QuestionResponseQCMActivity extends Activity {
-	LayoutInflater inflater;
+	private LayoutInflater inflater;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

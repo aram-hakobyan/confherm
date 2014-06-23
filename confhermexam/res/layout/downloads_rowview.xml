@@ -51,10 +51,9 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/buttonAction"
             android:layout_width="25dp"
-            android:layout_height="22dp"
-            android:background="@drawable/exam_checked" />
+            android:layout_height="22dp" />
 
         <View
             android:layout_width="2dp"
@@ -63,11 +62,10 @@
             android:background="@android:color/white" />
 
         <Button
-            android:id="@+id/button2"
-            android:layout_width="25dp"
+            android:id="@+id/buttonRemove"
+            android:layout_width="20dp"
             android:layout_height="25dp"
-            android:layout_marginLeft="20dp"
-            android:background="@drawable/exam_delete" />
+            android:layout_marginLeft="20dp" />
     </LinearLayout>
 
 </RelativeLayout>

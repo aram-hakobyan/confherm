@@ -35,4 +35,11 @@
     <string name="time11am">11 A.M</string>
     <string name="time12am">12 A.M</string>
 
+    <!-- Result Page Text -->
+    <string name="target_button">Target me</string>
+    <string name="global_button">GLOBAL TEST</string>
+    <string name="notes_rank">RANG</string>
+    <string name="notes_nom">NOM</string>
+    <string name="notes_note">NOTE</string>
+
 </resources>

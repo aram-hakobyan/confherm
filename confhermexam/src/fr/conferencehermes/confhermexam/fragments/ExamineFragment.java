@@ -7,7 +7,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -21,14 +20,15 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
-import fr.conferencehermes.confhermexam.ExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExamineFragment extends Fragment {
+
 	LayoutInflater inflater;
 	ListView listview;
 	ExamsAdapter adapter;
@@ -45,41 +45,41 @@ public class ExamineFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				Intent intent = new Intent(getActivity(),
-						ExercisesActivity.class);
-				intent.putExtra("examId", exams.get(position).getId());
-				intent.putExtra("exam", true);
-				startActivity(intent);
+
 			}
 
 		});
 
 		AQuery aq = new AQuery(getActivity());
-		String url = "http://ecni.conference-hermes.fr/api/exams.php";
+
 		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put("device_id", Utilities.getDeviceId(getActivity()));
 
-		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
-			@Override
-			public void callback(String url, JSONObject json, AjaxStatus status) {
+		aq.ajax(Constants.EXAM_LIST_URL, params, JSONObject.class,
+				new AjaxCallback<JSONObject>() {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
 
-				try {
-					if (json.has("data") && json.get("data") != null) {
-						exams = JSONParser.parseExams(json);
-						if (adapter == null) {
-							adapter = new ExamsAdapter(getActivity(), exams);
-						} else {
-							adapter.notifyDataSetChanged();
+						try {
+							if (json.has("data") && json.get("data") != null) {
+								exams = JSONParser.parseExams(json);
+								if (adapter == null) {
+									adapter = new ExamsAdapter(getActivity(),
+											exams);
+								} else {
+									adapter.notifyDataSetChanged();
+								}
+								listview.setAdapter(adapter);
+							}
+
+						} catch (JSONException e) {
+							e.printStackTrace();
+
 						}
-						listview.setAdapter(adapter);
 					}
-
-				} catch (JSONException e) {
-					e.printStackTrace();
-
-				}
-			}
-		});
+				});
 
 		return fragment;
 	}

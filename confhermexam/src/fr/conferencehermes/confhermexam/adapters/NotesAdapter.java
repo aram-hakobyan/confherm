@@ -11,14 +11,15 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.parser.NotesResult;
 
 public class NotesAdapter extends BaseAdapter {
-	private ArrayList<String> mListItems;
+	private ArrayList<NotesResult> mListItems;
 	private LayoutInflater mLayoutInflater;
 	private Context c;
 
-	public NotesAdapter(Context context, ArrayList<String> arrayList) {
-		mListItems = arrayList;
+	public NotesAdapter(Context context, ArrayList<NotesResult> list) {
+		mListItems = list;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.c = context;
@@ -46,7 +47,7 @@ public class NotesAdapter extends BaseAdapter {
 		if (view == null) {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.notes_rowview, null);
-			holder.name = (TextView) view.findViewById(R.id.noteRang);
+			holder.name = (TextView) view.findViewById(R.id.noteName);
 			holder.rang = (TextView) view.findViewById(R.id.noteRang);
 			holder.score = (TextView) view.findViewById(R.id.noteScore);
 
@@ -55,12 +56,15 @@ public class NotesAdapter extends BaseAdapter {
 			holder = (ViewHolder) view.getTag();
 		}
 
-		String stringItem = (String) mListItems.get(position);
-		if (stringItem != null) {
+		String studentName = (String) mListItems.get(position).getStudentName();
+		int studentRank = (int) mListItems.get(position).getRank();
+		int studentScore = (int) mListItems.get(position).getScore();
+
+		if (studentName != null) {
 			if (holder.name != null) {
-				holder.name.setText(stringItem);
-				holder.rang.setText("0" + position);
-				holder.score.setText(String.valueOf(position * 100));
+				holder.name.setText(studentName);
+				holder.rang.setText(String.valueOf(studentRank));
+				holder.score.setText(String.valueOf(studentScore));
 
 			}
 		}

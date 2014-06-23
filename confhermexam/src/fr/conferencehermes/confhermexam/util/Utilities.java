@@ -14,6 +14,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.telephony.TelephonyManager;
 import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
@@ -30,6 +31,7 @@ import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
 public class Utilities {
 	private static ProgressDialog mDialog;
 	public static final String IS_LOGGED_IN = "IS_LOGGED_IN";
+
 	public static void writeBoolean(Context context, String key, boolean value) {
 		getEditor(context).putBoolean(key, value).commit();
 	}
@@ -198,6 +200,12 @@ public class Utilities {
 		Intent browserIntent1 = new Intent(Intent.ACTION_VIEW,
 				Uri.parse("http://www.conference-hermes.fr"));
 		c.startActivity(browserIntent1);
+	}
+
+	public static String getDeviceId(Context c) {
+		final TelephonyManager tm = (TelephonyManager) c
+				.getSystemService(Context.TELEPHONY_SERVICE);
+		return tm.getDeviceId();
 	}
 
 }

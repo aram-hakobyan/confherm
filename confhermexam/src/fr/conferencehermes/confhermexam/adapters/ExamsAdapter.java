@@ -1,12 +1,14 @@
 package fr.conferencehermes.confhermexam.adapters;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.Button;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.Exam;
@@ -46,6 +48,7 @@ public class ExamsAdapter extends BaseAdapter {
 			holder.name = (TextView) view.findViewById(R.id.examName);
 			holder.desc = (TextView) view.findViewById(R.id.examDesc);
 			holder.status = (TextView) view.findViewById(R.id.examStatus);
+			holder.button = (Button) view.findViewById(R.id.examButton1);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
@@ -55,10 +58,29 @@ public class ExamsAdapter extends BaseAdapter {
 		if (exam != null) {
 			if (holder.name != null) {
 				holder.name.setText(exam.getTitle());
-				holder.desc.setText(exam.getStartDate());
-				holder.status.setText("Status: "
-						+ String.valueOf(exam.getCategoryType()));
+				holder.desc.setText("Available from : " + new Date(exam.getStartDate()));
+
+				int status = exam.getStatus();
+				if (status == 1) {
+					holder.status.setText("Disponible");
+					holder.button
+							.setBackgroundResource(R.drawable.exam_checked);
+				} else if (status == 2) {
+					holder.status.setText("Non disponible");
+					holder.button
+							.setBackgroundResource(R.drawable.exam_refresh);
+				} else if (status == 3) {
+					holder.status.setText("Non disponible");
+					holder.button
+							.setBackgroundResource(R.drawable.exam_download);
+
+				} else if (status == 4) {
+					holder.status.setText("Non disponible");
+					holder.button
+							.setBackgroundResource(R.drawable.exam_x);
+				}
 			}
+
 		}
 
 		return view;
@@ -69,6 +91,7 @@ public class ExamsAdapter extends BaseAdapter {
 		protected TextView name;
 		protected TextView desc;
 		protected TextView status;
+		protected Button button;
 
 	}
 }

@@ -30,6 +30,9 @@ public class NetworkReachability {
 		} else {
 			return false;
 		}
+		
+		
+
 	}
 
 	/**

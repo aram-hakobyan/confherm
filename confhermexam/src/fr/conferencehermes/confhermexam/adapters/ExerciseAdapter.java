@@ -3,19 +3,25 @@ package fr.conferencehermes.confhermexam.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import fr.conferencehermes.confhermexam.NotesActivity;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.parser.ExamExercise;
 
 public class ExerciseAdapter extends BaseAdapter {
-	private ArrayList<String> mListItems;
+	private ArrayList<ExamExercise> mListItems;
 	private LayoutInflater mLayoutInflater;
+	private Context context;
 
-	public ExerciseAdapter(Context context, ArrayList<String> arrayList) {
-		mListItems = arrayList;
+	public ExerciseAdapter(Context context, ArrayList<ExamExercise> listEx) {
+		mListItems = listEx;
+		this.context = context;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 	}
@@ -36,7 +42,7 @@ public class ExerciseAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View view, ViewGroup viewGroup) {
+	public View getView(final int position, View view, ViewGroup viewGroup) {
 		ViewHolder holder;
 
 		if (view == null) {
@@ -50,8 +56,23 @@ public class ExerciseAdapter extends BaseAdapter {
 		}
 
 		if (holder.name != null) {
-			holder.name.setText(mListItems.get(position));
+			holder.name.setText(mListItems.get(position).getExamName());
 		}
+
+		holder.name.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				((NotesActivity) context).setParamExersiceId(mListItems.get(
+						position).getExersiceId());
+				((NotesActivity) context).setParamGlobalTest(0);
+
+				((NotesActivity) context).exerciseResult(context);
+
+				Log.i("Exersice ", mListItems.get(position).getExersiceId()
+						+ "");
+			}
+		});
 
 		return view;
 

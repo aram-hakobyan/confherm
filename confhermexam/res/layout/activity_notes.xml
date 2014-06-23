@@ -5,6 +5,7 @@
     android:background="@android:color/white" >
 
     <RelativeLayout
+        android:id="@+id/relativeLayout1"
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentTop="true"
@@ -20,181 +21,208 @@
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/notesHeadMenu"
-        android:layout_width="700dp"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="80dp"
-        android:layout_marginTop="140dp"
-        android:gravity="center_vertical"
+        android:layout_below="@+id/relativeLayout1"
+        android:layout_margin="30dp"
         android:orientation="horizontal" >
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="@drawable/ic_target" />
-
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="Target me"
-            android:textColor="@color/app_main_color"
-            android:textSize="20sp" />
+            android:layout_weight="1"
+            android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/notesHeadMenu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" >
+
+                <ImageView
+                    android:id="@+id/targetMe"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/ic_target" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:text="@string/target_button"
+                    android:textColor="@color/app_main_color"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/moyenneScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="120dp"
+                    android:textColor="@color/app_main_color"
+                    android:textSize="20sp" />
+
+                <TextView
+                    android:id="@+id/medianScore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:textColor="@color/app_main_color"
+                    android:textSize="20sp" />
+
+                <RadioGroup
+                    android:id="@+id/radioGroupPG"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal" >
+
+                    <RadioButton
+                        android:id="@+id/radio_people"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_margin="5dp"
+                        android:background="@drawable/radio_buttons_selector"
+                        android:button="@drawable/ic_people" />
+
+                    <RadioButton
+                        android:id="@+id/radio_globe"
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:layout_margin="5dp"
+                        android:checked="true"
+                        android:background="@drawable/radio_buttons_selector"
+                        android:button="@drawable/ic_globe" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/listHeader"
+                android:layout_width="700dp"
+                android:layout_height="40dp"
+                android:layout_marginTop="20dp"
+                android:orientation="horizontal" >
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="10dp"
+                    android:orientation="horizontal" >
+
+                    <TextView
+                        android:id="@+id/noteRang"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="@string/notes_rank"
+                        android:textSize="15sp" />
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:background="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/noteName"
+                        android:layout_width="380dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:text="@string/notes_nom"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="30dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" >
+
+                    <View
+                        android:layout_width="2dp"
+                        android:layout_height="wrap_content"
+                        android:background="@android:color/white" />
+
+                    <TextView
+                        android:id="@+id/noteScore"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="20dp"
+                        android:text="@string/notes_note"
+                        android:textSize="15sp" />
+                </LinearLayout>
+            </RelativeLayout>
+
+            <ListView
+                android:id="@+id/notesListView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="2dp" >
+            </ListView>
+
+            <ProgressBar
+                android:id="@+id/progressBarNotes"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:gravity="center_vertical|center_horizontal"
+                android:visibility="visible" 
+                android:layout_marginTop="200dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="120dp"
-            android:text="Moyenne : 290"
-            android:textColor="@color/app_main_color"
-            android:textSize="20sp" />
+            android:layout_weight="2"
+            android:gravity="right"
+            android:orientation="vertical" >
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:text="| Median : 280"
-            android:textColor="@color/app_main_color"
-            android:textSize="20sp" />
+            <TextView
+                android:id="@+id/teacherName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:textColor="@color/app_main_color"
+                android:textSize="20sp" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="70dp"
-            android:background="@drawable/ic_people" />
+            <TextView
+                android:id="@+id/examName"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:textColor="@color/app_main_color"
+                android:textSize="20sp" />
 
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginLeft="10dp"
-            android:background="@drawable/ic_globe" />
+            <TextView
+                android:id="@+id/globalTest"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:background="@drawable/blue_bg"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:padding="5dp"
+                android:text="@string/global_button"
+                android:textColor="@android:color/white"
+                android:textSize="23sp" />
+
+            <ListView
+                android:id="@+id/exercizesListViewNotes"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:layout_marginTop="10dp"
+                android:choiceMode="singleChoice" >
+            </ListView>
+        </LinearLayout>
     </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/listHeader"
-        android:layout_width="700dp"
-        android:layout_height="40dp"
-        android:layout_alignLeft="@+id/notesHeadMenu"
-        android:layout_below="@+id/notesHeadMenu"
-        android:layout_marginTop="20dp"
-        android:orientation="horizontal" >
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
-            android:orientation="horizontal" >
-
-            <TextView
-                android:id="@+id/noteRang"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:padding="5dp"
-                android:text="RANG"
-                android:textSize="15sp" />
-
-            <View
-                android:layout_width="2dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:background="@android:color/white" />
-
-            <TextView
-                android:id="@+id/noteName"
-                android:layout_width="380dp"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:gravity="center_vertical"
-                android:padding="5dp"
-                android:text="NOM"
-                android:textSize="15sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="30dp"
-            android:gravity="center_vertical"
-            android:orientation="horizontal" >
-
-            <View
-                android:layout_width="2dp"
-                android:layout_height="wrap_content"
-                android:background="@android:color/white" />
-
-            <TextView
-                android:id="@+id/noteScore"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="20dp"
-                android:text="NOTE"
-                android:textSize="15sp" />
-        </LinearLayout>
-    </RelativeLayout>
-
-    <ListView
-        android:id="@+id/notesListView"
-        android:layout_width="700dp"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/listHeader"
-        android:layout_marginBottom="40dp"
-        android:layout_marginLeft="70dp"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="2dp" >
-    </ListView>
-
-    <TextView
-        android:id="@+id/teacherName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="100dp"
-        android:layout_marginTop="110dp"
-        android:text="Teacher Mr. Shirman"
-        android:textColor="@color/app_main_color"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/examName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/teacherName"
-        android:layout_marginRight="100dp"
-        android:text="Exam Nom_002"
-        android:textColor="@color/app_main_color"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/globalTest"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="70dp"
-        android:layout_marginTop="190dp"
-        android:background="@drawable/blue_bg"
-        android:gravity="center"
-        android:padding="5dp"
-        android:text="GLOBAL TEST"
-        android:textColor="@android:color/white"
-        android:textSize="23sp" />
-
-    <ListView
-        android:id="@+id/exercizesListViewNotes"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/globalTest"
-        android:layout_marginBottom="40dp"
-        android:layout_marginRight="70dp"
-        android:layout_marginTop="10dp"
-        android:choiceMode="singleChoice" >
-    </ListView>
 
 </RelativeLayout>

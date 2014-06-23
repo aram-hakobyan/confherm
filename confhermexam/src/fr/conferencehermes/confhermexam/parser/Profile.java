@@ -9,6 +9,7 @@ public class Profile {
 	private HashMap<String, String> groups;
 	private String email;
 	private String userName;
+	private String authKey;
 
 	public Profile() {
 		setGroups(new HashMap<String, String>());
@@ -52,6 +53,14 @@ public class Profile {
 
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
+	}
+
+	public void setAuthKey(String authKey) {
+		this.authKey = authKey;
+	}
+
+	public String getAuthKey() {
+		return authKey;
 	}
 
 	public HashMap<String, String> getGroups() {

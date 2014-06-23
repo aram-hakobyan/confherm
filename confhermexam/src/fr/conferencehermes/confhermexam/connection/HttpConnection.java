@@ -23,6 +23,7 @@ import org.json.JSONObject;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import fr.conferencehermes.confhermexam.LoginActivity;
 import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Profile;
@@ -142,6 +143,7 @@ public class HttpConnection implements Runnable {
 
 				JSONObject jsonObj = new JSONObject(responses);
 				Profile profileData= JSONParser.parseProfileData(jsonObj);
+				LoginActivity.setLoginData(profileData);
 				MyProfileFragment.setProfileData(profileData);
 				handler.sendMessage(Message.obtain(handler, status));
 				// JSONParserCategories.parseJSONData(result)

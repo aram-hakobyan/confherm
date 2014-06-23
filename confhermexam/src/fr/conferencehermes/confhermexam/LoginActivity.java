@@ -9,6 +9,7 @@ import org.apache.http.NameValuePair;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
@@ -16,20 +17,27 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import fr.conferencehermes.confhermexam.connection.BaseNetworkManager;
 import fr.conferencehermes.confhermexam.connectionhelper.ActionDelegate;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestCreator;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestHelper;
+import fr.conferencehermes.confhermexam.parser.Profile;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.Utilities;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
 
 public class LoginActivity extends Activity implements ActionDelegate {
-
+	private static Profile lData;
 	private EditText username;
 	private EditText password;
+	private ProgressBar progressBarLogin;
+	private LinearLayout loginContentLayout;
 	public static String authToken;
+	private SharedPreferences.Editor authKeyEditor;
+	private SharedPreferences authKeyPrefs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +45,23 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_login);
 
+
+		ViewTracker.getInstance().setCurrentContext(this);
+		ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
+		
 		username = (EditText) findViewById(R.id.loginRow);
 		password = (EditText) findViewById(R.id.passwordRow);
-
+		loginContentLayout =(LinearLayout) findViewById(R.id.loginContentLayout);
+		progressBarLogin =(ProgressBar) findViewById(R.id.progressBarLogin);
+		
+		authKeyEditor = getPreferences(MODE_PRIVATE).edit();
+		
+		if (lData != null){
+		authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
+				lData.getAuthKey());
+		}
+		authKeyEditor.commit();
+		loginAction();
 		Button loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -60,51 +82,62 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	}
 
 	public void loginAction() {
+		String logonOrAuth = null;
+		Map<String, String> params = null;
 
-		// ------------------- Setting up login request here -------------- //
 
-		BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
+		authKeyPrefs = getPreferences(MODE_PRIVATE);
+		String restoredAuthKey = authKeyPrefs.getString(
+				Constants.AUTHKEY_SHAREDPREFS_KEY, null);
+
+		final String uname = "STUDENT";// username.getText().toString().trim();
+		final String pass = "123456"; // password.getText().toString().trim();//
 		RequestCreator creator = new RequestCreator();
+		if (restoredAuthKey != null) {
+			logonOrAuth = Constants.SERVER_URL_AUTH;
+			params = creator.createAppropriateMapRequest("auth_key", restoredAuthKey);
 
-		final String uname = "armen_mkrtchyan";// username.getText().toString().trim();
-		// key f24a1647499b645a37cb46baaebb005b2b491777										//
-		final String pass = "Student1!"; // password.getText().toString().trim();//
-		if (!uname.isEmpty() && !pass.isEmpty()) {
-			Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
-					"Logging into Hermes...");
+			loginContentLayout.setVisibility(View.GONE);
+			progressBarLogin.setVisibility(View.VISIBLE);
+			
+		} else {
 
-			Map<String, String> params = creator.createAppropriateMapRequest(
-					"username", uname, "password", pass);
+			logonOrAuth = Constants.SERVER_URL;
+			
+			params = creator.createAppropriateMapRequest("username", uname,
+					"password", pass);
 
-			// ----------------------- Construct POST DATA
-			// ---------------------------//
+			loginContentLayout.setVisibility(View.VISIBLE);
+			progressBarLogin.setVisibility(View.GONE);
+
+		}
+
+		if (!uname.isEmpty() && !pass.isEmpty() || restoredAuthKey != null) {
+			//Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
+				//	"Logging into Hermes...");
+			BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
+	
 			final RequestHelper reqHelper = new RequestHelper();
 			final List<NameValuePair> paramsList = reqHelper
 					.createPostDataWithKeyValuePair(params);
 
 			baseNetworkManager.constructConnectionAndHitPOST(
 					"Login Successful", "Login Request Started", paramsList,
-
-					this, "LogView", "LogService");
+					this, "LogView", "LogService", logonOrAuth);
 		} else {
-			Toast.makeText(LoginActivity.this,
-					"Username or Password can not be empty", Toast.LENGTH_LONG)
-					.show();
+			//Toast.makeText(LoginActivity.this,
+				//	"Username or Password can not be empty", Toast.LENGTH_LONG)
+					//.show();
 		}
 
 	}
+	
+	
 
 	@Override
 	public void didFinishRequestProcessing() {
 
 		/***** Share Preferences Save */
-		// String nameText = username.getText().toString();
-		// String surnameText = password.getText().toString();
-
-		// if (nameText != null)
-		// Utilities.writeString(this, Utilities.LOGIN, nameText);
-		// if (surnameText != null)
-		// Utilities.writeString(this, Utilities.PASSWORD, surnameText);
 
 		Intent hIntent = new Intent(getApplicationContext(), HomeActivity.class);
 
@@ -116,8 +149,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 			Utilities.writeString(this, Utilities.IS_LOGGED_IN, "YES");
 		}
 
-		Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
-				"Logging into Hermes...");
+		//Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
+				//"Logging into Hermes...");
 
 		startActivity(hIntent);
 		finish();
@@ -147,4 +180,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		return false;
 	}
 
+	
+	
+	public static void setLoginData(Profile loginData) {
+		lData = loginData;
+	}
 }

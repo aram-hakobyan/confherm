@@ -1,14 +1,20 @@
 package fr.conferencehermes.confhermexam;
 
+import java.util.List;
+
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningTaskInfo;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.LinearLayout;
-import fr.conferencehermes.confhermexam.connection.HttpAsyncPost;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class HomeActivity extends Activity implements OnClickListener {
@@ -31,8 +37,8 @@ public class HomeActivity extends Activity implements OnClickListener {
 				.setOnClickListener(this);
 		((LinearLayout) findViewById(R.id.homeButton6))
 				.setOnClickListener(this);
-
-		new HttpAsyncPost().execute();
+		// registerActivityLifecycleCallbacks(new HermesLifeCycleHandler());
+		// new HttpAsyncPost().execute();
 	}
 
 	@Override
@@ -70,6 +76,41 @@ public class HomeActivity extends Activity implements OnClickListener {
 		if (intent != null)
 			startActivity(intent);
 
+	}
+
+	private boolean isApplicationBroughtToBackground(Context context) {
+		ActivityManager am = (ActivityManager) context
+				.getSystemService(Context.ACTIVITY_SERVICE);
+		List<RunningTaskInfo> tasks = am.getRunningTasks(1);
+		if (!tasks.isEmpty()) {
+			ComponentName topActivity = tasks.get(0).topActivity;
+			if (!topActivity.getPackageName().equals(context.getPackageName())) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	protected void onPause() {
+		super.onPause();
+		//Log.d("onPause", isApplicationBroughtToBackground(HomeActivity.this) + "");
+		
+	}
+
+	protected void onResume() {
+		super.onResume();
+		//Log.d("onResume", isApplicationBroughtToBackground(HomeActivity.this) + "");
+	}
+
+	protected void onStop() {
+		super.onStop();
+		//Log.d("onStop", isApplicationBroughtToBackground(HomeActivity.this) + "");
+	}
+
+	protected void onStart() {
+		super.onStart();
+		Log.d("onStart", "onStart");
 	}
 
 }
