@@ -263,7 +263,7 @@ public class QuestionResponseActivity extends Activity implements
 						LinearLayout.LayoutParams.MATCH_PARENT,
 						LinearLayout.LayoutParams.WRAP_CONTENT);
 				if (i != 0)
-					layoutParams.setMargins(0, 20, 0, 0);
+					layoutParams.setMargins(0, 10, 0, 0);
 				answersLayout.addView(editText, layoutParams);
 			}
 		}
