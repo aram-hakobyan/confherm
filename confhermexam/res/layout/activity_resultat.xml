@@ -7,7 +7,7 @@
 
     <ListView
         android:id="@+id/listViewResultat"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
         android:layout_margin="50dp"

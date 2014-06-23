@@ -16,8 +16,11 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -88,6 +91,8 @@ public class QuestionResponseActivity extends Activity implements
 
 	int ANSWERED_QUESTIONS_COUNT = 0;
 	ArrayList<EditText> editTextsArray;
+
+	private boolean onPaused = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -262,7 +267,7 @@ public class QuestionResponseActivity extends Activity implements
 						LinearLayout.LayoutParams.MATCH_PARENT,
 						LinearLayout.LayoutParams.WRAP_CONTENT);
 				if (i != 0)
-					layoutParams.setMargins(0, 20, 0, 0);
+					layoutParams.setMargins(0, 10, 0, 0);
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 			}
@@ -606,4 +611,54 @@ public class QuestionResponseActivity extends Activity implements
 		dialog.getWindow().setLayout(800, 600);
 
 	}
+
+	private void showAlertDialog() {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				QuestionResponseActivity.this);
+
+		// set title
+		alertDialogBuilder.setTitle("You have been dropped out");
+
+		// set dialog message
+		alertDialogBuilder
+				.setMessage(
+						"You dropped out drop examination , because you leave examen")
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+
+						Intent intentHome = new Intent(
+								QuestionResponseActivity.this,
+								HomeActivity.class);
+						startActivity(intentHome);
+
+						QuestionResponseActivity.this.finish();
+						onPaused = false;
+					}
+				});
+
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+
+		// show it
+		alertDialog.show();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if (onPaused == true) {
+			showAlertDialog();
+		}
+
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		onPaused = true;
+
+	}
+
 }
