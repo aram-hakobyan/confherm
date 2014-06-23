@@ -317,7 +317,7 @@ public class JSONParser {
 					eFiles.put("sound", soundObjExercise.getString("file"));
 				}
 				JSONArray videoArrayExercise = (JSONArray) filesExercise
-						.getJSONArray("image");
+						.getJSONArray("video");
 				if (videoArrayExercise.length() != 0) {
 					JSONObject videoObjExercise = (JSONObject) videoArrayExercise
 							.get(0);
@@ -352,7 +352,7 @@ public class JSONParser {
 						qFiles.put("sound", soundObj.getString("file"));
 					}
 					JSONArray videoArray = (JSONArray) files
-							.getJSONArray("image");
+							.getJSONArray("video");
 					if (videoArray.length() != 0) {
 						JSONObject videoObj = (JSONObject) videoArray.get(0);
 						qFiles.put("video", videoObj.getString("file"));
@@ -379,7 +379,7 @@ public class JSONParser {
 								soundObjCorrection.getString("file"));
 					}
 					JSONArray videoArrayCorrection = (JSONArray) files
-							.getJSONArray("image");
+							.getJSONArray("video");
 					if (videoArrayCorrection.length() != 0) {
 						JSONObject videoObjCorrection = (JSONObject) videoArrayCorrection
 								.get(0);

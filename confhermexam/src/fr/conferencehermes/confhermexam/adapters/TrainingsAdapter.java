@@ -44,8 +44,6 @@ public class TrainingsAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.training_rowview, null);
 			holder.name = (TextView) view.findViewById(R.id.examName);
-			holder.desc = (TextView) view.findViewById(R.id.examDesc);
-			holder.status = (TextView) view.findViewById(R.id.examStatus);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
@@ -55,8 +53,6 @@ public class TrainingsAdapter extends BaseAdapter {
 		if (training != null) {
 			if (holder.name != null) {
 				holder.name.setText(training.getTitle());
-				holder.desc.setText("ID: " + training.getId());
-				// holder.status.setText(training.getCategoryType());
 			}
 		}
 
@@ -66,8 +62,6 @@ public class TrainingsAdapter extends BaseAdapter {
 
 	private static class ViewHolder {
 		protected TextView name;
-		protected TextView desc;
-		protected TextView status;
 
 	}
 }
