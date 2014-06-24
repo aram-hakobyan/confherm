@@ -182,12 +182,8 @@ public class JSONParser {
 		try {
 			if (exRJson.has(Constants.KEY_DATA)
 					&& exRJson.get(Constants.KEY_DATA) != null) {
-				NotesResult exR = new NotesResult();
 
 				JSONObject obj = exRJson.getJSONObject(Constants.KEY_DATA);
-
-				exR.setMedianScore(obj.getInt("median_score"));
-				exR.setMonenneScore(obj.getInt("moyenne_score"));
 
 				JSONArray data = obj.getJSONArray(Constants.KEY_RESULTS);
 
@@ -195,12 +191,13 @@ public class JSONParser {
 
 					for (int i = 0; i < data.length(); i++) {
 						JSONObject gObj = data.getJSONObject(i);
-
+						NotesResult exR = new NotesResult();
 						exR.setStudentId(gObj.getInt("student_id"));
 						exR.setRank(gObj.getInt("rank"));
 						exR.setStudentName(gObj.getString("name"));
 						exR.setScore(gObj.getInt("score"));
-
+						exR.setMedianScore(obj.getInt("median_score"));
+						exR.setMonenneScore(obj.getInt("moyenne_score"));
 						exerciseResult.add(exR);
 					}
 
@@ -219,11 +216,7 @@ public class JSONParser {
 			if (exEJson.has(Constants.KEY_DATA)
 					&& exEJson.get(Constants.KEY_DATA) != null) {
 
-				ExamExercise exR = new ExamExercise();
 				JSONObject obj = exEJson.getJSONObject(Constants.KEY_DATA);
-
-				exR.setCreatedBy(obj.getString("created_by"));
-				exR.setExamName(obj.getString("exam_name"));
 
 				JSONArray dataExercises = obj.getJSONArray("exercises");
 
@@ -231,9 +224,11 @@ public class JSONParser {
 
 					for (int i = 0; i < dataExercises.length(); i++) {
 						JSONObject gObj = dataExercises.getJSONObject(i);
-
+						ExamExercise exR = new ExamExercise();
+						exR.setCreatedBy(obj.getString("created_by"));
+						exR.setExamName(obj.getString("exam_name"));
 						exR.setExerciseId(gObj.getInt("exercise_id"));
-						exR.setExamName(gObj.getString("exercise_name"));
+						exR.setExersiceName(gObj.getString("exercise_name"));
 						exR.setPastExersice(gObj.getBoolean("past_exercise"));
 
 						examExercise.add(exR);
@@ -450,6 +445,42 @@ public class JSONParser {
 			e.printStackTrace();
 		}
 		return score;
+	}
+
+	public static ArrayList<Planning> parsePlannig(JSONObject planJson) {
+		ArrayList<Planning> planningResult = new ArrayList<Planning>();
+		try {
+			if (planJson.has(Constants.KEY_DATA)
+					&& planJson.get(Constants.KEY_DATA) != null) {
+				// JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
+				JSONArray data = planJson.getJSONArray(Constants.KEY_DATA);
+				if (data.length() != 0) {
+
+					for (int i = 0; i < data.length(); i++) {
+						JSONObject gObj = data.getJSONObject(i);
+
+						Planning r = new Planning();
+
+						r.setTimeslot_id(gObj.getInt("timeslot_id"));
+						r.setTest_id(gObj.getInt("test_id"));
+						r.setTest_name(gObj.getString("test_name"));
+						r.setAcademy(gObj.getString("academy"));
+						r.setStart_date(gObj.getInt("start_date"));
+						r.setEnd_date(gObj.getInt("end_date"));
+						r.setPlace(gObj.getString("place"));
+						r.setRoom(gObj.getString("room"));
+						r.setStatus(gObj.getInt("status"));
+
+						planningResult.add(r);
+					}
+
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return planningResult;
+
 	}
 
 }

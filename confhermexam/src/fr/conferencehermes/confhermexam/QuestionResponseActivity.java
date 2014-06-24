@@ -31,10 +31,12 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
@@ -75,6 +77,7 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
+import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
@@ -127,6 +130,12 @@ public class QuestionResponseActivity extends Activity implements
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
 		validAnswers = new SparseBooleanArray();
+
+		// INITIALIZE RECEIVER
+		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+		filter.addAction(Intent.ACTION_SCREEN_OFF);
+		BroadcastReceiver mReceiver = new ScreenReceiver();
+		registerReceiver(mReceiver, filter);
 
 		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);
@@ -821,7 +830,7 @@ public class QuestionResponseActivity extends Activity implements
 		// set dialog message
 		alertDialogBuilder
 				.setMessage(
-						"You dropped out drop examination , because you leave examen")
+						"You dropped out drop from examination , because you leave examen")
 				.setCancelable(false)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -845,19 +854,36 @@ public class QuestionResponseActivity extends Activity implements
 
 	@Override
 	protected void onResume() {
-		super.onResume();
+		// ONLY WHEN SCREEN TURNS ON
+		if (!ScreenReceiver.wasScreenOn) {
+			// THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
+			System.out.println("SCREEN TURNED ON");
+		} else {
+			// THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT
+			// CHANGED
+		}
 
 		if (onPaused == true) {
 			showAlertDialog();
 		}
-
+		super.onResume();
 	}
 
 	@Override
 	protected void onPause() {
-		super.onPause();
+
 		onPaused = true;
 
+		// WHEN THE SCREEN IS ABOUT TO TURN OFF
+		if (ScreenReceiver.wasScreenOn) {
+			// THIS IS THE CASE WHEN ONPAUSE() IS CALLED BY THE SYSTEM DUE TO A
+			// SCREEN STATE CHANGE
+			System.out.println("SCREEN TURNED OFF");
+		} else {
+			// THIS IS WHEN ONPAUSE() IS CALLED WHEN THE SCREEN STATE HAS NOT
+			// CHANGED
+		}
+		super.onPause();
 	}
 
 }

@@ -10,14 +10,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -55,7 +54,8 @@ public class NotesActivity extends Activity {
 	int paramExersiceId = -1;
 	int paramExamId = -1;
 	int paramGlobalTest = 1;
-
+	int wantedPosition;
+	int wantedChild;
 	int paramGroups = 0;
 
 	@Override
@@ -79,26 +79,26 @@ public class NotesActivity extends Activity {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-	
+
 		exerciseResult(NotesActivity.this);
 
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
 
-		/*
-		 * listviewEx.setOnItemClickListener(new OnItemClickListener() {
-		 * 
-		 * @Override public void onItemClick(AdapterView<?> parent, View view,
-		 * int position, long id) { globalOrExercise = -1; //
-		 * exerciseResult(NotesActivity.this, -1, examID, // globalOrExercise,
-		 * 1); progressBarNotes.setVisibility(View.VISIBLE);
-		 * listviewNt.setVisibility(View.GONE);
-		 * 
-		 * }
-		 * 
-		 * });
-		 */
+		// listviewEx.setOnItemClickListener(new OnItemClickListener() {
+		//
+		// @Override
+		// public void onItemClick(AdapterView<?> parent, View view,
+		// int position, long id) {
+		//
+		//
+		// progressBarNotes.setVisibility(View.VISIBLE);
+		// listviewNt.setVisibility(View.GONE);
+		//
+		// }
+		//
+		// });
+
 		globalTest.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -140,8 +140,52 @@ public class NotesActivity extends Activity {
 						Toast.LENGTH_SHORT).show();
 
 				// For a direct scroll:
-				// listviewNt.getListView().setSelection(21);
+				if (listviewNt != null) {
 
+					listviewNt.post(new Runnable() {
+						@Override
+						public void run() {
+
+							listviewNt.smoothScrollToPosition(21);
+
+							wantedPosition = 21; // Whatever position you're
+							// looking for
+							int firstPosition = listviewNt
+									.getFirstVisiblePosition()
+									- listviewNt.getHeaderViewsCount();
+							wantedChild = wantedPosition - firstPosition;
+
+							if (wantedChild < 0
+									|| wantedChild >= listviewNt
+											.getChildCount()) {
+								Log.w("TAG",
+										"Unable to get view for desired position, because it's not being displayed on screen.");
+								return;
+							}
+						}
+					});
+
+					Handler h = new Handler();
+					h.postDelayed(new Runnable() {
+
+						@Override
+						public void run() {
+							 View wantedView = listviewNt
+									.getChildAt(21);
+			
+							// TODO Auto-generated method stub
+							if (wantedView != null) {
+								//wantedView.requestFocus();
+						       
+								wantedView.setBackgroundColor(getResources()
+										.getColor(R.color.app_main_color));
+							}
+						}
+					}, 5000);
+
+					// myListView.setClickable(true);
+
+				}
 				// For a smooth scroll:
 				// getListView().smoothScrollToPosition(21);
 
