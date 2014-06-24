@@ -424,7 +424,7 @@ public class QuestionResponseActivity extends Activity implements
 					e.printStackTrace();
 				}
 				if (ob != null) {
-					final int score = JSONParser.parseCorrections(ob);
+					final String score = JSONParser.parseCorrections(ob);
 					runOnUiThread(new Runnable() {
 						public void run() {
 							makeCorrections(score, DataHolder.getInstance()
@@ -461,10 +461,10 @@ public class QuestionResponseActivity extends Activity implements
 		return total.toString();
 	}
 
-	private void makeCorrections(int score, ArrayList<Correction> corrections) {
+	private void makeCorrections(String score, ArrayList<Correction> corrections) {
 		CORRECTED_ANSWERS = true;
 		TextView scoreText = (TextView) findViewById(R.id.score);
-		scoreText.setText("Score : " + String.valueOf(score));
+		scoreText.setText(score);
 	}
 
 	private void saveQuestionAnswers() throws JSONException {

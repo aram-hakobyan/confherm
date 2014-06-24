@@ -416,15 +416,15 @@ public class JSONParser {
 		return exercise;
 	}
 
-	public static int parseCorrections(JSONObject json) {
+	public static String parseCorrections(JSONObject json) {
 		ArrayList<Correction> correctionsList = new ArrayList<Correction>();
-		int score = 0;
+		String score = "";
 		try {
 			if (json.has(Constants.KEY_DATA)
 					&& json.get(Constants.KEY_DATA) != null) {
 
 				JSONObject data = json.getJSONObject("data");
-				score = data.getInt("score");
+				score = data.getString("score_message");
 				JSONArray corrections = data
 						.getJSONArray("question_corrections");
 
