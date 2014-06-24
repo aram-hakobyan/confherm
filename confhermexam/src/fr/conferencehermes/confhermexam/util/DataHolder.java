@@ -18,6 +18,7 @@ public class DataHolder {
 	private ArrayList<Training> trainings;
 	private ArrayList<DownloadInstance> downloads;
 	private ArrayList<Correction> corrections;
+	private int trainingDuration = 0;
 
 	private DataHolder() {
 		setExams(new ArrayList<Exam>());
@@ -83,6 +84,14 @@ public class DataHolder {
 
 	public void setCorrections(ArrayList<Correction> corrections) {
 		this.corrections = corrections;
+	}
+
+	public int getTrainingDuration() {
+		return trainingDuration;
+	}
+
+	public void setTrainingDuration(int trainingDuration) {
+		this.trainingDuration = trainingDuration;
 	}
 
 }

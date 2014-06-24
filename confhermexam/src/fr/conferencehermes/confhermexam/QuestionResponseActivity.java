@@ -33,6 +33,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -112,6 +113,8 @@ public class QuestionResponseActivity extends Activity implements
 	private boolean onPaused = false;
 	private boolean CORRECTED_ANSWERS = false;
 
+	private HashMap<Integer, Integer> validAnswers;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -122,6 +125,7 @@ public class QuestionResponseActivity extends Activity implements
 		aq = new AQuery(QuestionResponseActivity.this);
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
+		validAnswers = new HashMap<Integer, Integer>();
 
 		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);
@@ -163,10 +167,6 @@ public class QuestionResponseActivity extends Activity implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				selectQuestion(questions.get(position), position);
-				if (view != null) {
-					view.setBackgroundColor(getResources().getColor(
-							R.color.app_main_color));
-				}
 			}
 
 		});
@@ -188,11 +188,6 @@ public class QuestionResponseActivity extends Activity implements
 							if (json.has("data") && json.get("data") != null) {
 								exercise = JSONParser.parseExercise(json);
 
-								questions = exercise.getQuestions();
-								if (!questions.isEmpty()) {
-									selectQuestion(questions.get(0), 0);
-								}
-
 								adapter = new QuestionsAdapter(
 										QuestionResponseActivity.this, exercise
 												.getQuestions());
@@ -201,6 +196,11 @@ public class QuestionResponseActivity extends Activity implements
 								examName.setText(exercise.getName());
 								teacher.setText("Teacher "
 										+ exercise.getTeacher());
+
+								questions = exercise.getQuestions();
+								if (!questions.isEmpty()) {
+									selectQuestion(questions.get(0), 0);
+								}
 
 							}
 						} catch (JSONException e) {
@@ -213,6 +213,16 @@ public class QuestionResponseActivity extends Activity implements
 	}
 
 	private void selectQuestion(Question q, int position) {
+		int wantedPosition = position;
+		int firstPosition = listview.getFirstVisiblePosition()
+				- listview.getHeaderViewsCount();
+		int wantedChild = wantedPosition - firstPosition;
+		if (!(wantedChild < 0 || wantedChild >= listview.getChildCount())) {
+			View wantedView = listview.getChildAt(wantedChild);
+			wantedView.setBackgroundColor(getResources().getColor(
+					R.color.app_main_color));
+		}
+
 		currentQuestionId = position;
 		currentQuestion = q;
 		answersLayout.removeAllViews();
@@ -317,7 +327,7 @@ public class QuestionResponseActivity extends Activity implements
 			}
 
 		} else if (q.getType().equalsIgnoreCase("3")) {
-
+			editTextsArray.clear();
 			int count = Integer.valueOf(q.getInputCount());
 			for (int i = 0; i < count; i++) {
 				EditText editText = new EditText(QuestionResponseActivity.this);
@@ -353,7 +363,6 @@ public class QuestionResponseActivity extends Activity implements
 	public void sendAnswers() throws JSONException {
 		Utilities.showOrHideActivityIndicator(QuestionResponseActivity.this, 0,
 				"Please wait...");
-		String url = "http://ecni.conference-hermes.fr/api/traninganswer";
 		Map<String, String> params = new HashMap<String, String>();
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -372,6 +381,7 @@ public class QuestionResponseActivity extends Activity implements
 		transmitter.execute(object);
 
 		/*
+		 * String url = "http://ecni.conference-hermes.fr/api/traninganswer";
 		 * aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>()
 		 * {
 		 * 
@@ -494,6 +504,8 @@ public class QuestionResponseActivity extends Activity implements
 				for (EditText editText : editTextsArray) {
 					if (editText.getText().length() != 0) {
 						answers.put(editText.getText());
+					} else {
+						answers.put("");
 					}
 				}
 
@@ -640,16 +652,43 @@ public class QuestionResponseActivity extends Activity implements
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
 
+		final String IMAGE_URL = files.get("image");
+		final String AUDIO_URL = files.get("sound");
+		final String VIDEO_URL = files.get("video");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
 		final MediaController mc = new MediaController(
 				QuestionResponseActivity.this);
 		final MediaPlayer mediaPlayer = new MediaPlayer();
-
-		final String IMAGE_URL = files.get("image");
-		final String AUDIO_URL = files.get("audio");
-		final String VIDEO_URL = files.get("video");
+		if (AUDIO_URL != null)
+			if (!AUDIO_URL.isEmpty()) {
+				try {
+					mediaPlayer.setDataSource(AUDIO_URL);
+					mediaPlayer.prepare();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalStateException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		if (VIDEO_URL != null)
+			if (!VIDEO_URL.isEmpty()) {
+				mc.setAnchorView(video);
+				Uri videoURI = Uri
+						.parse("http://ecni.conference-hermes.fr/uploads/exercises/Understanding%20Different%20Heart%20Operations%20and%20Surgeries%20-.mp4");
+				video.setMediaController(mc);
+				video.setVideoURI(videoURI);
+				video.setZOrderOnTop(true);
+			}
 
 		if (IMAGE_URL != null)
 			if (!IMAGE_URL.isEmpty()) {
@@ -693,7 +732,9 @@ public class QuestionResponseActivity extends Activity implements
 					public void onClick(View v) {
 						if (mediaPlayer != null) {
 							try {
-								mediaPlayer.stop();
+								if (mediaPlayer.isPlaying()) {
+									mediaPlayer.pause();
+								}
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
@@ -717,26 +758,9 @@ public class QuestionResponseActivity extends Activity implements
 							video.stopPlayback();
 						}
 						try {
-							if (AUDIO_URL != null)
-								if (!AUDIO_URL.isEmpty()) {
-									mediaPlayer.setDataSource(AUDIO_URL);
-									mediaPlayer.prepare();
-									mediaPlayer
-											.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-												@Override
-												public void onPrepared(
-														MediaPlayer arg0) {
-													mediaPlayer.start();
-												}
-											});
-								}
-						} catch (IllegalArgumentException e) {
-							e.printStackTrace();
-						} catch (SecurityException e) {
-							e.printStackTrace();
-						} catch (IllegalStateException e) {
-							e.printStackTrace();
-						} catch (IOException e) {
+							mediaPlayer.seekTo(0);
+							mediaPlayer.start();
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 
@@ -746,29 +770,40 @@ public class QuestionResponseActivity extends Activity implements
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						/*
-						 * if (mediaPlayer != null) { try { mediaPlayer.stop();
-						 * } catch (Exception e) { e.printStackTrace(); } }
-						 */
+						try {
+							if (mediaPlayer.isPlaying()) {
+								mediaPlayer.pause();
+							}
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						img.setVisibility(View.INVISIBLE);
 						video.setVisibility(View.VISIBLE);
-						// mc.setVisibility(View.INVISIBLE);
+						mc.setVisibility(View.INVISIBLE);
 
 						try {
-							if (VIDEO_URL != null)
-								if (VIDEO_URL.isEmpty()) {
-									mc.setAnchorView(video);
-									Uri videoURI = Uri
-											.parse("http://ecni.conference-hermes.fr/uploads/exercises/Understanding%20Different%20Heart%20Operations%20and%20Surgeries%20-.mp4");
-									video.setMediaController(mc);
-									video.setVideoURI(videoURI);
-									video.start();
-								}
+							video.start();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
 				});
+
+		dialog.setOnDismissListener(new OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				try {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.pause();
+					}
+					if (video.isPlaying()) {
+						video.stopPlayback();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		dialog.show();
 		dialog.getWindow().setLayout(800, 600);

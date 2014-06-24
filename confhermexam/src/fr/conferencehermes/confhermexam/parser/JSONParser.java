@@ -256,11 +256,14 @@ public class JSONParser {
 			if (json.has(Constants.KEY_DATA)
 					&& json.get(Constants.KEY_DATA) != null) {
 
-				JSONArray data = json.getJSONArray("data");
+				JSONObject data = json.getJSONObject("data");
+				int duration = data.getInt("duration");
+				DataHolder.getInstance().setTrainingDuration(duration);
 
+				JSONArray exObj = data.getJSONArray("exercises");
 				for (int i = 0; i < data.length(); i++) {
 					TrainingExercise t = new TrainingExercise();
-					JSONObject obj = data.getJSONObject(i);
+					JSONObject obj = exObj.getJSONObject(i);
 
 					t.setExercise_id(obj.getInt("exercise_id"));
 					t.setTitle(obj.getString("title"));
