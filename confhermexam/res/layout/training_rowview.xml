@@ -6,7 +6,7 @@
     android:padding="10dp" >
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_centerVertical="true"
@@ -17,19 +17,10 @@
             android:id="@+id/examName"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
+            android:layout_gravity="center"
+            android:gravity="center"
             android:padding="5dp"
             android:text="Exam Name"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/examDesc"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:gravity="center_vertical"
-            android:paddingRight="50dp"
-            android:text="Available from:"
             android:textSize="20sp" />
     </LinearLayout>
 

@@ -274,7 +274,7 @@ public class QuestionResponseActivity extends Activity implements
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.WRAP_CONTENT,
 						LinearLayout.LayoutParams.WRAP_CONTENT);
-				// layoutParams.setMargins(50, 20, 30, 20);
+				layoutParams.setMargins(0, -5, 0, 0);
 				checkBoxLayout.addView(checkBox);
 				checkBoxLayout.addView(text, layoutParams);
 				answersLayout.addView(checkBoxLayout);
@@ -462,6 +462,8 @@ public class QuestionResponseActivity extends Activity implements
 	}
 
 	private void makeCorrections(String score, ArrayList<Correction> corrections) {
+		ANSWERED_QUESTIONS_COUNT = 0;
+		abandonner.setText("ABANDONNER");
 		CORRECTED_ANSWERS = true;
 		TextView scoreText = (TextView) findViewById(R.id.score);
 		scoreText.setText(score);
@@ -528,6 +530,7 @@ public class QuestionResponseActivity extends Activity implements
 					ANSWERED_QUESTIONS_COUNT++;
 					if (ANSWERED_QUESTIONS_COUNT == questions.size()) {
 						abandonner.setText("SUBMIT");
+						valider.setVisibility(View.GONE);
 					}
 
 					if (currentQuestionId < questions.size() - 1) {
@@ -640,8 +643,8 @@ public class QuestionResponseActivity extends Activity implements
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = (MediaController) dialog
-				.findViewById(R.id.mediaController1);
+		final MediaController mc = new MediaController(
+				QuestionResponseActivity.this);
 		final MediaPlayer mediaPlayer = new MediaPlayer();
 
 		final String IMAGE_URL = files.get("image");
@@ -743,21 +746,22 @@ public class QuestionResponseActivity extends Activity implements
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						if (mediaPlayer != null) {
-							try {
-								mediaPlayer.stop();
-							} catch (Exception e) {
-								e.printStackTrace();
-							}
-						}
+						/*
+						 * if (mediaPlayer != null) { try { mediaPlayer.stop();
+						 * } catch (Exception e) { e.printStackTrace(); } }
+						 */
 						img.setVisibility(View.INVISIBLE);
 						video.setVisibility(View.VISIBLE);
-						mc.setVisibility(View.INVISIBLE);
+						// mc.setVisibility(View.INVISIBLE);
 
 						try {
 							if (VIDEO_URL != null)
 								if (VIDEO_URL.isEmpty()) {
-									video.setVideoURI(Uri.parse(VIDEO_URL));
+									mc.setAnchorView(video);
+									Uri videoURI = Uri
+											.parse("http://ecni.conference-hermes.fr/uploads/exercises/Understanding%20Different%20Heart%20Operations%20and%20Surgeries%20-.mp4");
+									video.setMediaController(mc);
+									video.setVideoURI(videoURI);
 									video.start();
 								}
 						} catch (Exception e) {
