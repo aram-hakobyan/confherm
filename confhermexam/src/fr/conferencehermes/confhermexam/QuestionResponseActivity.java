@@ -48,6 +48,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -116,7 +117,7 @@ public class QuestionResponseActivity extends Activity implements
 	private boolean onPaused = false;
 	private boolean CORRECTED_ANSWERS = false;
 
-	private HashMap<Integer, Integer> validAnswers;
+	private SparseBooleanArray validAnswers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -128,7 +129,7 @@ public class QuestionResponseActivity extends Activity implements
 		aq = new AQuery(QuestionResponseActivity.this);
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
-		validAnswers = new HashMap<Integer, Integer>();
+		validAnswers = new SparseBooleanArray();
 
 		// INITIALIZE RECEIVER
 		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
@@ -228,8 +229,9 @@ public class QuestionResponseActivity extends Activity implements
 		int wantedChild = wantedPosition - firstPosition;
 		if (!(wantedChild < 0 || wantedChild >= listview.getChildCount())) {
 			View wantedView = listview.getChildAt(wantedChild);
-			wantedView.setBackgroundColor(getResources().getColor(
-					R.color.app_main_color));
+			if (validAnswers.get(position, false))
+				wantedView.setBackgroundColor(getResources().getColor(
+						R.color.app_main_color));
 		}
 
 		currentQuestionId = position;
@@ -566,7 +568,7 @@ public class QuestionResponseActivity extends Activity implements
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-
+			validAnswers.put(currentQuestionId, true);
 			break;
 		case R.id.abandonner:
 			try {
