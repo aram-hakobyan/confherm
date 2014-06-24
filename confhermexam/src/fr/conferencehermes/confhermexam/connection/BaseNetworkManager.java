@@ -59,18 +59,19 @@ public class BaseNetworkManager {
 					case 403:
 						Log.d("Access denied. Please login",
 								"404");
-
+						handleFailResponse("Access denied. Please login");
 						break;
 
 					case 400:
 						Log.d("Exception occured while hitting response!",
 								"400");
-						handleFailResponse();
+						handleFailResponse("Exception occured while hitting response!");
 						break;
 						
 					case 500:
 						Log.d("Something went wrong. Please try again later",
-								"500");				
+								"500");	
+						handleFailResponse("Something went wrong. Please try again later");
 						break;
 
 					}
@@ -93,7 +94,7 @@ public class BaseNetworkManager {
 		} else {
 			ActionDelegate delegate = (ActionDelegate) ViewTracker
 					.getInstance().getCurrentContext();
-			delegate.didFailRequestProcessing();
+			delegate.didFailRequestProcessing("Please check your internet connection");
 		}
 	}
 
@@ -110,11 +111,11 @@ public class BaseNetworkManager {
 		del.didFinishRequestProcessing();
 	}
 
-	private void handleFailResponse() {
+	private void handleFailResponse(String Message) {
 		ActionDelegate del = (ActionDelegate) ViewTracker.getInstance()
 				.getCurrentContext();
 
-		del.didFailRequestProcessing();
+		del.didFailRequestProcessing(Message);
 	}
 
 }

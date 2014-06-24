@@ -90,8 +90,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		String restoredAuthKey = authKeyPrefs.getString(
 				Constants.AUTHKEY_SHAREDPREFS_KEY, null);
 
-		final String uname = "STUDENT";// username.getText().toString().trim();
-		final String pass = "123456"; // password.getText().toString().trim();//
+		final String uname =  username.getText().toString().trim();
+		final String pass = password.getText().toString().trim();
 		RequestCreator creator = new RequestCreator();
 		if (restoredAuthKey != null) {
 			logonOrAuth = Constants.SERVER_URL_AUTH;
@@ -125,9 +125,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 					"Login Successful", "Login Request Started", paramsList,
 					this, "LogView", "LogService", logonOrAuth);
 		} else {
-			//Toast.makeText(LoginActivity.this,
-				//	"Username or Password can not be empty", Toast.LENGTH_LONG)
-					//.show();
+			Toast.makeText(LoginActivity.this,
+			"Username or Password can not be empty", Toast.LENGTH_LONG)
+					.show();
 		}
 
 	}
@@ -166,10 +166,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	}
 
 	@Override
-	public void didFailRequestProcessing() {
-		Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
-				"Something went wrong...");
-		Toast.makeText(getApplicationContext(), "Request Failed",
+	public void didFailRequestProcessing(String Message) {
+
+		Toast.makeText(getApplicationContext(), Message,
 				Toast.LENGTH_SHORT).show();
 
 	}

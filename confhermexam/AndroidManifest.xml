@@ -60,7 +60,7 @@
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
-        <service android:name="fr.conferencehermes.confhermexam.lifecycle.CountDownService" />
+        <service android:name="fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver" />
     </application>
 
 </manifest>
