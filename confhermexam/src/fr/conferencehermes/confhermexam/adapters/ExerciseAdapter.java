@@ -56,7 +56,7 @@ public class ExerciseAdapter extends BaseAdapter {
 		}
 
 		if (holder.name != null) {
-			holder.name.setText(mListItems.get(position).getExamName());
+			holder.name.setText(mListItems.get(position).getExersiceName());
 		}
 
 		holder.name.setOnClickListener(new OnClickListener() {

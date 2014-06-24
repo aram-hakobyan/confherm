@@ -21,7 +21,8 @@ public class Constants {
 	public static String DOWNLOADS_LIST_URL = "http://ecni.conference-hermes.fr/api/download";
 	public static String LOG_OUT_URL = "http://ecni.conference-hermes.fr/api/logout.php";
 	public static String CURRENT_EXAM_URL = "http://ecni.conference-hermes.fr/api/result";
-
+	public static String PLANNING_URL = "http://ecni.conference-hermes.fr/api/planning";
+	
 	/********************************* Json Keys ***********************************/
 
 	public static String KEY_AUTH_TOKEN = "auth_key";
@@ -32,7 +33,12 @@ public class Constants {
 	public static String KEY_EXAM_ID = "exam_id";
 	public static String KEY_GLOBAL_TEST = "global_test";
 	public static String KEY_GROUPS = "groups";
-
+	public static String KEY_DEVICE_ID = "device_id";
+	public static String KEY_FROM = "from";
+	public static String KEY_TO = "to";
+	
+	
+	
 	/********************************* Other ***********************************/
 	public static final String RIGHT_SLASH = "/";
 	public static final String EQUAL = "=";
