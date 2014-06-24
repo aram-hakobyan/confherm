@@ -10,7 +10,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,6 +17,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
 import android.widget.ImageView;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioGroup;
@@ -51,12 +51,13 @@ public class NotesActivity extends Activity {
 
 	static NotesAdapter adapterNt;
 	private TextView globalTest;
-	int paramExersiceId = -1;
-	int paramExamId = -1;
-	int paramGlobalTest = 1;
-	int wantedPosition;
-	int wantedChild;
-	int paramGroups = 0;
+	private int paramExersiceId = -1;
+	private int paramExamId = -1;
+	private int paramGlobalTest = 1;
+	private int wantedPosition;
+	private int wantedChild;
+	private int paramGroups = 0;
+	private int userID;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -85,20 +86,6 @@ public class NotesActivity extends Activity {
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
 
-		// listviewEx.setOnItemClickListener(new OnItemClickListener() {
-		//
-		// @Override
-		// public void onItemClick(AdapterView<?> parent, View view,
-		// int position, long id) {
-		//
-		//
-		// progressBarNotes.setVisibility(View.VISIBLE);
-		// listviewNt.setVisibility(View.GONE);
-		//
-		// }
-		//
-		// });
-
 		globalTest.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -117,14 +104,10 @@ public class NotesActivity extends Activity {
 
 					paramGroups = 0;
 					exerciseResult(NotesActivity.this);
-					Toast.makeText(getApplicationContext(), "radio_globe",
-							Toast.LENGTH_SHORT).show();
 
 				} else if (checkedId == R.id.radio_people) {
 					paramGroups = 1;
 					exerciseResult(NotesActivity.this);
-					Toast.makeText(getApplicationContext(), "radio_people",
-							Toast.LENGTH_SHORT).show();
 
 				}
 
@@ -135,25 +118,52 @@ public class NotesActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				Toast.makeText(NotesActivity.this, JSONParser.USER_ID,
-						Toast.LENGTH_SHORT).show();
 
-				// For a direct scroll:
+				try {
+					
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
 				if (listviewNt != null) {
-
+					ListAdapter listAdapter = listviewNt.getAdapter();
+					for (int i = 0; i < listAdapter.getCount(); i++) {
+						NotesResult nr = (NotesResult) listAdapter.getItem(i);
+						if(JSONParser.USER_ID != null && JSONParser.USER_ID.equals(nr.getStudentId()))
+						{
+							userID = i;
+							break;
+						}
+						
+					}
+					
 					listviewNt.post(new Runnable() {
 						@Override
 						public void run() {
 
-							listviewNt.smoothScrollToPosition(21);
+							listviewNt.setSelection(userID-1);
 
-							wantedPosition = 21; // Whatever position you're
-							// looking for
+						}
+					});
+
+					listviewNt.postDelayed(new Runnable() {
+						@Override
+						public void run() {
+
+							wantedPosition = userID;
 							int firstPosition = listviewNt
 									.getFirstVisiblePosition()
 									- listviewNt.getHeaderViewsCount();
 							wantedChild = wantedPosition - firstPosition;
+							View wantedView = listviewNt
+									.getChildAt(wantedChild);
+							if (wantedView != null) {
+								wantedView.requestFocus();
+
+								wantedView.setBackgroundColor(getResources()
+										.getColor(R.color.app_main_color));
+							}
 
 							if (wantedChild < 0
 									|| wantedChild >= listviewNt
@@ -163,31 +173,9 @@ public class NotesActivity extends Activity {
 								return;
 							}
 						}
-					});
-
-					Handler h = new Handler();
-					h.postDelayed(new Runnable() {
-
-						@Override
-						public void run() {
-							 View wantedView = listviewNt
-									.getChildAt(21);
-			
-							// TODO Auto-generated method stub
-							if (wantedView != null) {
-								//wantedView.requestFocus();
-						       
-								wantedView.setBackgroundColor(getResources()
-										.getColor(R.color.app_main_color));
-							}
-						}
-					}, 5000);
-
-					// myListView.setClickable(true);
+					}, 300);
 
 				}
-				// For a smooth scroll:
-				// getListView().smoothScrollToPosition(21);
 
 			}
 		});

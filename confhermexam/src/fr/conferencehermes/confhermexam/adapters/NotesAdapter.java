@@ -32,12 +32,12 @@ public class NotesAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int i) {
-		return null;
+		return mListItems.get(i) ;
 	}
 
 	@Override
 	public long getItemId(int i) {
-		return 0;
+		return i;
 	}
 
 	@Override
@@ -57,13 +57,13 @@ public class NotesAdapter extends BaseAdapter {
 		}
 
 		String studentName = (String) mListItems.get(position).getStudentName();
-		int studentRank = (int) mListItems.get(position).getRank();
+		String studentRank = mListItems.get(position).getRank();
 		int studentScore = (int) mListItems.get(position).getScore();
 
 		if (studentName != null) {
 			if (holder.name != null) {
 				holder.name.setText(studentName);
-				holder.rang.setText(String.valueOf(studentRank));
+				holder.rang.setText(studentRank);
 				holder.score.setText(String.valueOf(studentScore));
 
 			}
