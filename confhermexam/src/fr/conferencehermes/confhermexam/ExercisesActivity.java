@@ -34,6 +34,7 @@ import com.androidquery.callback.AjaxStatus;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.TrainingExercise;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExercisesActivity extends FragmentActivity implements
@@ -110,7 +111,9 @@ public class ExercisesActivity extends FragmentActivity implements
 	}
 
 	private void updateTimer() {
-		final CounterClass timer = new CounterClass(7200000, 1000);
+		Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished", 0);
+		final CounterClass timer = new CounterClass(DataHolder.getInstance()
+				.getTrainingDuration(), 1000);
 		timer.start();
 	}
 
@@ -126,6 +129,7 @@ public class ExercisesActivity extends FragmentActivity implements
 		Intent intent = new Intent(ExercisesActivity.this,
 				QuestionResponseActivity.class);
 		intent.putExtra("exercise_id", id);
+		intent.putExtra("training_id", training_id);
 		startActivity(intent);
 	}
 

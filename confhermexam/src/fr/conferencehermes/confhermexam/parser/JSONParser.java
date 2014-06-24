@@ -251,11 +251,14 @@ public class JSONParser {
 			if (json.has(Constants.KEY_DATA)
 					&& json.get(Constants.KEY_DATA) != null) {
 
-				JSONArray data = json.getJSONArray("data");
+				JSONObject data = json.getJSONObject("data");
+				int duration = data.getInt("duration");
+				DataHolder.getInstance().setTrainingDuration(duration);
 
+				JSONArray exObj = data.getJSONArray("exercises");
 				for (int i = 0; i < data.length(); i++) {
 					TrainingExercise t = new TrainingExercise();
-					JSONObject obj = data.getJSONObject(i);
+					JSONObject obj = exObj.getJSONObject(i);
 
 					t.setExercise_id(obj.getInt("exercise_id"));
 					t.setTitle(obj.getString("title"));
@@ -312,7 +315,7 @@ public class JSONParser {
 					eFiles.put("sound", soundObjExercise.getString("file"));
 				}
 				JSONArray videoArrayExercise = (JSONArray) filesExercise
-						.getJSONArray("image");
+						.getJSONArray("video");
 				if (videoArrayExercise.length() != 0) {
 					JSONObject videoObjExercise = (JSONObject) videoArrayExercise
 							.get(0);
@@ -347,7 +350,7 @@ public class JSONParser {
 						qFiles.put("sound", soundObj.getString("file"));
 					}
 					JSONArray videoArray = (JSONArray) files
-							.getJSONArray("image");
+							.getJSONArray("video");
 					if (videoArray.length() != 0) {
 						JSONObject videoObj = (JSONObject) videoArray.get(0);
 						qFiles.put("video", videoObj.getString("file"));
@@ -374,7 +377,7 @@ public class JSONParser {
 								soundObjCorrection.getString("file"));
 					}
 					JSONArray videoArrayCorrection = (JSONArray) files
-							.getJSONArray("image");
+							.getJSONArray("video");
 					if (videoArrayCorrection.length() != 0) {
 						JSONObject videoObjCorrection = (JSONObject) videoArrayCorrection
 								.get(0);
@@ -411,8 +414,37 @@ public class JSONParser {
 		return exercise;
 	}
 
-	public static void parseTrainings() {
+	public static String parseCorrections(JSONObject json) {
+		ArrayList<Correction> correctionsList = new ArrayList<Correction>();
+		String score = "";
+		try {
+			if (json.has(Constants.KEY_DATA)
+					&& json.get(Constants.KEY_DATA) != null) {
 
+				JSONObject data = json.getJSONObject("data");
+				score = data.getString("score_message");
+				JSONArray corrections = data
+						.getJSONArray("question_corrections");
+
+				for (int i = 0; i < corrections.length(); i++) {
+					Correction c = new Correction();
+					JSONObject obj = corrections.getJSONObject(i);
+					c.setQuestionId(obj.getString("question_id"));
+					c.setText(obj.getString("correction_text"));
+					ArrayList<String> answersArray = new ArrayList<String>();
+					JSONArray answers = obj.getJSONArray("answers");
+					for (int j = 0; j < answers.length(); j++) {
+						answersArray.add(String.valueOf(answers.get(j)));
+					}
+					c.setAnswersArray(answersArray);
+					correctionsList.add(c);
+				}
+				DataHolder.getInstance().setCorrections(correctionsList);
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return score;
 	}
 
 	public static ArrayList<Planning> parsePlannig(JSONObject planJson) {
