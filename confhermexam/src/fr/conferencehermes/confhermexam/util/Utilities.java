@@ -10,6 +10,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.provider.Settings.Secure;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -24,9 +25,9 @@ import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
 import fr.conferencehermes.confhermexam.fragments.ExamineFragment;
 import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
-import fr.conferencehermes.confhermexam.fragments.TrainingsFragment;
 import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
+import fr.conferencehermes.confhermexam.fragments.TrainingsFragment;
 
 public class Utilities {
 	private static ProgressDialog mDialog;
@@ -205,7 +206,10 @@ public class Utilities {
 	public static String getDeviceId(Context c) {
 		final TelephonyManager tm = (TelephonyManager) c
 				.getSystemService(Context.TELEPHONY_SERVICE);
-		return tm.getDeviceId();
+		if (tm.getDeviceId() != null)
+			return tm.getDeviceId();
+		else
+			return Secure.getString(c.getContentResolver(), Secure.ANDROID_ID);
 	}
 
 }

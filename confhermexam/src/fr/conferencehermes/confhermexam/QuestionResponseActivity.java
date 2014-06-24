@@ -229,8 +229,9 @@ public class QuestionResponseActivity extends Activity implements
 		int wantedChild = wantedPosition - firstPosition;
 		if (!(wantedChild < 0 || wantedChild >= listview.getChildCount())) {
 			View wantedView = listview.getChildAt(wantedChild);
-			wantedView.setBackgroundColor(getResources().getColor(
-					R.color.app_main_color));
+			if (validAnswers.get(position, false))
+				wantedView.setBackgroundColor(getResources().getColor(
+						R.color.app_main_color));
 		}
 
 		currentQuestionId = position;
@@ -567,7 +568,7 @@ public class QuestionResponseActivity extends Activity implements
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
-
+			validAnswers.put(currentQuestionId, true);
 			break;
 		case R.id.abandonner:
 			try {
