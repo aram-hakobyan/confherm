@@ -46,6 +46,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -113,7 +114,7 @@ public class QuestionResponseActivity extends Activity implements
 	private boolean onPaused = false;
 	private boolean CORRECTED_ANSWERS = false;
 
-	private HashMap<Integer, Integer> validAnswers;
+	private SparseBooleanArray validAnswers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +126,7 @@ public class QuestionResponseActivity extends Activity implements
 		aq = new AQuery(QuestionResponseActivity.this);
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
-		validAnswers = new HashMap<Integer, Integer>();
+		validAnswers = new SparseBooleanArray();
 
 		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);
