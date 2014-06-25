@@ -6,18 +6,11 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.client.params.CookiePolicy;
-import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.impl.client.BasicCookieStore;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.protocol.BasicHttpContext;
-import org.apache.http.protocol.HttpContext;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import android.os.Handler;
@@ -43,10 +36,8 @@ public class HttpConnection implements Runnable {
 
 	private static final int GET = 0;
 	private static final int POST = 1;
-
-
-
-	private String cookieString = "";
+	int status;
+	// private String cookieString = "";
 	private String url;
 	private int method;
 	private Handler handler;
@@ -85,64 +76,29 @@ public class HttpConnection implements Runnable {
 		handler.sendMessage(Message.obtain(handler, HttpConnection.DID_START));
 
 		httpClient = new DefaultHttpClient();
-		CookieStore cookieStore = new BasicCookieStore();
+	
 
-		if (CookieStorage.getInstance().getArrayList() != null
-				&& !CookieStorage.getInstance().getArrayList().isEmpty()) {
-			this.cookieString = (String) CookieStorage.getInstance()
-					.getArrayList().get(0);
-		}
 
 		try {
 			HttpResponse response = null;
 			switch (method) {
-			case GET:
-				HttpGet httpGet = new HttpGet(url);
-				if (cookieString != null) {
-					httpGet.setHeader("Cookie", cookieString);
-				}
-				response = httpClient.execute(httpGet);
-				break;
-			case POST:
-				httpClient.getParams().setParameter(ClientPNames.COOKIE_POLICY,
-						CookiePolicy.RFC_2109);
 
-				// Create local HTTP context
-				HttpContext localContext = new BasicHttpContext();
-				// Bind custom cookie store to the local context
-				localContext.setAttribute(ClientContext.COOKIE_STORE,
-						cookieStore);
+			case POST:
 
 				HttpPost httpPost = new HttpPost(url);
 				httpPost.setEntity(new UrlEncodedFormEntity(this.nameValuePairs));
 
-				if (cookieString != null) {
-					httpPost.setHeader("Cookie", cookieString);
-				}
-				httpPost.setHeader(
-						"User-Agent",
-						"Mozilla/5.0 (X11; U; Linux "
-								+ "i686; en-US; rv:1.8.1.6) Gecko/20061201 Firefox/2.0.0.6 (Ubuntu-feisty)");
-				httpPost.setHeader(
-						"Accept",
-						"text/html,application/xml,"
-								+ "application/xhtml+xml,text/html;q=0.9,text/plain;q=0.8,image/png,*/*;q=0.5");
-				httpPost.setHeader("Content-Type",
-						"application/x-www-form-urlencoded");
+				response = httpClient.execute(httpPost);
 
-				response = httpClient.execute(httpPost, localContext);
-				ResponseHandler<String> responseHandler = new BasicResponseHandler();
+				String responses = EntityUtils.toString(response.getEntity());
 
-				String responses = httpClient
-						.execute(httpPost, responseHandler);
-
-				int status = response.getStatusLine().getStatusCode();
+				status = response.getStatusLine().getStatusCode();
 				Log.d("Response HTTP", status + "");
 				Log.d("RESPONS", responses + "");
 				JSONParser.parseLoginData(responses);
 
 				JSONObject jsonObj = new JSONObject(responses);
-				Profile profileData= JSONParser.parseProfileData(jsonObj);
+				Profile profileData = JSONParser.parseProfileData(jsonObj);
 				LoginActivity.setLoginData(profileData);
 				MyProfileFragment.setProfileData(profileData);
 				handler.sendMessage(Message.obtain(handler, status));
@@ -151,10 +107,11 @@ public class HttpConnection implements Runnable {
 				break;
 
 			}
-	
+
 		} catch (Exception e) {
-			handler.sendMessage(Message.obtain(handler,
-					HttpConnection.DID_ERROR, e));
+			e.printStackTrace();
+
+			handler.sendMessage(Message.obtain(handler, status));
 		}
 		ConnectionManager.getInstance().didComplete(this);
 	}
