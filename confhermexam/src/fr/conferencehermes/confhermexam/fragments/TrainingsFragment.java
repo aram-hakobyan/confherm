@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ProgressBar;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
@@ -33,13 +34,15 @@ public class TrainingsFragment extends Fragment {
 	ListView listview;
 	TrainingsAdapter adapter;
 	ArrayList<Training> trainings;
-
+	ProgressBar progressBarTrainings;
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View fragment = inflater.inflate(R.layout.activity_examine, container,
 				false);
 
+		progressBarTrainings = (ProgressBar) fragment
+				.findViewById(R.id.progressBarExamin);
 		listview = (ListView) fragment.findViewById(R.id.listViewExamine);
 		listview.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -75,6 +78,8 @@ public class TrainingsFragment extends Fragment {
 									adapter.notifyDataSetChanged();
 								}
 								listview.setAdapter(adapter);
+								progressBarTrainings.setVisibility(View.GONE);
+								listview.setVisibility(View.VISIBLE);
 							}
 
 						} catch (JSONException e) {

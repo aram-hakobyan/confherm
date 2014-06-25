@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentTop="true"
-        android:background="@color/app_main_color" >
+        android:background="@color/app_main_color_dark" >
 
         <ImageView
             android:layout_width="wrap_content"
@@ -60,7 +60,7 @@
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="40dp"
             android:layout_weight="1"
             android:orientation="vertical" >
 
@@ -163,19 +163,25 @@
                 </ScrollView>
             </LinearLayout>
 
-            <Button
-                android:id="@+id/validerBtn"
+                        <ScrollView
+                android:id="@+id/scrollView4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginBottom="30dp"
-                android:background="@color/app_main_color"
-                android:drawableLeft="@drawable/ic_check_white"
-                android:drawablePadding="10dp"
-                android:gravity="center"
-                android:padding="10dp"
-                android:text="VALIDER"
-                android:textColor="@android:color/white" />
+                android:layout_gravity="right" >
+
+                <Button
+                    android:id="@+id/validerBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@color/app_main_color"
+                    android:drawableLeft="@drawable/ic_check_white"
+                    android:drawablePadding="10dp"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="VALIDER"
+                    android:textColor="@android:color/white" />
+            </ScrollView>
+
         </LinearLayout>
 
         <LinearLayout

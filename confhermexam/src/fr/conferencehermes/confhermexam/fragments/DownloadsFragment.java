@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
@@ -32,12 +33,18 @@ public class DownloadsFragment extends Fragment {
 	ArrayList<DownloadInstance> downloads;
 	AQuery aq;
 
+	ProgressBar progressBarTelecharge;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View fragment = inflater.inflate(R.layout.activity_telechargement,
 				container, false);
 		aq = new AQuery(getActivity());
+
+		progressBarTelecharge = (ProgressBar) fragment
+				.findViewById(R.id.progressBarTelecharge);
+
 		listview = (ListView) fragment.findViewById(R.id.listViewDownloads);
 
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -60,6 +67,8 @@ public class DownloadsFragment extends Fragment {
 									adapter.notifyDataSetChanged();
 								}
 								listview.setAdapter(adapter);
+								progressBarTelecharge.setVisibility(View.GONE);
+								listview.setVisibility(View.VISIBLE);
 							}
 
 						} catch (JSONException e) {

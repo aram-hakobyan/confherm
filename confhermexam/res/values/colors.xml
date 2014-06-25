@@ -4,5 +4,5 @@
     <color name="app_main_color">#3f889e</color>
      <color name="medium_dark_gray">#ffcccccc</color>
      <color name="medium_gray">#cccccc</color>
-
+<color name="app_main_color_dark">#0d5c7c</color>
 </resources>
