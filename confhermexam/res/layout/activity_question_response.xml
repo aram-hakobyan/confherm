@@ -57,123 +57,123 @@
         android:layout_below="@+id/headerExersice"
         android:orientation="horizontal" >
 
-        <LinearLayout
-            android:layout_width="fill_parent"
+        <ScrollView
+            android:id="@+id/scrollView4"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:layout_weight="1"
-            android:orientation="vertical" >
+            android:layout_weight="1" >
 
-            <TextView
-                android:id="@+id/questionTitle"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="30dp"
-                android:layout_marginTop="10dp"
-                android:text="QUESTION"
-                android:textColor="@color/app_main_color"
-                android:textSize="20sp" />
-
-            <ScrollView
-                android:id="@+id/scrollviewQR"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:layout_marginLeft="70dp"
-                android:layout_marginTop="10dp" >
+                android:layout_marginTop="40dp"
+                android:orientation="vertical" >
 
                 <TextView
-                    android:id="@+id/question"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/lorem_ipsum"
-                    android:textSize="16sp" />
-            </ScrollView>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right"
-                android:layout_marginRight="50dp"
-                android:orientation="horizontal" >
-
-                <Button
-                    android:id="@+id/btnImage"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:background="@drawable/ic_camera"
-                    android:clickable="true" >
-                </Button>
-
-                <Button
-                    android:id="@+id/btnAudio"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_marginLeft="10dp"
-                    android:background="@drawable/ic_sound"
-                    android:clickable="true" >
-                </Button>
-
-                <Button
-                    android:id="@+id/btnVideo"
-                    android:layout_width="15dp"
-                    android:layout_height="15dp"
-                    android:layout_marginLeft="10dp"
-                    android:background="@drawable/ic_video"
-                    android:clickable="true" >
-                </Button>
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="40dp"
-                android:layout_marginTop="30dp"
-                android:orientation="horizontal"
-                android:weightSum="10" >
-
-                <ScrollView
-                    android:id="@+id/scrollView1"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="70dp"
-                    android:layout_weight="7" >
-
-                    <LinearLayout
-                        android:id="@+id/answersLayout"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" >
-                    </LinearLayout>
-                </ScrollView>
-
-                <ScrollView
-                    android:id="@+id/scrollView2"
-                    android:layout_width="0dp"
+                    android:id="@+id/questionTitle"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="30dp"
-                    android:layout_marginRight="20dp"
-                    android:layout_weight="3" >
+                    android:layout_marginTop="10dp"
+                    android:text="QUESTION"
+                    android:textColor="@color/app_main_color"
+                    android:textSize="20sp" />
 
-                    <LinearLayout
-                        android:id="@+id/correctionsLayout"
+                <ScrollView
+                    android:id="@+id/scrollviewQR"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginTop="10dp" >
+
+                    <TextView
+                        android:id="@+id/question"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical" >
-                    </LinearLayout>
+                        android:text="@string/lorem_ipsum"
+                        android:textSize="16sp" />
                 </ScrollView>
-            </LinearLayout>
 
-                        <ScrollView
-                android:id="@+id/scrollView4"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="right" >
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="30dp"
+                    android:orientation="horizontal" >
+
+                    <Button
+                        android:id="@+id/btnImage"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:background="@drawable/ic_camera"
+                        android:clickable="true" >
+                    </Button>
+
+                    <Button
+                        android:id="@+id/btnAudio"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginLeft="10dp"
+                        android:background="@drawable/ic_sound"
+                        android:clickable="true" >
+                    </Button>
+
+                    <Button
+                        android:id="@+id/btnVideo"
+                        android:layout_width="15dp"
+                        android:layout_height="15dp"
+                        android:layout_marginLeft="10dp"
+                        android:background="@drawable/ic_video"
+                        android:clickable="true" >
+                    </Button>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:layout_marginTop="30dp"
+                    android:orientation="horizontal"
+                    android:weightSum="10" >
+
+                    <ScrollView
+                        android:id="@+id/scrollView1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="70dp"
+                        android:layout_weight="7" >
+
+                        <LinearLayout
+                            android:id="@+id/answersLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+                        </LinearLayout>
+                    </ScrollView>
+
+                    <ScrollView
+                        android:id="@+id/scrollView2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="30dp"
+                        android:layout_marginRight="20dp"
+                        android:layout_weight="3" >
+
+                        <LinearLayout
+                            android:id="@+id/correctionsLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+                        </LinearLayout>
+                    </ScrollView>
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/validerBtn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="right"
                     android:background="@color/app_main_color"
                     android:drawableLeft="@drawable/ic_check_white"
                     android:drawablePadding="10dp"
@@ -181,9 +181,8 @@
                     android:padding="5dp"
                     android:text="VALIDER"
                     android:textColor="@android:color/white" />
-            </ScrollView>
-
-        </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
 
         <LinearLayout
             android:layout_width="fill_parent"
