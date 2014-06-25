@@ -77,7 +77,9 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
+import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
+import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
@@ -118,6 +120,7 @@ public class QuestionResponseActivity extends Activity implements
 	private boolean CORRECTED_ANSWERS = false;
 
 	private SparseBooleanArray validAnswers;
+	private ArrayList<QuestionAnswer> questionAnswers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,6 +133,7 @@ public class QuestionResponseActivity extends Activity implements
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
 		validAnswers = new SparseBooleanArray();
+		questionAnswers = new ArrayList<QuestionAnswer>();
 
 		// INITIALIZE RECEIVER
 		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
@@ -209,7 +213,12 @@ public class QuestionResponseActivity extends Activity implements
 
 								questions = exercise.getQuestions();
 								if (!questions.isEmpty()) {
+
+									for (int i = 0; i < questions.size(); i++) {
+										questionAnswers.add(null);
+									}
 									selectQuestion(questions.get(0), 0);
+
 								}
 
 							}
@@ -243,13 +252,15 @@ public class QuestionResponseActivity extends Activity implements
 		title.setText("QUESTION " + String.valueOf(position + 1));
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
+		setFileIcons(currentQuestion.getFiles());
+
 		int answersCount = q.getAnswers().size();
 
 		// Single choice answer
 		if (q.getType().equalsIgnoreCase("2")) {
 			mRadioGroup = new RadioGroup(QuestionResponseActivity.this);
 			mRadioGroup.setOrientation(RadioGroup.VERTICAL);
-			for (int i = 0; i < answersCount; i++) {
+			for (int i = answersCount - 1; i >= 0; i--) {
 				RadioButton newRadioButton = new RadioButton(this);
 				newRadioButton.setText(q.getAnswers().get(i).getAnswer());
 				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
@@ -258,29 +269,19 @@ public class QuestionResponseActivity extends Activity implements
 						RadioGroup.LayoutParams.WRAP_CONTENT);
 				mRadioGroup.addView(newRadioButton, 0, layoutParams);
 
-				if (CORRECTED_ANSWERS) {
-					ImageView img = new ImageView(QuestionResponseActivity.this);
-					img.setBackgroundResource(R.drawable.correction_true);
-					LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-							30, 30);
-					if (i != 0)
-						imageParams.setMargins(0, 10, 0, 0);
-					correctionsLayout.addView(img, imageParams);
-				}
 			}
 			answersLayout.addView(mRadioGroup);
+
+			if (questionAnswers.get(currentQuestionId) != null) {
+				int pos = questionAnswers.get(currentQuestionId)
+						.getSingleAnswerPosition();
+				View v = mRadioGroup.getChildAt(pos);
+				mRadioGroup.check(v.getId());
+			}
+
 		} else // Multichoice answer
 		if (q.getType().equalsIgnoreCase("1")) {
 			ArrayList<String> answers = null;
-			if (CORRECTED_ANSWERS) {
-				ArrayList<Correction> corrections = DataHolder.getInstance()
-						.getCorrections();
-				for (Correction c : corrections) {
-					if (q.getId() == Integer.valueOf(c.getQuestionId())) {
-						answers = c.getAnswersArray();
-					}
-				}
-			}
 
 			for (int i = 0; i < answersCount; i++) {
 				LinearLayout checkBoxLayout = new LinearLayout(
@@ -299,23 +300,6 @@ public class QuestionResponseActivity extends Activity implements
 				checkBoxLayout.addView(checkBox);
 				checkBoxLayout.addView(text, layoutParams);
 				answersLayout.addView(checkBoxLayout);
-
-				if (CORRECTED_ANSWERS) {
-					for (int j = 0; j < answers.size(); j++) {
-						if (q.getAnswers().get(i).getId() == Integer
-								.valueOf(answers.get(j))) {
-							ImageView img = new ImageView(
-									QuestionResponseActivity.this);
-							img.setBackgroundResource(R.drawable.correction_true);
-							LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-									30, 30);
-							if (i != 0)
-								imageParams.setMargins(0, 10, 0, 0);
-							correctionsLayout.addView(img, imageParams);
-						}
-					}
-
-				}
 
 				checkBox.setTag(q.getAnswers().get(i).getId());
 				checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -337,6 +321,28 @@ public class QuestionResponseActivity extends Activity implements
 				});
 			}
 
+			if (questionAnswers.get(currentQuestionId) != null) {
+				ArrayList<Integer> answerIds = new ArrayList<Integer>();
+				answerIds.addAll(questionAnswers.get(currentQuestionId)
+						.getMultiAnswerPositions());
+				for (int j = 0; j < answersLayout.getChildCount(); j++) {
+					try {
+						LinearLayout layout = (LinearLayout) answersLayout
+								.getChildAt(j);
+						CheckBox box = (CheckBox) layout.getChildAt(0);
+						int currentId = questions.get(currentQuestionId)
+								.getAnswers().get(j).getId();
+						for (int k = 0; k < answerIds.size(); k++) {
+							if (answerIds.get(k) == currentId)
+								box.setChecked(true);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+				}
+			}
+
 		} else if (q.getType().equalsIgnoreCase("3")) {
 			editTextsArray.clear();
 			int count = Integer.valueOf(q.getInputCount());
@@ -351,18 +357,40 @@ public class QuestionResponseActivity extends Activity implements
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 
-				if (CORRECTED_ANSWERS) {
-
-					ImageView img = new ImageView(QuestionResponseActivity.this);
-					img.setBackgroundResource(R.drawable.correction_true);
-					LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-							30, 30);
-					imageParams.setMargins(0, 17, 0, 0);
-					correctionsLayout.addView(img, imageParams);
+			}
+			if (questionAnswers.get(currentQuestionId) != null) {
+				ArrayList<String> answers = questionAnswers.get(
+						currentQuestionId).getTextAnswers();
+				for (int c = 0; c < editTextsArray.size(); c++) {
+					editTextsArray.get(c).setText(answers.get(c));
 				}
 			}
 		}
 
+	}
+
+	private void setFileIcons(HashMap<String, String> files) {
+		if (files.get("image").isEmpty()) {
+			btnImage.setBackgroundResource(android.R.color.transparent);
+			btnImage.setClickable(false);
+		} else {
+			btnImage.setBackgroundResource(R.drawable.ic_camera);
+			btnImage.setClickable(true);
+		}
+		if (files.get("sound").isEmpty()) {
+			btnAudio.setBackgroundResource(android.R.color.transparent);
+			btnAudio.setClickable(false);
+		} else {
+			btnAudio.setBackgroundResource(R.drawable.ic_sound);
+			btnAudio.setClickable(true);
+		}
+		if (files.get("video").isEmpty()) {
+			btnVideo.setBackgroundResource(android.R.color.transparent);
+			btnVideo.setClickable(false);
+		} else {
+			btnVideo.setBackgroundResource(R.drawable.ic_video);
+			btnVideo.setClickable(true);
+		}
 	}
 
 	@Override
@@ -488,6 +516,51 @@ public class QuestionResponseActivity extends Activity implements
 		CORRECTED_ANSWERS = true;
 		TextView scoreText = (TextView) findViewById(R.id.score);
 		scoreText.setText(score);
+		drawCorrections(corrections);
+	}
+
+	private void drawCorrections(ArrayList<Correction> corrections) {
+		ArrayList<String> correctionAnswerIDs = new ArrayList<String>();
+		for (Correction c : corrections) {
+			if (currentQuestion.getId() == Integer.valueOf(c.getQuestionId())) {
+				correctionAnswerIDs = c.getAnswersArray();
+			}
+		}
+
+		ArrayList<String> allAnswerIDs = new ArrayList<String>();
+		ArrayList<Answer> allAnswers = currentQuestion.getAnswers();
+		for (int i = 0; i < allAnswers.size(); i++) {
+			allAnswerIDs.add(String.valueOf(allAnswers.get(i).getId()));
+		}
+
+		for (int j = 0; j < allAnswers.size(); j++) {
+			ImageView img = new ImageView(QuestionResponseActivity.this);
+
+			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+					30, 30);
+
+			if (currentQuestion.getType().equalsIgnoreCase("2")) {
+				imageParams.setMargins(0, 10, 0, 0);
+				String userAnswerIDs = String.valueOf(questionAnswers.get(
+						currentQuestionId).getSingleAnswerPosition());
+				for (int i = 0; i < correctionAnswerIDs.size(); i++) {
+					if (userAnswerIDs.equalsIgnoreCase(correctionAnswerIDs
+							.get(i)))
+						img.setBackgroundResource(R.drawable.correction_true);
+					else
+						img.setBackgroundResource(R.drawable.correction_false);
+					break;
+				}
+
+			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
+				imageParams.setMargins(0, 10, 0, 0);
+			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
+				imageParams.setMargins(0, 10, 0, 0);
+			}
+
+			correctionsLayout.addView(img, imageParams);
+		}
+
 	}
 
 	private void saveQuestionAnswers() throws JSONException {
@@ -528,6 +601,30 @@ public class QuestionResponseActivity extends Activity implements
 		answersArray.put(questionAnswer);
 	}
 
+	private void saveValidation() {
+		QuestionAnswer qa = new QuestionAnswer();
+		if (currentQuestion.getType().equalsIgnoreCase("2")) {
+			qa.setType(2);
+			int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
+			View radioButton = mRadioGroup.findViewById(radioButtonID);
+			int idx = mRadioGroup.indexOfChild(radioButton);
+			qa.setSingleAnswerPosition(idx);
+		} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
+			qa.setType(1);
+			ArrayList<Integer> mAnswers = new ArrayList<Integer>(
+					multipleAnswers);
+			qa.setMultiAnswerPositions(mAnswers);
+		} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
+			qa.setType(3);
+			for (int e = 0; e < editTextsArray.size(); e++) {
+				qa.getTextAnswers().add(e,
+						editTextsArray.get(e).getText().toString());
+			}
+		}
+
+		questionAnswers.set(currentQuestionId, qa);
+	}
+
 	private boolean isValidAnswer() {
 		if (currentQuestion.getType().equalsIgnoreCase("2")) {
 			return mRadioGroup.getCheckedRadioButtonId() != -1;
@@ -549,6 +646,7 @@ public class QuestionResponseActivity extends Activity implements
 		case R.id.validerBtn:
 			try {
 				if (isValidAnswer()) {
+					saveValidation();
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
 					if (ANSWERED_QUESTIONS_COUNT == questions.size()) {
@@ -611,7 +709,7 @@ public class QuestionResponseActivity extends Activity implements
 
 		@Override
 		public void onFinish() {
-			temps1.setText("Completed.");
+			temps1.setText("");
 		}
 
 		@Override
@@ -663,10 +761,14 @@ public class QuestionResponseActivity extends Activity implements
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
 
+		// setFileIcons(files);
+
 		final String IMAGE_URL = files.get("image");
 		final String AUDIO_URL = files.get("sound");
 		final String VIDEO_URL = files.get("video");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
+		final ImageView audioImage = (ImageView) dialog
+				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
 		final MediaController mc = new MediaController(
@@ -756,6 +858,7 @@ public class QuestionResponseActivity extends Activity implements
 						img.setVisibility(View.VISIBLE);
 						video.setVisibility(View.INVISIBLE);
 						mc.setVisibility(View.INVISIBLE);
+						audioImage.setVisibility(View.INVISIBLE);
 					}
 				});
 		dialog.findViewById(R.id.button2).setOnClickListener(
@@ -765,6 +868,7 @@ public class QuestionResponseActivity extends Activity implements
 						img.setVisibility(View.INVISIBLE);
 						video.setVisibility(View.INVISIBLE);
 						mc.setVisibility(View.VISIBLE);
+						audioImage.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
 						}
@@ -791,6 +895,7 @@ public class QuestionResponseActivity extends Activity implements
 						img.setVisibility(View.INVISIBLE);
 						video.setVisibility(View.VISIBLE);
 						mc.setVisibility(View.INVISIBLE);
+						audioImage.setVisibility(View.INVISIBLE);
 
 						try {
 							video.start();
@@ -859,7 +964,6 @@ public class QuestionResponseActivity extends Activity implements
 		// ONLY WHEN SCREEN TURNS ON
 		if (!ScreenReceiver.wasScreenOn) {
 			// THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
-		
 
 		} else {
 			// THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT

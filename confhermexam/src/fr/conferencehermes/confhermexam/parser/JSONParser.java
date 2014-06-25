@@ -256,7 +256,7 @@ public class JSONParser {
 				DataHolder.getInstance().setTrainingDuration(duration);
 
 				JSONArray exObj = data.getJSONArray("exercises");
-				for (int i = 0; i < data.length(); i++) {
+				for (int i = 0; i < exObj.length(); i++) {
 					TrainingExercise t = new TrainingExercise();
 					JSONObject obj = exObj.getJSONObject(i);
 
@@ -305,22 +305,34 @@ public class JSONParser {
 				if (imgArrayExercise.length() != 0) {
 					JSONObject imgObjExercise = (JSONObject) imgArrayExercise
 							.get(0);
-					eFiles.put("image", imgObjExercise.getString("file"));
-				}
+					eFiles.put(
+							"image",
+							imgObjExercise.getString("file") != null ? imgObjExercise
+									.getString("file") : "");
+				} else
+					eFiles.put("image", "");
 				JSONArray soundArrayExercise = (JSONArray) filesExercise
 						.getJSONArray("sound");
 				if (soundArrayExercise.length() != 0) {
 					JSONObject soundObjExercise = (JSONObject) soundArrayExercise
 							.get(0);
-					eFiles.put("sound", soundObjExercise.getString("file"));
-				}
+					eFiles.put(
+							"sound",
+							soundObjExercise.getString("file") != null ? soundObjExercise
+									.getString("file") : "");
+				} else
+					eFiles.put("sound", "");
 				JSONArray videoArrayExercise = (JSONArray) filesExercise
 						.getJSONArray("video");
 				if (videoArrayExercise.length() != 0) {
 					JSONObject videoObjExercise = (JSONObject) videoArrayExercise
 							.get(0);
-					eFiles.put("video", videoObjExercise.getString("file"));
-				}
+					eFiles.put(
+							"video",
+							videoObjExercise.getString("file") != null ? videoObjExercise
+									.getString("file") : "");
+				} else
+					eFiles.put("video", "");
 
 				exercise.setFiles(eFiles);
 
@@ -341,20 +353,32 @@ public class JSONParser {
 							.getJSONArray("image");
 					if (imgArray.length() != 0) {
 						JSONObject imgObj = (JSONObject) imgArray.get(0);
-						qFiles.put("image", imgObj.getString("file"));
-					}
+						qFiles.put(
+								"image",
+								imgObj.getString("file") != null ? imgObj
+										.getString("file") : "");
+					} else
+						qFiles.put("image", "");
 					JSONArray soundArray = (JSONArray) files
 							.getJSONArray("sound");
 					if (soundArray.length() != 0) {
 						JSONObject soundObj = (JSONObject) soundArray.get(0);
-						qFiles.put("sound", soundObj.getString("file"));
-					}
+						qFiles.put(
+								"sound",
+								soundObj.getString("file") != null ? soundObj
+										.getString("file") : "");
+					} else
+						qFiles.put("sound", "");
 					JSONArray videoArray = (JSONArray) files
 							.getJSONArray("video");
 					if (videoArray.length() != 0) {
 						JSONObject videoObj = (JSONObject) videoArray.get(0);
-						qFiles.put("video", videoObj.getString("file"));
-					}
+						qFiles.put(
+								"video",
+								videoObj.getString("file") != null ? videoObj
+										.getString("file") : "");
+					} else
+						qFiles.put("video", "");
 
 					q.setFiles(qFiles);
 
@@ -366,24 +390,34 @@ public class JSONParser {
 					if (imgArrayCorrection.length() != 0) {
 						JSONObject imgObjCorrection = (JSONObject) imgArrayCorrection
 								.get(0);
-						qFiles.put("image", imgObjCorrection.getString("file"));
-					}
+						qFilesCorrection
+								.put("image",
+										imgObjCorrection.getString("file") != null ? imgObjCorrection
+												.getString("file") : "");
+					} else
+						qFilesCorrection.put("image", "");
 					JSONArray soundArrayCorrection = (JSONArray) files
 							.getJSONArray("sound");
 					if (soundArrayCorrection.length() != 0) {
 						JSONObject soundObjCorrection = (JSONObject) soundArrayCorrection
 								.get(0);
-						qFiles.put("sound",
-								soundObjCorrection.getString("file"));
-					}
+						qFilesCorrection
+								.put("sound",
+										soundObjCorrection.getString("file") != null ? soundObjCorrection
+												.getString("file") : "");
+					} else
+						qFilesCorrection.put("sound", "");
 					JSONArray videoArrayCorrection = (JSONArray) files
 							.getJSONArray("video");
 					if (videoArrayCorrection.length() != 0) {
 						JSONObject videoObjCorrection = (JSONObject) videoArrayCorrection
 								.get(0);
-						qFiles.put("video",
-								videoObjCorrection.getString("file"));
-					}
+						qFilesCorrection
+								.put("video",
+										videoObjCorrection.getString("file") != null ? videoObjCorrection
+												.getString("file") : "");
+					} else
+						qFilesCorrection.put("video", "");
 
 					q.setCorrectionFiles(qFilesCorrection);
 

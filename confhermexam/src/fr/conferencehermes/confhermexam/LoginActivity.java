@@ -45,20 +45,19 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_login);
 
-
 		ViewTracker.getInstance().setCurrentContext(this);
 		ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
-		
+
 		username = (EditText) findViewById(R.id.loginRow);
 		password = (EditText) findViewById(R.id.passwordRow);
-		loginContentLayout =(LinearLayout) findViewById(R.id.loginContentLayout);
-		progressBarLogin =(ProgressBar) findViewById(R.id.progressBarLogin);
-		
+		loginContentLayout = (LinearLayout) findViewById(R.id.loginContentLayout);
+		progressBarLogin = (ProgressBar) findViewById(R.id.progressBarLogin);
+
 		authKeyEditor = getPreferences(MODE_PRIVATE).edit();
-		
-		if (lData != null){
-		authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
-				lData.getAuthKey());
+
+		if (lData != null) {
+			authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
+					lData.getAuthKey());
 		}
 		authKeyEditor.commit();
 		loginAction();
@@ -85,25 +84,25 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		String logonOrAuth = null;
 		Map<String, String> params = null;
 
-
 		authKeyPrefs = getPreferences(MODE_PRIVATE);
 		String restoredAuthKey = authKeyPrefs.getString(
 				Constants.AUTHKEY_SHAREDPREFS_KEY, null);
 
-		final String uname =  username.getText().toString().trim();
-		final String pass = password.getText().toString().trim();
+		final String uname = "STUDENT"; // username.getText().toString().trim();
+		final String pass = "123456";// password.getText().toString().trim();
 		RequestCreator creator = new RequestCreator();
 		if (restoredAuthKey != null) {
 			logonOrAuth = Constants.SERVER_URL_AUTH;
-			params = creator.createAppropriateMapRequest("auth_key", restoredAuthKey);
+			params = creator.createAppropriateMapRequest("auth_key",
+					restoredAuthKey);
 
 			loginContentLayout.setVisibility(View.GONE);
 			progressBarLogin.setVisibility(View.VISIBLE);
-			
+
 		} else {
 
 			logonOrAuth = Constants.SERVER_URL;
-			
+
 			params = creator.createAppropriateMapRequest("username", uname,
 					"password", pass);
 
@@ -113,10 +112,10 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		}
 
 		if (!uname.isEmpty() && !pass.isEmpty() || restoredAuthKey != null) {
-			//Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
-				//	"Logging into Hermes...");
+			// Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
+			// "Logging into Hermes...");
 			BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
-	
+
 			final RequestHelper reqHelper = new RequestHelper();
 			final List<NameValuePair> paramsList = reqHelper
 					.createPostDataWithKeyValuePair(params);
@@ -126,13 +125,11 @@ public class LoginActivity extends Activity implements ActionDelegate {
 					this, "LogView", "LogService", logonOrAuth);
 		} else {
 			Toast.makeText(LoginActivity.this,
-			"Username or Password can not be empty", Toast.LENGTH_LONG)
+					"Username or Password can not be empty", Toast.LENGTH_LONG)
 					.show();
 		}
 
 	}
-	
-	
 
 	@Override
 	public void didFinishRequestProcessing() {
@@ -149,8 +146,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 			Utilities.writeString(this, Utilities.IS_LOGGED_IN, "YES");
 		}
 
-		//Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
-				//"Logging into Hermes...");
+		// Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
+		// "Logging into Hermes...");
 
 		startActivity(hIntent);
 		finish();
@@ -168,8 +165,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	@Override
 	public void didFailRequestProcessing(String Message) {
 
-		Toast.makeText(getApplicationContext(), Message,
-				Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(), Message, Toast.LENGTH_SHORT)
+				.show();
 
 	}
 
@@ -179,8 +176,6 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		return false;
 	}
 
-	
-	
 	public static void setLoginData(Profile loginData) {
 		lData = loginData;
 	}

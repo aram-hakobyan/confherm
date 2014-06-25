@@ -174,7 +174,7 @@ public class ExercisesActivity extends FragmentActivity implements
 
 		@Override
 		public void onFinish() {
-			timerText.setText("Completed.");
+			timerText.setText("");
 		}
 
 		@Override
