@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
@@ -86,6 +88,18 @@ public class NotesActivity extends Activity {
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
 
+//		listviewEx.setOnItemClickListener(new OnItemClickListener() {
+//
+//			@Override
+//			public void onItemClick(AdapterView<?> parent, View view,
+//					int position, long id) {
+//				progressBarNotes.setVisibility(View.VISIBLE);
+//				listviewNt.setVisibility(View.GONE);
+//				
+//			}
+//		});
+		
+		
 		globalTest.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -93,6 +107,7 @@ public class NotesActivity extends Activity {
 				paramExersiceId = -1;
 				paramGlobalTest = 1;
 				exerciseResult(NotesActivity.this);
+				
 			}
 		});
 
@@ -104,10 +119,14 @@ public class NotesActivity extends Activity {
 
 					paramGroups = 0;
 					exerciseResult(NotesActivity.this);
+					progressBarNotes.setVisibility(View.VISIBLE);
+					listviewNt.setVisibility(View.GONE);
 
 				} else if (checkedId == R.id.radio_people) {
 					paramGroups = 1;
 					exerciseResult(NotesActivity.this);
+					progressBarNotes.setVisibility(View.VISIBLE);
+					listviewNt.setVisibility(View.GONE);
 
 				}
 
@@ -119,30 +138,25 @@ public class NotesActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 
-				try {
-					
 
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
 
 				if (listviewNt != null) {
 					ListAdapter listAdapter = listviewNt.getAdapter();
 					for (int i = 0; i < listAdapter.getCount(); i++) {
 						NotesResult nr = (NotesResult) listAdapter.getItem(i);
-						if(JSONParser.USER_ID != null && JSONParser.USER_ID.equals(nr.getStudentId()))
-						{
+						if (JSONParser.USER_ID != null
+								&& JSONParser.USER_ID.equals(nr.getStudentId())) {
 							userID = i;
 							break;
 						}
-						
+
 					}
-					
+
 					listviewNt.post(new Runnable() {
 						@Override
 						public void run() {
 
-							listviewNt.setSelection(userID-1);
+							listviewNt.setSelection(userID);
 
 						}
 					});
@@ -173,7 +187,7 @@ public class NotesActivity extends Activity {
 								return;
 							}
 						}
-					}, 300);
+					}, 400);
 
 				}
 

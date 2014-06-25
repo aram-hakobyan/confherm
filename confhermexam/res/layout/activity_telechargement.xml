@@ -16,7 +16,16 @@
         android:layout_marginRight="100dp"
         android:layout_marginTop="70dp"
         android:divider="@android:color/transparent"
-        android:dividerHeight="2dp" >
+        android:dividerHeight="2dp"
+        android:visibility="gone" >
     </ListView>
+
+    <ProgressBar
+        android:id="@+id/progressBarTelecharge"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
 
 </RelativeLayout>

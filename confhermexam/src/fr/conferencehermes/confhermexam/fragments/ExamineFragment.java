@@ -12,9 +12,11 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebView.FindListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
@@ -33,12 +35,16 @@ public class ExamineFragment extends Fragment {
 	ListView listview;
 	ExamsAdapter adapter;
 	ArrayList<Exam> exams;
+	ProgressBar progressBarExamin;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View fragment = inflater.inflate(R.layout.activity_examine, container,
 				false);
+
+		progressBarExamin = (ProgressBar) fragment
+				.findViewById(R.id.progressBarExamin);
 
 		listview = (ListView) fragment.findViewById(R.id.listViewExamine);
 		listview.setOnItemClickListener(new OnItemClickListener() {
@@ -72,6 +78,8 @@ public class ExamineFragment extends Fragment {
 									adapter.notifyDataSetChanged();
 								}
 								listview.setAdapter(adapter);
+								progressBarExamin.setVisibility(View.GONE);
+								listview.setVisibility(View.VISIBLE);
 							}
 
 						} catch (JSONException e) {

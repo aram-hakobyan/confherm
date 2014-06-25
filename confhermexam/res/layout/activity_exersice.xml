@@ -8,7 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentTop="true"
-        android:background="@color/app_main_color" >
+        android:background="@color/app_main_color_dark" >
 
         <ImageView
             android:layout_width="wrap_content"
@@ -33,9 +33,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/gvMain"
+        android:textSize="20sp"
         android:layout_marginTop="110dp"
         android:text="Temps epreuve - "
-        android:textColor="@color/app_main_color"
-        android:textSize="20sp" />
+        android:textColor="@color/app_main_color" />
 
 </RelativeLayout>
