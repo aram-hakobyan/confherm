@@ -192,8 +192,8 @@ public class JSONParser {
 					for (int i = 0; i < data.length(); i++) {
 						JSONObject gObj = data.getJSONObject(i);
 						NotesResult exR = new NotesResult();
-						exR.setStudentId(gObj.getInt("student_id"));
-						exR.setRank(gObj.getInt("rank"));
+						exR.setStudentId(gObj.getString("student_id"));
+						exR.setRank(gObj.getString("rank"));
 						exR.setStudentName(gObj.getString("name"));
 						exR.setScore(gObj.getInt("score"));
 						exR.setMedianScore(obj.getInt("median_score"));

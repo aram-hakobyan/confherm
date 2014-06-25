@@ -1,10 +1,10 @@
 package fr.conferencehermes.confhermexam.parser;
 
 public class NotesResult {
-	private int student_id;
+	private String student_id;
 	private String name;
 	private int score;
-	private int rank;
+	private String rank;
 	public static int moyenne_score;
 	public static int median_score;
 
@@ -28,19 +28,19 @@ public class NotesResult {
 		this.moyenne_score = moyenne_score;
 	}
 
-	public int getRank() {
+	public String getRank() {
 		return rank;
 	}
 
-	public void setRank(int rank) {
+	public void setRank(String rank) {
 		this.rank = rank;
 	}
 
-	public int getStudentId() {
+	public String getStudentId() {
 		return student_id;
 	}
 
-	public void setStudentId(int student_id) {
+	public void setStudentId(String student_id) {
 		this.student_id = student_id;
 	}
 
