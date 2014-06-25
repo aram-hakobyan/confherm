@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.NotesActivity;
 import fr.conferencehermes.confhermexam.R;
@@ -43,13 +44,13 @@ public class ExerciseAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, View view, ViewGroup viewGroup) {
-		ViewHolder holder;
+		final ViewHolder holder;
 
 		if (view == null) {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.exersice_rowview, null);
 			holder.name = (TextView) view.findViewById(R.id.listExerciseTitle);
-
+			holder.layuot =(LinearLayout )view.findViewById(R.id.listExerciseLayout);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
@@ -69,6 +70,8 @@ public class ExerciseAdapter extends BaseAdapter {
 
 				((NotesActivity) context).exerciseResult(context);
 
+				holder.layuot.setBackgroundColor(context.getResources().getColor(R.color.app_main_color_dark));
+				
 				Log.i("Exersice ", mListItems.get(position).getExersiceId()
 						+ "");
 			}
@@ -80,6 +83,6 @@ public class ExerciseAdapter extends BaseAdapter {
 
 	private static class ViewHolder {
 		protected TextView name;
-
+		protected LinearLayout layuot;
 	}
 }
