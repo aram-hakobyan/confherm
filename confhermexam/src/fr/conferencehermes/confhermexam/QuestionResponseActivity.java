@@ -39,7 +39,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.LinearGradient;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -55,6 +54,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -213,6 +214,33 @@ public class QuestionResponseActivity extends Activity implements
 								teacher.setText("Teacher "
 										+ exercise.getTeacher());
 
+								ViewTreeObserver vto = listview
+										.getViewTreeObserver();
+								vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+									@Override
+									public void onGlobalLayout() {
+										for (int i = 0; i < listview
+												.getChildCount(); i++) {
+											if (i == 0)
+												listview.getChildAt(i)
+														.setBackgroundColor(
+																getResources()
+																		.getColor(
+																				R.color.app_main_color_dark));
+											else
+												listview.getChildAt(i)
+														.setBackgroundColor(
+																getResources()
+																		.getColor(
+																				R.color.app_main_color));
+										}
+
+										listview.getViewTreeObserver()
+												.removeGlobalOnLayoutListener(
+														this);
+									}
+								});
+
 								questions = exercise.getQuestions();
 								if (!questions.isEmpty()) {
 
@@ -238,11 +266,16 @@ public class QuestionResponseActivity extends Activity implements
 		int firstPosition = listview.getFirstVisiblePosition()
 				- listview.getHeaderViewsCount();
 		int wantedChild = wantedPosition - firstPosition;
-		if (!(wantedChild < 0 || wantedChild >= listview.getChildCount())) {
-			View wantedView = listview.getChildAt(wantedChild);
-			if (validAnswers.get(position, false))
-				wantedView.setBackgroundColor(getResources().getColor(
-						R.color.app_main_color));
+		if (wantedChild >= 0 && wantedChild < listview.getChildCount()) {
+			for (int i = 0; i < listview.getChildCount(); i++) {
+				if (i == wantedChild)
+					listview.getChildAt(i).setBackgroundColor(
+							getResources()
+									.getColor(R.color.app_main_color_dark));
+				else
+					listview.getChildAt(i).setBackgroundColor(
+							getResources().getColor(R.color.app_main_color));
+			}
 		}
 
 		currentQuestionId = position;
@@ -254,7 +287,7 @@ public class QuestionResponseActivity extends Activity implements
 		title.setText("QUESTION " + String.valueOf(position + 1));
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
-		// setFileIcons(currentQuestion.getFiles());
+		setFileIcons(currentQuestion.getFiles());
 
 		int answersCount = q.getAnswers().size();
 
@@ -375,21 +408,21 @@ public class QuestionResponseActivity extends Activity implements
 
 	private void setFileIcons(HashMap<String, String> files) {
 		if (files.get("image").isEmpty()) {
-			btnImage.setBackgroundResource(android.R.color.transparent);
+			btnImage.setBackgroundResource(R.drawable.ic_camera_gray);
 			btnImage.setClickable(false);
 		} else {
 			btnImage.setBackgroundResource(R.drawable.ic_camera);
 			btnImage.setClickable(true);
 		}
 		if (files.get("sound").isEmpty()) {
-			btnAudio.setBackgroundResource(android.R.color.transparent);
+			btnAudio.setBackgroundResource(R.drawable.ic_sound_gray);
 			btnAudio.setClickable(false);
 		} else {
 			btnAudio.setBackgroundResource(R.drawable.ic_sound);
 			btnAudio.setClickable(true);
 		}
 		if (files.get("video").isEmpty()) {
-			btnVideo.setBackgroundResource(android.R.color.transparent);
+			btnVideo.setBackgroundResource(R.drawable.ic_video_gray);
 			btnVideo.setClickable(false);
 		} else {
 			btnVideo.setBackgroundResource(R.drawable.ic_video);
@@ -520,10 +553,13 @@ public class QuestionResponseActivity extends Activity implements
 		CORRECTED_ANSWERS = true;
 		TextView scoreText = (TextView) findViewById(R.id.score);
 		scoreText.setText(score);
+
+		selectQuestion(questions.get(0), 0);
 		drawCorrections(corrections);
 	}
 
 	private void drawCorrections(ArrayList<Correction> corrections) {
+		correctionsLayout.removeAllViews();
 		ArrayList<String> correctionAnswerIDs = new ArrayList<String>();
 		for (Correction c : corrections) {
 			if (currentQuestion.getId() == Integer.valueOf(c.getQuestionId())) {
@@ -548,7 +584,7 @@ public class QuestionResponseActivity extends Activity implements
 			ImageView img = new ImageView(QuestionResponseActivity.this);
 
 			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-					25, 25);
+					30, 30);
 
 			if (currentQuestion.getType().equalsIgnoreCase("2")) {
 				for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
@@ -614,7 +650,7 @@ public class QuestionResponseActivity extends Activity implements
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-				imageParams.setMargins(0, 21, 0, 0);
+				imageParams.setMargins(0, 20, 0, 0);
 
 				int inputCount = Integer.valueOf(currentQuestion
 						.getInputCount());
@@ -838,17 +874,43 @@ public class QuestionResponseActivity extends Activity implements
 		}
 
 	};
+	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files) {
-		Dialog dialog = new Dialog(QuestionResponseActivity.this);
+		dialog = new Dialog(QuestionResponseActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
 
-		// setFileIcons(files);
+		Button button1 = (Button) dialog.findViewById(R.id.button1);
+		Button button2 = (Button) dialog.findViewById(R.id.button2);
+		Button button3 = (Button) dialog.findViewById(R.id.button3);
+
+		if (files.get("image").isEmpty()) {
+			button1.setBackgroundResource(R.drawable.ic_camera_gray);
+			button1.setClickable(false);
+		} else {
+			button1.setBackgroundResource(R.drawable.ic_camera);
+			button1.setClickable(true);
+		}
+		if (files.get("sound").isEmpty()) {
+			button2.setBackgroundResource(R.drawable.ic_sound_gray);
+			button2.setClickable(false);
+		} else {
+			button2.setBackgroundResource(R.drawable.ic_sound);
+			button2.setClickable(true);
+		}
+		if (files.get("video").isEmpty()) {
+			button3.setBackgroundResource(R.drawable.ic_video_gray);
+			button3.setClickable(false);
+		} else {
+			button3.setBackgroundResource(R.drawable.ic_video);
+			button3.setClickable(true);
+		}
 
 		final String IMAGE_URL = files.get("image");
 		final String AUDIO_URL = files.get("sound");
 		final String VIDEO_URL = files.get("video");
+		VIDEO_URL.replaceAll(" ", "%20");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
 		final ImageView audioImage = (ImageView) dialog
 				.findViewById(R.id.sound_icon);
@@ -879,8 +941,7 @@ public class QuestionResponseActivity extends Activity implements
 		if (VIDEO_URL != null)
 			if (!VIDEO_URL.isEmpty()) {
 				mc.setAnchorView(video);
-				Uri videoURI = Uri
-						.parse("http://ecni.conference-hermes.fr/uploads/exercises/Understanding%20Different%20Heart%20Operations%20and%20Surgeries%20-.mp4");
+				Uri videoURI = Uri.parse(VIDEO_URL);
 				video.setMediaController(mc);
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
@@ -1004,8 +1065,10 @@ public class QuestionResponseActivity extends Activity implements
 			}
 		});
 
-		dialog.show();
-		dialog.getWindow().setLayout(800, 600);
+		if (!dialog.isShowing()) {
+			dialog.show();
+			dialog.getWindow().setLayout(800, 600);
+		}
 
 	}
 
