@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.LinearGradient;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -121,6 +122,7 @@ public class QuestionResponseActivity extends Activity implements
 
 	private SparseBooleanArray validAnswers;
 	private ArrayList<QuestionAnswer> questionAnswers;
+	private LinearLayout checkBoxLayout;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -252,7 +254,7 @@ public class QuestionResponseActivity extends Activity implements
 		title.setText("QUESTION " + String.valueOf(position + 1));
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
-		setFileIcons(currentQuestion.getFiles());
+		// setFileIcons(currentQuestion.getFiles());
 
 		int answersCount = q.getAnswers().size();
 
@@ -284,8 +286,7 @@ public class QuestionResponseActivity extends Activity implements
 			ArrayList<String> answers = null;
 
 			for (int i = 0; i < answersCount; i++) {
-				LinearLayout checkBoxLayout = new LinearLayout(
-						QuestionResponseActivity.this);
+				checkBoxLayout = new LinearLayout(QuestionResponseActivity.this);
 				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
 				final CheckBox checkBox = new CheckBox(
 						QuestionResponseActivity.this);
@@ -366,6 +367,9 @@ public class QuestionResponseActivity extends Activity implements
 				}
 			}
 		}
+
+		if (CORRECTED_ANSWERS)
+			drawCorrections(DataHolder.getInstance().getCorrections());
 
 	}
 
@@ -533,29 +537,108 @@ public class QuestionResponseActivity extends Activity implements
 			allAnswerIDs.add(String.valueOf(allAnswers.get(i).getId()));
 		}
 
-		for (int j = 0; j < allAnswers.size(); j++) {
+		int answerCount = 0;
+		if (currentQuestion.getType().equalsIgnoreCase("3")) {
+			answerCount = Integer.valueOf(currentQuestion.getInputCount());
+		} else {
+			answerCount = allAnswers.size();
+		}
+
+		for (int j = 0; j < answerCount; j++) {
 			ImageView img = new ImageView(QuestionResponseActivity.this);
 
 			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-					30, 30);
+					25, 25);
 
 			if (currentQuestion.getType().equalsIgnoreCase("2")) {
-				imageParams.setMargins(0, 10, 0, 0);
-				String userAnswerIDs = String.valueOf(questionAnswers.get(
-						currentQuestionId).getSingleAnswerPosition());
-				for (int i = 0; i < correctionAnswerIDs.size(); i++) {
-					if (userAnswerIDs.equalsIgnoreCase(correctionAnswerIDs
-							.get(i)))
+				for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
+					mRadioGroup.getChildAt(i).setEnabled(false);
+				}
+
+				imageParams.setMargins(0, 7, 0, 0);
+				int userAnswerIDs = questionAnswers.get(currentQuestionId)
+						.getSingleAnswerPosition();
+
+				if (userAnswerIDs == j) {
+					if (allAnswerIDs.get(userAnswerIDs).equalsIgnoreCase(
+							correctionAnswerIDs.get(0)))
 						img.setBackgroundResource(R.drawable.correction_true);
 					else
 						img.setBackgroundResource(R.drawable.correction_false);
-					break;
+				} else {
+					if (allAnswerIDs.get(j).equalsIgnoreCase(
+							correctionAnswerIDs.get(0)))
+						img.setBackgroundResource(R.drawable.correction_true);
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-				imageParams.setMargins(0, 10, 0, 0);
+				for (int i = 0; i < answersLayout.getChildCount(); i++) {
+					LinearLayout layout = (LinearLayout) answersLayout
+							.getChildAt(i);
+					for (int i1 = 0; i1 < layout.getChildCount(); i1++) {
+						layout.getChildAt(i1).setEnabled(false);
+					}
+				}
+
+				imageParams.setMargins(0, 5, 0, 0);
+
+				ArrayList<Integer> userAnswerIDs = questionAnswers.get(
+						currentQuestionId).getMultiAnswerPositions();
+				for (int i = 0; i < userAnswerIDs.size(); i++) {
+					String currentAsnwerId = allAnswerIDs.get(j);
+					if (currentAsnwerId.equalsIgnoreCase(String
+							.valueOf(userAnswerIDs.get(i)))) { // User has
+																// checked
+																// this
+																// answer
+
+						for (int k = 0; k < correctionAnswerIDs.size(); k++) {
+							if (correctionAnswerIDs.get(k).equalsIgnoreCase(
+									currentAsnwerId)) // The checked answer
+														// exists in correct
+														// answers
+								img.setBackgroundResource(R.drawable.correction_true);
+							else
+								img.setBackgroundResource(R.drawable.correction_false);
+						}
+					} else {
+						for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
+							if (currentAsnwerId
+									.equalsIgnoreCase(correctionAnswerIDs
+											.get(k1)))
+								img.setBackgroundResource(R.drawable.correction_true);
+
+						}
+
+					}
+				}
+
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-				imageParams.setMargins(0, 10, 0, 0);
+				imageParams.setMargins(0, 21, 0, 0);
+
+				int inputCount = Integer.valueOf(currentQuestion
+						.getInputCount());
+				for (int i = 0; i < inputCount; i++) {
+					try {
+						JSONObject corObj = new JSONObject(corrections
+								.get(currentQuestionId).getAnswersArray()
+								.get(i));
+						String answerText = corObj.getString("name");
+						editTextsArray.get(i).setText(answerText);
+						editTextsArray.get(i).setEnabled(false);
+
+						int IS_GOOD = corObj.getInt("is_good");
+						if (IS_GOOD == 1) {
+							img.setBackgroundResource(R.drawable.correction_true);
+						} else {
+							img.setBackgroundResource(R.drawable.correction_false);
+						}
+
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+				}
+
 			}
 
 			correctionsLayout.addView(img, imageParams);

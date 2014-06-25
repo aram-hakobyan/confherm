@@ -253,7 +253,7 @@ public class JSONParser {
 
 				JSONObject data = json.getJSONObject("data");
 				int duration = data.getInt("duration");
-				DataHolder.getInstance().setTrainingDuration(duration);
+				DataHolder.getInstance().setTrainingDuration(duration * 1000);
 
 				JSONArray exObj = data.getJSONArray("exercises");
 				for (int i = 0; i < exObj.length(); i++) {

@@ -8,6 +8,7 @@ public class Answer {
 	private String feedback;
 	private int feedbackFormat;
 	private double fraction;
+	private int IS_GOOD_ANSWER = 0;
 
 	public Answer() {
 	}
@@ -66,6 +67,14 @@ public class Answer {
 
 	public void setFraction(double fraction) {
 		this.fraction = fraction;
+	}
+
+	public int getIS_GOOD_ANSWER() {
+		return IS_GOOD_ANSWER;
+	}
+
+	public void setIS_GOOD_ANSWER(int iS_GOOD_ANSWER) {
+		IS_GOOD_ANSWER = iS_GOOD_ANSWER;
 	}
 
 }
