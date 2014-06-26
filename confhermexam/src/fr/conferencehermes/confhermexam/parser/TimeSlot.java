@@ -1,7 +1,7 @@
 package fr.conferencehermes.confhermexam.parser;
 
-public class Planning {
-
+public class TimeSlot {
+	private int timeslot_id;
 	private int test_id;
 	private String test_name;
 	private int start_date;
@@ -10,9 +10,8 @@ public class Planning {
 	private String place;
 	private String room;
 	private int status;
-	private int timeslot_id;
 
-	public Planning() {
+	public TimeSlot() {
 
 	}
 

@@ -481,20 +481,17 @@ public class JSONParser {
 		return score;
 	}
 
-	public static ArrayList<Planning> parsePlannig(JSONObject planJson) {
-		ArrayList<Planning> planningResult = new ArrayList<Planning>();
+	public static ArrayList<TimeSlot> parsePlannig(JSONObject planJson) {
+		ArrayList<TimeSlot> planningResult = new ArrayList<TimeSlot>();
 		try {
 			if (planJson.has(Constants.KEY_DATA)
 					&& planJson.get(Constants.KEY_DATA) != null) {
 				// JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
 				JSONArray data = planJson.getJSONArray(Constants.KEY_DATA);
 				if (data.length() != 0) {
-
 					for (int i = 0; i < data.length(); i++) {
 						JSONObject gObj = data.getJSONObject(i);
-
-						Planning r = new Planning();
-
+						TimeSlot r = new TimeSlot();
 						r.setTimeslot_id(gObj.getInt("timeslot_id"));
 						r.setTest_id(gObj.getInt("test_id"));
 						r.setTest_name(gObj.getString("test_name"));
@@ -504,10 +501,8 @@ public class JSONParser {
 						r.setPlace(gObj.getString("place"));
 						r.setRoom(gObj.getString("room"));
 						r.setStatus(gObj.getInt("status"));
-
 						planningResult.add(r);
 					}
-
 				}
 			}
 		} catch (JSONException e) {
