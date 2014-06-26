@@ -1,13 +1,14 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical" >
+    android:background="@android:color/white" >
 
     <RelativeLayout
+        android:id="@+id/calendarMenu"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_alignParentTop="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="100dp"
         android:layout_marginRight="70dp"
@@ -53,8 +54,10 @@
     </RelativeLayout>
 
     <LinearLayout
+        android:id="@+id/calendarHeader"
         android:layout_width="match_parent"
         android:layout_height="60dp"
+        android:layout_below="@+id/calendarMenu"
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="100dp"
         android:layout_marginRight="70dp"
@@ -149,15 +152,16 @@
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/calendarHeader"
+        android:layout_below="@+id/calendarHeader"
         android:layout_marginBottom="30dp" >
 
         <LinearLayout
             android:id="@+id/calendar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="15dp"
             android:orientation="vertical" >
         </LinearLayout>
     </ScrollView>
 
-</LinearLayout>
+</RelativeLayout>

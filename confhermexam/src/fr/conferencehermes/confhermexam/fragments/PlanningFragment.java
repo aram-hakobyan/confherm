@@ -21,15 +21,15 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
-import fr.conferencehermes.confhermexam.parser.Planning;
+import fr.conferencehermes.confhermexam.parser.TimeSlot;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class PlanningFragment extends Fragment {
 	private LayoutInflater inflater;
-	private ArrayList<Planning> planningList;
-	private int currentTime;
-	private int currentTimeAddWeek;
+	private ArrayList<TimeSlot> timeSlotsArray;
+	private long currentTime;
+	private long currentTimeAddWeek;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -57,55 +57,53 @@ public class PlanningFragment extends Fragment {
 			layoutContainer.addView(myLayout);
 		}
 
-		try {
-			Calendar c = Calendar.getInstance();
-			currentTime = c.get(Calendar.MILLISECOND);
-			currentTimeAddWeek = currentTime + (7 * 24 * 60 * 60 * 1000);
-		}
+		Calendar cal = Calendar.getInstance();
+		cal.set(Calendar.HOUR_OF_DAY, 0);
+		cal.clear(Calendar.MINUTE);
+		cal.clear(Calendar.SECOND);
+		cal.clear(Calendar.MILLISECOND);
+		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
+		currentTime = cal.getTimeInMillis();
+		cal.add(Calendar.WEEK_OF_YEAR, 1);
+		currentTimeAddWeek = cal.getTimeInMillis();
 
-		catch (Exception e) {
-			e.printStackTrace();
-		}
 		AQuery aq = new AQuery(getActivity());
 
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 		params.put(Constants.KEY_DEVICE_ID,
 				Utilities.getDeviceId(getActivity()));
-		params.put(Constants.KEY_FROM, currentTime);
-		params.put(Constants.KEY_TO, currentTimeAddWeek);
+		params.put(Constants.KEY_FROM, currentTime / 1000);
+		params.put(Constants.KEY_TO, currentTimeAddWeek / 1000);
 
 		aq.ajax(Constants.PLANNING_URL, params, JSONObject.class,
 				new AjaxCallback<JSONObject>() {
 					@Override
 					public void callback(String url, JSONObject json,
 							AjaxStatus status) {
-
 						if (json != null) {
-							System.out.println(json.toString());
 							try {
 								if (json.has("data")
 										&& json.get("data") != null) {
-									planningList = JSONParser
+									timeSlotsArray = JSONParser
 											.parsePlannig(json);
-									// if (adapter == null) {
-									// adapter = new ExamsAdapter(getActivity(),
-									// exams);
-									// } else {
-									// adapter.notifyDataSetChanged();
-									// }
-									// listview.setAdapter(adapter);
+									if (!timeSlotsArray.isEmpty())
+										drawTimeSlot(timeSlotsArray.get(0));
 								}
-
 							} catch (JSONException e) {
 								e.printStackTrace();
-
+							} catch (NullPointerException e1) {
+								e1.printStackTrace();
 							}
 						}
 					}
 				});
 
 		return fragment;
+	}
+
+	private void drawTimeSlot(TimeSlot timeSlot) {
+
 	}
 
 }

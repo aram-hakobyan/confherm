@@ -91,6 +91,7 @@ public class NotesActivity extends Activity {
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
 
+
 		listviewEx.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -105,6 +106,7 @@ public class NotesActivity extends Activity {
 
 		});
 
+
 		globalTest.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -112,11 +114,13 @@ public class NotesActivity extends Activity {
 				paramExersiceId = -1;
 				paramGlobalTest = 1;
 				exerciseResult(NotesActivity.this);
+
 				globalTest.setBackgroundColor(getResources().getColor(
 						R.color.app_main_color_dark));
 				
 				if (listViewLastPosition != -1)
 				selectExersiceBackground(listEx.get(listViewLastPosition), listViewLastPosition,false);
+
 
 			}
 		});
@@ -304,9 +308,10 @@ public class NotesActivity extends Activity {
 			if (wantedChild >= 0 && wantedChild < listviewEx.getChildCount()) {
 				for (int i = 0; i < listviewEx.getChildCount(); i++) {
 					if (i == wantedChild)
-						listviewEx.getChildAt(i).setBackgroundColor(
-								getResources().getColor(
-										R.color.app_main_color));
+						listviewEx.getChildAt(i)
+								.setBackgroundColor(
+										getResources().getColor(
+												R.color.app_main_color));
 					else
 						listviewEx.getChildAt(i)
 								.setBackgroundColor(

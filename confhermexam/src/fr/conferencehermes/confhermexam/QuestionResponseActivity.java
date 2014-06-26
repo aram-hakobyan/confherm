@@ -659,33 +659,31 @@ public class QuestionResponseActivity extends Activity implements
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
 				imageParams.setMargins(0, 20, 0, 0);
 
-				int inputCount = Integer.valueOf(currentQuestion
-						.getInputCount());
-				for (int i = 0; i < inputCount; i++) {
-					try {
-						JSONObject corObj = new JSONObject(corrections
-								.get(currentQuestionId).getAnswersArray()
-								.get(i));
-						String answerText = corObj.getString("name");
-						editTextsArray.get(i).setText(answerText);
-						editTextsArray.get(i).setEnabled(false);
+				try {
+					JSONObject corObj = new JSONObject(corrections
+							.get(currentQuestionId).getAnswersArray().get(j));
+					String answerText = corObj.getString("name");
+					editTextsArray.get(j).setText(answerText);
+					editTextsArray.get(j).setEnabled(false);
 
-						int IS_GOOD = corObj.getInt("is_good");
-						if (IS_GOOD == 1) {
-							img.setBackgroundResource(R.drawable.correction_true);
-						} else {
-							img.setBackgroundResource(R.drawable.correction_false);
-						}
-
-					} catch (JSONException e) {
-						e.printStackTrace();
+					int IS_GOOD = corObj.getInt("is_good");
+					if (IS_GOOD == 1) {
+						img.setBackgroundResource(R.drawable.correction_true);
+					} else {
+						img.setBackgroundResource(R.drawable.correction_false);
 					}
+
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
 
 			}
 
 			correctionsLayout.addView(img, imageParams);
 		}
+
+		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
+		correctionText.setText(corrections.get(currentQuestionId).getText());
 
 	}
 
