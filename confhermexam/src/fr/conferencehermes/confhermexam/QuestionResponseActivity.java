@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -47,16 +48,19 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
+import android.text.InputType;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -124,6 +128,7 @@ public class QuestionResponseActivity extends Activity implements
 	private SparseBooleanArray validAnswers;
 	private ArrayList<QuestionAnswer> questionAnswers;
 	private LinearLayout checkBoxLayout;
+	MediaPlayer mediaPlayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -173,6 +178,8 @@ public class QuestionResponseActivity extends Activity implements
 
 		startTime = SystemClock.uptimeMillis();
 		customHandler.postDelayed(updateTimerThread, 0);
+		mediaPlayer = new MediaPlayer();
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
 		exercise_id = getIntent().getIntExtra("exercise_id", 1);
 		training_id = getIntent().getIntExtra("training_id", 1);
@@ -383,6 +390,11 @@ public class QuestionResponseActivity extends Activity implements
 			for (int i = 0; i < count; i++) {
 				EditText editText = new EditText(QuestionResponseActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
+				editText.setInputType(InputType.TYPE_CLASS_TEXT);
+				editText.requestFocus();
+				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
+
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.MATCH_PARENT,
 						LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -428,6 +440,37 @@ public class QuestionResponseActivity extends Activity implements
 			btnVideo.setBackgroundResource(R.drawable.ic_video);
 			btnVideo.setClickable(true);
 		}
+	}
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+
+		View v = getCurrentFocus();
+		boolean ret = super.dispatchTouchEvent(event);
+
+		if (v instanceof EditText) {
+			View w = getCurrentFocus();
+			int scrcoords[] = new int[2];
+			w.getLocationOnScreen(scrcoords);
+			float x = event.getRawX() + w.getLeft() - scrcoords[0];
+			float y = event.getRawY() + w.getTop() - scrcoords[1];
+
+			Log.d("Activity",
+					"Touch event " + event.getRawX() + "," + event.getRawY()
+							+ " " + x + "," + y + " rect " + w.getLeft() + ","
+							+ w.getTop() + "," + w.getRight() + ","
+							+ w.getBottom() + " coords " + scrcoords[0] + ","
+							+ scrcoords[1]);
+			if (event.getAction() == MotionEvent.ACTION_UP
+					&& (x < w.getLeft() || x >= w.getRight() || y < w.getTop() || y > w
+							.getBottom())) {
+
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(getWindow().getCurrentFocus()
+						.getWindowToken(), 0);
+			}
+		}
+		return ret;
 	}
 
 	@Override
@@ -513,8 +556,10 @@ public class QuestionResponseActivity extends Activity implements
 					final String score = JSONParser.parseCorrections(ob);
 					runOnUiThread(new Runnable() {
 						public void run() {
+							showScoreDialog(score);
 							makeCorrections(score, DataHolder.getInstance()
 									.getCorrections());
+
 						}
 					});
 
@@ -551,11 +596,10 @@ public class QuestionResponseActivity extends Activity implements
 		ANSWERED_QUESTIONS_COUNT = 0;
 		abandonner.setText("ABANDONNER");
 		CORRECTED_ANSWERS = true;
-		TextView scoreText = (TextView) findViewById(R.id.score);
-		scoreText.setText(score);
 
 		selectQuestion(questions.get(0), 0);
 		drawCorrections(corrections);
+
 	}
 
 	private void drawCorrections(ArrayList<Correction> corrections) {
@@ -652,33 +696,35 @@ public class QuestionResponseActivity extends Activity implements
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
 				imageParams.setMargins(0, 20, 0, 0);
 
-				int inputCount = Integer.valueOf(currentQuestion
-						.getInputCount());
-				for (int i = 0; i < inputCount; i++) {
-					try {
-						JSONObject corObj = new JSONObject(corrections
-								.get(currentQuestionId).getAnswersArray()
-								.get(i));
-						String answerText = corObj.getString("name");
-						editTextsArray.get(i).setText(answerText);
-						editTextsArray.get(i).setEnabled(false);
+				try {
+					JSONObject corObj = new JSONObject(corrections
+							.get(currentQuestionId).getAnswersArray().get(j));
+					String answerText = corObj.getString("name");
+					editTextsArray.get(j).setText(answerText);
+					editTextsArray.get(j).setEnabled(false);
 
-						int IS_GOOD = corObj.getInt("is_good");
-						if (IS_GOOD == 1) {
-							img.setBackgroundResource(R.drawable.correction_true);
-						} else {
-							img.setBackgroundResource(R.drawable.correction_false);
-						}
-
-					} catch (JSONException e) {
-						e.printStackTrace();
+					int IS_GOOD = corObj.getInt("is_good");
+					if (IS_GOOD == 1) {
+						img.setBackgroundResource(R.drawable.correction_true);
+					} else {
+						img.setBackgroundResource(R.drawable.correction_false);
 					}
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (IndexOutOfBoundsException e) {
+					e.printStackTrace();
+				} catch (NullPointerException e) {
+					e.printStackTrace();
 				}
 
 			}
 
 			correctionsLayout.addView(img, imageParams);
 		}
+
+		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
+		correctionText.setText(corrections.get(currentQuestionId).getText());
 
 	}
 
@@ -759,6 +805,16 @@ public class QuestionResponseActivity extends Activity implements
 		return false;
 	}
 
+	private boolean areAllAnswersValidated() {
+		int count = 0;
+		for (int i = 0; i < questionAnswers.size(); i++) {
+			if (questionAnswers.get(i) != null)
+				count++;
+		}
+
+		return count == questions.size();
+	}
+
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
@@ -768,7 +824,7 @@ public class QuestionResponseActivity extends Activity implements
 					saveValidation();
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
-					if (ANSWERED_QUESTIONS_COUNT == questions.size()) {
+					if (areAllAnswersValidated()) {
 						abandonner.setText("SUBMIT");
 						valider.setVisibility(View.GONE);
 					}
@@ -789,7 +845,7 @@ public class QuestionResponseActivity extends Activity implements
 			break;
 		case R.id.abandonner:
 			try {
-				if (ANSWERED_QUESTIONS_COUNT == questions.size()) {
+				if (areAllAnswersValidated()) {
 					sendAnswers();
 				} else {
 					finish();
@@ -918,7 +974,7 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.videoView1);
 		final MediaController mc = new MediaController(
 				QuestionResponseActivity.this);
-		final MediaPlayer mediaPlayer = new MediaPlayer();
+
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
 				try {
@@ -1053,9 +1109,8 @@ public class QuestionResponseActivity extends Activity implements
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				try {
-					if (mediaPlayer.isPlaying()) {
+					if (mediaPlayer.isPlaying())
 						mediaPlayer.pause();
-					}
 					if (video.isPlaying()) {
 						video.stopPlayback();
 					}
@@ -1070,6 +1125,36 @@ public class QuestionResponseActivity extends Activity implements
 			dialog.getWindow().setLayout(800, 600);
 		}
 
+	}
+
+	@Override
+	protected void onDestroy() {
+		mediaPlayer.stop();
+		mediaPlayer.release();
+		super.onDestroy();
+	}
+
+	private void showScoreDialog(String score) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				QuestionResponseActivity.this);
+		// create alert dialog
+		if (score.equalsIgnoreCase("")) {
+			score = "no any result yet";
+
+		}// set title
+		alertDialogBuilder.setTitle("Final Score");
+
+		// set dialog message
+		alertDialogBuilder.setMessage(score).setCancelable(false)
+				.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+		// show it
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();
 	}
 
 	private void showAlertDialog() {

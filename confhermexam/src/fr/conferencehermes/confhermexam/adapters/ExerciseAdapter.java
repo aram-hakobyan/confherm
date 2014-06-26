@@ -3,16 +3,12 @@ package fr.conferencehermes.confhermexam.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import fr.conferencehermes.confhermexam.NotesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.ExamExercise;
 
@@ -51,11 +47,9 @@ public class ExerciseAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.exersice_rowview, null);
 			holder.name = (TextView) view.findViewById(R.id.listExerciseTitle);
-			holder.layout =(LinearLayout )view.findViewById(R.id.listExerciseLayout);
+			holder.layuot = (LinearLayout) view
+					.findViewById(R.id.listExerciseLayout);
 			view.setTag(holder);
-
-			
-			
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
@@ -64,29 +58,12 @@ public class ExerciseAdapter extends BaseAdapter {
 			holder.name.setText(mListItems.get(position).getExersiceName());
 		}
 
-		holder.name.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				((NotesActivity) context).setParamExersiceId(mListItems.get(
-						position).getExersiceId());
-				((NotesActivity) context).setParamGlobalTest(0);
-				((NotesActivity) context).exerciseResult(context);
-
-				
-				//holder.layout.setBackgroundColor(context.getResources().getColor(R.color.app_main_color_dark));
-				
-				Log.i("Exersice ", mListItems.get(position).getExersiceId()
-						+ "");
-			}
-		});
-
 		return view;
 
 	}
 
 	private static class ViewHolder {
 		protected TextView name;
-		protected LinearLayout layout;
+		protected LinearLayout layuot;
 	}
 }

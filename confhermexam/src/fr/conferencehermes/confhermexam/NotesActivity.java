@@ -35,8 +35,10 @@ import com.androidquery.callback.AjaxStatus;
 import fr.conferencehermes.confhermexam.adapters.ExerciseAdapter;
 import fr.conferencehermes.confhermexam.adapters.NotesAdapter;
 import fr.conferencehermes.confhermexam.parser.ExamExercise;
+import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.NotesResult;
+import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class NotesActivity extends Activity {
@@ -45,7 +47,7 @@ public class NotesActivity extends Activity {
 	// private NotesAdapter adapterNt;
 	private ListView listviewEx;
 	private ExerciseAdapter adapterEx;
-
+	private int listViewLastPosition = -1;
 	private static TextView teacherName, examName, medianScore, moyenneScore;
 	private ArrayList<ExamExercise> listEx;
 	private ExamExercise ex;
@@ -91,6 +93,22 @@ public class NotesActivity extends Activity {
 
 
 
+		listviewEx.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view,
+					int position, long id) {
+
+				selectExersiceBackground(listEx.get(position), position,true);
+				globalTest.setBackgroundColor(getResources().getColor(
+						R.color.global_normal_color));
+
+				listViewLastPosition = position;
+			}
+
+		});
+
+
+
 		globalTest.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -98,6 +116,13 @@ public class NotesActivity extends Activity {
 				paramExersiceId = -1;
 				paramGlobalTest = 1;
 				exerciseResult(NotesActivity.this);
+
+				globalTest.setBackgroundColor(getResources().getColor(
+						R.color.app_main_color_dark));
+				
+				if (listViewLastPosition != -1)
+				selectExersiceBackground(listEx.get(listViewLastPosition), listViewLastPosition,false);
+
 
 			}
 		});
@@ -233,6 +258,7 @@ public class NotesActivity extends Activity {
 											Toast.LENGTH_SHORT).show();
 
 								}
+
 							}
 						} catch (JSONException e) {
 							e.printStackTrace();
@@ -247,6 +273,57 @@ public class NotesActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return false;
+	}
+
+	private void selectExersiceBackground(ExamExercise r, int position,
+			boolean glabalButton) {
+
+		if (glabalButton) {
+			int wantedPosition = position;
+			int firstPosition = listviewEx.getFirstVisiblePosition()
+					- listviewEx.getHeaderViewsCount();
+			int wantedChild = wantedPosition - firstPosition;
+			if (wantedChild >= 0 && wantedChild < listviewEx.getChildCount()) {
+				for (int i = 0; i < listviewEx.getChildCount(); i++) {
+					if (i == wantedChild)
+						listviewEx.getChildAt(i).setBackgroundColor(
+								getResources().getColor(
+										R.color.excercise_selected_color));
+					else
+						listviewEx.getChildAt(i)
+								.setBackgroundColor(
+										getResources().getColor(
+												R.color.excercise_normal_color));
+				}
+			}
+
+			setParamExersiceId(r.getExersiceId());
+			Log.i("EXERSICE ID", r.getExersiceId() + "");
+			setParamGlobalTest(0);
+			exerciseResult(getApplicationContext());
+
+		} else {
+			int wantedPosition = position;
+			int firstPosition = listviewEx.getFirstVisiblePosition()
+					- listviewEx.getHeaderViewsCount();
+			int wantedChild = wantedPosition - firstPosition;
+			if (wantedChild >= 0 && wantedChild < listviewEx.getChildCount()) {
+				for (int i = 0; i < listviewEx.getChildCount(); i++) {
+					if (i == wantedChild)
+						listviewEx.getChildAt(i)
+								.setBackgroundColor(
+										getResources().getColor(
+												R.color.excercise_normal_color));
+					else
+						listviewEx.getChildAt(i)
+								.setBackgroundColor(
+										getResources().getColor(
+												R.color.excercise_normal_color));
+				}
+			}
+
+		}
+
 	}
 
 	public void exerciseResult(final Context context) {

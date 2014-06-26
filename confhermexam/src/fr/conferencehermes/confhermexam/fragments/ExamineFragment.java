@@ -69,6 +69,7 @@ public class ExamineFragment extends Fragment {
 							AjaxStatus status) {
 
 						try {
+							System.out.println(json);
 							if (json.has("data") && json.get("data") != null) {
 								exams = JSONParser.parseExams(json);
 								if (adapter == null) {
