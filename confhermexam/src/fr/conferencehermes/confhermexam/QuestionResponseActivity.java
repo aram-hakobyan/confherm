@@ -39,6 +39,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -124,6 +125,7 @@ public class QuestionResponseActivity extends Activity implements
 	private SparseBooleanArray validAnswers;
 	private ArrayList<QuestionAnswer> questionAnswers;
 	private LinearLayout checkBoxLayout;
+	MediaPlayer mediaPlayer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -173,6 +175,8 @@ public class QuestionResponseActivity extends Activity implements
 
 		startTime = SystemClock.uptimeMillis();
 		customHandler.postDelayed(updateTimerThread, 0);
+		mediaPlayer = new MediaPlayer();
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
 		exercise_id = getIntent().getIntExtra("exercise_id", 1);
 		training_id = getIntent().getIntExtra("training_id", 1);
@@ -668,6 +672,10 @@ public class QuestionResponseActivity extends Activity implements
 
 				} catch (JSONException e) {
 					e.printStackTrace();
+				} catch (IndexOutOfBoundsException e) {
+					e.printStackTrace();
+				} catch (NullPointerException e) {
+					e.printStackTrace();
 				}
 
 			}
@@ -757,6 +765,16 @@ public class QuestionResponseActivity extends Activity implements
 		return false;
 	}
 
+	private boolean areAllAnswersValidated() {
+		int count = 0;
+		for (int i = 0; i < questionAnswers.size(); i++) {
+			if (questionAnswers.get(i) != null)
+				count++;
+		}
+
+		return count == questions.size();
+	}
+
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
@@ -766,7 +784,7 @@ public class QuestionResponseActivity extends Activity implements
 					saveValidation();
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
-					if (ANSWERED_QUESTIONS_COUNT == questions.size()) {
+					if (areAllAnswersValidated()) {
 						abandonner.setText("SUBMIT");
 						valider.setVisibility(View.GONE);
 					}
@@ -787,7 +805,7 @@ public class QuestionResponseActivity extends Activity implements
 			break;
 		case R.id.abandonner:
 			try {
-				if (ANSWERED_QUESTIONS_COUNT == questions.size()) {
+				if (areAllAnswersValidated()) {
 					sendAnswers();
 				} else {
 					finish();
@@ -916,7 +934,7 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.videoView1);
 		final MediaController mc = new MediaController(
 				QuestionResponseActivity.this);
-		final MediaPlayer mediaPlayer = new MediaPlayer();
+
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
 				try {
@@ -1051,9 +1069,8 @@ public class QuestionResponseActivity extends Activity implements
 			@Override
 			public void onDismiss(DialogInterface dialog) {
 				try {
-					if (mediaPlayer.isPlaying()) {
+					if (mediaPlayer.isPlaying())
 						mediaPlayer.pause();
-					}
 					if (video.isPlaying()) {
 						video.stopPlayback();
 					}
@@ -1068,6 +1085,13 @@ public class QuestionResponseActivity extends Activity implements
 			dialog.getWindow().setLayout(800, 600);
 		}
 
+	}
+
+	@Override
+	protected void onDestroy() {
+		mediaPlayer.stop();
+		mediaPlayer.release();
+		super.onDestroy();
 	}
 
 	private void showAlertDialog() {

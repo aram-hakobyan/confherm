@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.content.res.Resources;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -16,6 +17,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 import android.view.Gravity;
 import android.view.Window;
 import android.view.WindowManager;
@@ -82,6 +84,20 @@ public class Utilities {
 
 	public static Editor getEditor(Context context) {
 		return getPreferences(context).edit();
+	}
+
+	public static float convertDpToPixel(float dp, Context context) {
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float px = dp * (metrics.densityDpi / 160f);
+		return px;
+	}
+
+	public static float convertPixelsToDp(float px, Context context) {
+		Resources resources = context.getResources();
+		DisplayMetrics metrics = resources.getDisplayMetrics();
+		float dp = px / (metrics.densityDpi / 160f);
+		return dp;
 	}
 
 	public static void selectFrag(FragmentActivity a, int PAGE_ID) {

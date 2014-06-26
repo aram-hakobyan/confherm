@@ -4,8 +4,8 @@ public class TimeSlot {
 	private int timeslot_id;
 	private int test_id;
 	private String test_name;
-	private int start_date;
-	private int end_date;
+	private long start_date;
+	private long end_date;
 	private String academy;
 	private String place;
 	private String room;
@@ -39,19 +39,19 @@ public class TimeSlot {
 		this.test_name = test_name;
 	}
 
-	public int getStart_date() {
+	public long getStart_date() {
 		return start_date;
 	}
 
-	public void setStart_date(int start_date) {
+	public void setStart_date(long start_date) {
 		this.start_date = start_date;
 	}
 
-	public int getEnd_date() {
+	public long getEnd_date() {
 		return end_date;
 	}
 
-	public void setEnd_date(int end_date) {
+	public void setEnd_date(long end_date) {
 		this.end_date = end_date;
 	}
 
