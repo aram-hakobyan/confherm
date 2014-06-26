@@ -221,7 +221,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="10dp"
-                android:choiceMode="singleChoice" >
+                android:listSelector="@drawable/exercieslist_selector" >
             </ListView>
         </LinearLayout>
     </LinearLayout>

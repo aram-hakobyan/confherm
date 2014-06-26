@@ -3,6 +3,7 @@ package fr.conferencehermes.confhermexam.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,8 +51,11 @@ public class ExerciseAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.exersice_rowview, null);
 			holder.name = (TextView) view.findViewById(R.id.listExerciseTitle);
-			holder.layuot =(LinearLayout )view.findViewById(R.id.listExerciseLayout);
+			holder.layout =(LinearLayout )view.findViewById(R.id.listExerciseLayout);
 			view.setTag(holder);
+
+			
+			
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
@@ -67,10 +71,10 @@ public class ExerciseAdapter extends BaseAdapter {
 				((NotesActivity) context).setParamExersiceId(mListItems.get(
 						position).getExersiceId());
 				((NotesActivity) context).setParamGlobalTest(0);
-
 				((NotesActivity) context).exerciseResult(context);
 
-				holder.layuot.setBackgroundColor(context.getResources().getColor(R.color.app_main_color_dark));
+				
+				//holder.layout.setBackgroundColor(context.getResources().getColor(R.color.app_main_color_dark));
 				
 				Log.i("Exersice ", mListItems.get(position).getExersiceId()
 						+ "");
@@ -83,6 +87,6 @@ public class ExerciseAdapter extends BaseAdapter {
 
 	private static class ViewHolder {
 		protected TextView name;
-		protected LinearLayout layuot;
+		protected LinearLayout layout;
 	}
 }

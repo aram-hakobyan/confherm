@@ -9,6 +9,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -88,39 +89,7 @@ public class NotesActivity extends Activity {
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
 
-//		listviewEx.setOnItemClickListener(new OnItemClickListener() {
-//
-//			@Override
-//			public void onItemClick(AdapterView<?> parent, View view,
-//					final int position, long id) {
-//				listviewEx.post(new Runnable() {  
-//					@Override
-//					public void run() {
-//						listviewEx.setSelection(position);
-//
-//						wantedPosition = position;
-//						int firstPosition = listviewEx.getFirstVisiblePosition()
-//								- listviewNt.getHeaderViewsCount();
-//						wantedChild = wantedPosition - firstPosition;
-//						View wantedView = listviewEx.getChildAt(wantedChild);
-//						if (wantedView != null) {
-//							wantedView.requestFocus();
-//
-//							wantedView.setBackgroundColor(getResources().getColor(
-//									R.color.app_main_color_dark));
-//						}
-//
-//						if (wantedChild < 0
-//								|| wantedChild >= listviewNt.getChildCount()) {
-//							Log.w("TAG",
-//									"Unable to get view for desired position, because it's not being displayed on screen.");
-//							return;
-//						}
-//					}
-//				});
-//
-//			}
-//		});
+
 
 		globalTest.setOnClickListener(new OnClickListener() {
 
@@ -348,7 +317,6 @@ public class NotesActivity extends Activity {
 
 	}
 
-	
 	public int getParamExersiceId() {
 		return paramExersiceId;
 	}
