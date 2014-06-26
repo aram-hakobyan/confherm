@@ -65,6 +65,9 @@ public class NotesAdapter extends BaseAdapter {
 				holder.name.setText(studentName);
 				holder.rang.setText(studentRank);
 				holder.score.setText(String.valueOf(studentScore));
+				holder.name.setTextColor(Color.parseColor("#000000"));
+				holder.rang.setTextColor(Color.parseColor("#000000"));
+				holder.score.setTextColor(Color.parseColor("#000000"));
 
 			}
 		}

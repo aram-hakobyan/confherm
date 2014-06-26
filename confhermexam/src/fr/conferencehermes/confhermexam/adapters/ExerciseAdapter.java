@@ -50,7 +50,8 @@ public class ExerciseAdapter extends BaseAdapter {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.exersice_rowview, null);
 			holder.name = (TextView) view.findViewById(R.id.listExerciseTitle);
-			holder.layuot =(LinearLayout )view.findViewById(R.id.listExerciseLayout);
+			holder.layuot = (LinearLayout) view
+					.findViewById(R.id.listExerciseLayout);
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
@@ -59,23 +60,6 @@ public class ExerciseAdapter extends BaseAdapter {
 		if (holder.name != null) {
 			holder.name.setText(mListItems.get(position).getExersiceName());
 		}
-
-		holder.name.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				((NotesActivity) context).setParamExersiceId(mListItems.get(
-						position).getExersiceId());
-				((NotesActivity) context).setParamGlobalTest(0);
-
-				((NotesActivity) context).exerciseResult(context);
-
-				holder.layuot.setBackgroundColor(context.getResources().getColor(R.color.app_main_color_dark));
-				
-				Log.i("Exersice ", mListItems.get(position).getExersiceId()
-						+ "");
-			}
-		});
 
 		return view;
 
