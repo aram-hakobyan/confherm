@@ -18,12 +18,13 @@ public class JSONParser {
 	public static void parseLoginData(String pData) {
 
 		try {
-			JSONObject jsonObj = new JSONObject(pData);
-			JSONObject data = jsonObj.getJSONObject("data");
+			if (pData != null) {
+				JSONObject jsonObj = new JSONObject(pData);
+				JSONObject data = jsonObj.getJSONObject("data");
 
-			USER_ID = data.getString("user_id");
-			AUTH_KEY = data.getString("auth_key");
-
+				USER_ID = data.getString("user_id");
+				AUTH_KEY = data.getString("auth_key");
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

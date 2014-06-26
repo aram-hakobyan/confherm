@@ -48,6 +48,7 @@ import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
+import android.text.InputType;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
@@ -58,6 +59,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -387,6 +389,11 @@ public class QuestionResponseActivity extends Activity implements
 			for (int i = 0; i < count; i++) {
 				EditText editText = new EditText(QuestionResponseActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
+				editText.setInputType(InputType.TYPE_CLASS_TEXT);
+	            editText.requestFocus();
+	            InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+	            mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
+
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.MATCH_PARENT,
 						LinearLayout.LayoutParams.WRAP_CONTENT);
