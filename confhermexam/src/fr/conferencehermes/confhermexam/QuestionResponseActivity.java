@@ -390,9 +390,9 @@ public class QuestionResponseActivity extends Activity implements
 				EditText editText = new EditText(QuestionResponseActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-	            editText.requestFocus();
-	            InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-	            mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
+				editText.requestFocus();
+				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.MATCH_PARENT,
@@ -1089,7 +1089,11 @@ public class QuestionResponseActivity extends Activity implements
 
 		if (!dialog.isShowing()) {
 			dialog.show();
-			dialog.getWindow().setLayout(800, 600);
+			dialog.getWindow().setLayout(
+					getResources().getDimensionPixelSize(
+							R.dimen.file_dialog_width),
+					getResources().getDimensionPixelSize(
+							R.dimen.file_dialog_height));
 		}
 
 	}
