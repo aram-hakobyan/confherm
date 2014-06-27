@@ -15,7 +15,7 @@
         android:layout_marginRight="100dp"
         android:layout_marginTop="70dp"
         android:divider="@android:color/transparent"
-        android:dividerHeight="10dp" >
+       android:dividerHeight="@dimen/listview_divider_height" >
     </ListView>
 
     <ProgressBar

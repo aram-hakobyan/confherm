@@ -2,10 +2,13 @@ package fr.conferencehermes.confhermexam.fragments;
 
 import java.util.Map;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,12 +18,15 @@ import android.widget.TextView;
 import fr.conferencehermes.confhermexam.LoginActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.Profile;
+import fr.conferencehermes.confhermexam.util.Constants;
 
 public class MyProfileFragment extends Fragment {
 
 	private static Profile pData;
 	private TextView pFirsName, pLastName, pUserName, pEmailAdress, pGroups;
 	private Button logout;
+	private SharedPreferences.Editor logoutEditor;
+	private SharedPreferences logoutPrefs;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -39,6 +45,17 @@ public class MyProfileFragment extends Fragment {
 				Intent i = new Intent(getActivity(), LoginActivity.class);
 				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 						| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+
+				logoutEditor = getActivity().getSharedPreferences(
+						"logoutPrefs", Context.MODE_PRIVATE).edit();
+				logoutEditor.putBoolean(Constants.LOGOUT_SHAREDPREFS_KEY, true);
+				logoutEditor.commit();
+
+				logoutPrefs = getActivity().getSharedPreferences("logoutPrefs",
+						Context.MODE_PRIVATE);
+				boolean b = logoutPrefs.getBoolean(
+						Constants.LOGOUT_SHAREDPREFS_KEY, false);
+				Log.i("Utils", b + "");
 				startActivity(i);
 
 				getActivity().finish();

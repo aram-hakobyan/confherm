@@ -38,7 +38,7 @@ public class BaseNetworkManager {
 	public void constructConnectionAndHitPOST(final String successMessage,
 			final String startingMessage, final List<NameValuePair> paramsList,
 			final Object managerObject, final String classString,
-			final String serviceName,final String loginOrAuth) {
+			final String serviceName, final String loginOrAuth) {
 
 		if (NetworkReachability.isReachable()) {
 
@@ -57,20 +57,18 @@ public class BaseNetworkManager {
 						break;
 
 					case 403:
-						Log.d("Access denied. Please login",
-								"404");
+						Log.d("Access denied. Please login", "404");
 						handleFailResponse("Access denied. Please login");
 						break;
 
 					case 400:
-						Log.d("Exception occured while hitting response!",
-								"400");
-						handleFailResponse("Exception occured while hitting response!");
+						Log.d("Please check your internet connection.", "400");
+						handleFailResponse("Please check your internet connection.");
 						break;
-						
+
 					case 500:
 						Log.d("Something went wrong. Please try again later",
-								"500");	
+								"500");
 						handleFailResponse("Something went wrong. Please try again later");
 						break;
 
@@ -83,9 +81,9 @@ public class BaseNetworkManager {
 
 			// ------------------- Construct Service Url ------------------//
 
-			if (loginOrAuth.equalsIgnoreCase(Constants.SERVER_URL_AUTH)){
+			if (loginOrAuth.equalsIgnoreCase(Constants.SERVER_URL_AUTH)) {
 				builder.append(Constants.SERVER_URL_AUTH);
-			}else{
+			} else {
 				builder.append(Constants.SERVER_URL);
 			}
 			final String httpRequestUrl = builder.toString();
@@ -97,9 +95,6 @@ public class BaseNetworkManager {
 			delegate.didFailRequestProcessing("Please check your internet connection");
 		}
 	}
-
-
-
 
 	/**
 	 * Hides Activity Indicator

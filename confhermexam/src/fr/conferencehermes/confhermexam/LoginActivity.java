@@ -8,9 +8,11 @@ import java.util.Map;
 import org.apache.http.NameValuePair;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -38,6 +40,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	public static String authToken;
 	private SharedPreferences.Editor authKeyEditor;
 	private SharedPreferences authKeyPrefs;
+	private SharedPreferences.Editor logoutEditor;
+	private SharedPreferences logoutPrefs;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,7 +64,20 @@ public class LoginActivity extends Activity implements ActionDelegate {
 					lData.getAuthKey());
 		}
 		authKeyEditor.commit();
-		loginAction();
+
+		logoutPrefs = getSharedPreferences("logoutPrefs", MODE_PRIVATE);
+		boolean logout = logoutPrefs.getBoolean(
+				Constants.LOGOUT_SHAREDPREFS_KEY, false);
+		Log.i("Utils1111", logout + "");
+		if (logout == false) {
+			loginAction();
+
+		} else {
+
+			loginContentLayout.setVisibility(View.VISIBLE);
+			progressBarLogin.setVisibility(View.GONE);
+		}
+
 		Button loginButton = (Button) findViewById(R.id.loginButton);
 		loginButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -84,12 +101,16 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		String logonOrAuth = null;
 		Map<String, String> params = null;
 
+		logoutEditor = getSharedPreferences("logoutPrefs", MODE_PRIVATE).edit();
+		logoutEditor.putBoolean(Constants.LOGOUT_SHAREDPREFS_KEY, false);
+		logoutEditor.commit();
+
 		authKeyPrefs = getPreferences(MODE_PRIVATE);
 		String restoredAuthKey = authKeyPrefs.getString(
 				Constants.AUTHKEY_SHAREDPREFS_KEY, null);
 
-		final String uname = "STUDENT";//username.getText().toString().trim();
-		final String pass =  "123456";//password.getText().toString().trim();
+		final String uname = username.getText().toString().trim();
+		final String pass = password.getText().toString().trim();
 		RequestCreator creator = new RequestCreator();
 		if (restoredAuthKey != null) {
 			logonOrAuth = Constants.SERVER_URL_AUTH;
@@ -179,4 +200,11 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	public static void setLoginData(Profile loginData) {
 		lData = loginData;
 	}
+
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		setIntent(intent);
+	}
+
 }
