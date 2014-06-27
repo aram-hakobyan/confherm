@@ -54,6 +54,7 @@ import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
@@ -442,6 +443,37 @@ public class QuestionResponseActivity extends Activity implements
 	}
 
 	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+
+		View v = getCurrentFocus();
+		boolean ret = super.dispatchTouchEvent(event);
+
+		if (v instanceof EditText) {
+			View w = getCurrentFocus();
+			int scrcoords[] = new int[2];
+			w.getLocationOnScreen(scrcoords);
+			float x = event.getRawX() + w.getLeft() - scrcoords[0];
+			float y = event.getRawY() + w.getTop() - scrcoords[1];
+
+			Log.d("Activity",
+					"Touch event " + event.getRawX() + "," + event.getRawY()
+							+ " " + x + "," + y + " rect " + w.getLeft() + ","
+							+ w.getTop() + "," + w.getRight() + ","
+							+ w.getBottom() + " coords " + scrcoords[0] + ","
+							+ scrcoords[1]);
+			if (event.getAction() == MotionEvent.ACTION_UP
+					&& (x < w.getLeft() || x >= w.getRight() || y < w.getTop() || y > w
+							.getBottom())) {
+
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(getWindow().getCurrentFocus()
+						.getWindowToken(), 0);
+			}
+		}
+		return ret;
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return false;
@@ -524,8 +556,10 @@ public class QuestionResponseActivity extends Activity implements
 					final String score = JSONParser.parseCorrections(ob);
 					runOnUiThread(new Runnable() {
 						public void run() {
+							showScoreDialog(score);
 							makeCorrections(score, DataHolder.getInstance()
 									.getCorrections());
+
 						}
 					});
 
@@ -562,11 +596,10 @@ public class QuestionResponseActivity extends Activity implements
 		ANSWERED_QUESTIONS_COUNT = 0;
 		abandonner.setText("ABANDONNER");
 		CORRECTED_ANSWERS = true;
-		TextView scoreText = (TextView) findViewById(R.id.score);
-		scoreText.setText(score);
 
 		selectQuestion(questions.get(0), 0);
 		drawCorrections(corrections);
+
 	}
 
 	private void drawCorrections(ArrayList<Correction> corrections) {
@@ -1103,6 +1136,29 @@ public class QuestionResponseActivity extends Activity implements
 		mediaPlayer.stop();
 		mediaPlayer.release();
 		super.onDestroy();
+	}
+
+	private void showScoreDialog(String score) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				QuestionResponseActivity.this);
+		// create alert dialog
+		if (score.equalsIgnoreCase("")) {
+			score = "no any result yet";
+
+		}// set title
+		alertDialogBuilder.setTitle("Final Score");
+
+		// set dialog message
+		alertDialogBuilder.setMessage(score).setCancelable(false)
+				.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+
+		// show it
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();
 	}
 
 	private void showAlertDialog() {

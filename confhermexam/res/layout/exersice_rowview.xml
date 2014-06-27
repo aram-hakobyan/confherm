@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:layout_gravity="right"
     android:layout_margin="20dp"
-    android:background="@color/app_main_color"
+    android:background="@color/excercise_normal_color"
     android:gravity="right"
     android:minHeight="30dp"
     android:orientation="horizontal" >

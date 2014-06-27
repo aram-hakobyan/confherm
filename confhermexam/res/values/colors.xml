@@ -2,7 +2,11 @@
 
     <!-- Default colors. -->
     <color name="app_main_color">#3f889e</color>
-     <color name="medium_dark_gray">#ffcccccc</color>
-     <color name="medium_gray">#cccccc</color>
-<color name="app_main_color_dark">#0d5c7c</color>
+    <color name="medium_dark_gray">#ffcccccc</color>
+    <color name="medium_gray">#cccccc</color>
+    <color name="app_main_color_dark">#0d5c7c</color>
+    <color name="excercise_normal_color">#86adbd</color>
+    <color name="excercise_selected_color">#0d5c7c</color>
+    <color name="global_normal_color">#158bbb</color>
+
 </resources>
