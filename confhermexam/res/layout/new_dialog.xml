@@ -5,6 +5,23 @@
     android:background="@android:color/white"
     tools:context="com.androidart.dialogpager.MainActivity$PlaceholderFragment" >
 
+    <Button
+        android:id="@+id/buttonClose2"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:background="@drawable/exam_x" />
+
+    <TextView
+        android:id="@+id/ennouncerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_margin="80dp"
+        android:visibility="invisible" />
+
     <ImageView
         android:id="@+id/imageView1"
         android:layout_width="wrap_content"
@@ -12,15 +29,15 @@
         android:layout_centerInParent="true"
         android:layout_margin="80dp"
         android:src="@drawable/ic_launcher" />
-    
-        <ImageView
-            android:id="@+id/sound_icon"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_centerInParent="true"
-            android:layout_margin="80dp"
-            android:visibility="invisible"
-            android:src="@drawable/audio_icon" />
+
+    <ImageView
+        android:id="@+id/sound_icon"
+        android:layout_width="160dp"
+        android:layout_height="160dp"
+        android:layout_centerInParent="true"
+        android:layout_margin="80dp"
+        android:src="@drawable/audio_icon"
+        android:visibility="invisible" />
 
     <VideoView
         android:id="@+id/videoView1"
@@ -36,13 +53,13 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:layout_margin="25dp"
+        android:layout_margin="15dp"
         android:orientation="horizontal" >
 
         <Button
             android:id="@+id/button1"
             android:layout_width="20dp"
-            android:layout_height="20dp"
+            android:layout_height="18dp"
             android:layout_margin="10dp"
             android:background="@drawable/ic_camera" />
 

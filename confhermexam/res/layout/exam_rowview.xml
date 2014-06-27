@@ -28,6 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:gravity="center_vertical"
+            android:paddingLeft="5dp"
             android:paddingRight="50dp"
             android:text="Available from:"
             android:textSize="20sp" />
@@ -41,7 +42,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="10dp"
         android:text="Status"
-        android:textSize="15sp" />
+        android:textSize="12sp" />
 
     <Button
         android:id="@+id/examButton1"
@@ -49,8 +50,9 @@
         android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
-        android:focusable="false"
         android:layout_marginRight="30dp"
-        android:background="@drawable/exam_x" />
+        android:layout_marginTop="5dp"
+        android:background="@drawable/exam_x"
+        android:focusable="false" />
 
 </RelativeLayout>

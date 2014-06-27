@@ -5,6 +5,15 @@
     android:background="@android:color/white"
     tools:context="com.androidart.dialogpager.MainActivity$PlaceholderFragment" >
 
+    <Button
+        android:id="@+id/buttonClose"
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_margin="10dp"
+        android:background="@drawable/exam_x" />
+
     <LinearLayout
         android:id="@+id/linearLayout1"
         android:layout_width="match_parent"

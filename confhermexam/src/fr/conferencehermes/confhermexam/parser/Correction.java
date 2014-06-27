@@ -1,11 +1,13 @@
 package fr.conferencehermes.confhermexam.parser;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Correction {
 	private String questionId;
 	private String text;
 	private ArrayList<String> answersArray;
+	private HashMap<String, String> files;
 
 	public Correction() {
 		setAnswersArray(new ArrayList<String>());
@@ -33,6 +35,14 @@ public class Correction {
 
 	public void setAnswersArray(ArrayList<String> answersArray) {
 		this.answersArray = answersArray;
+	}
+
+	public HashMap<String, String> getFiles() {
+		return files;
+	}
+
+	public void setFiles(HashMap<String, String> files) {
+		this.files = files;
 	}
 
 }

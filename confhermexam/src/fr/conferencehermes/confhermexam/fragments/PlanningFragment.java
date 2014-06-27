@@ -270,7 +270,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 	}
 
 	public void openDialog(TimeSlot ts) {
-		Dialog dialog = new Dialog(getActivity());
+		final Dialog dialog = new Dialog(getActivity());
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.planning_dialog);
 
@@ -282,6 +282,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		TextView status = (TextView) dialog.findViewById(R.id.status);
 		TextView hour = (TextView) dialog.findViewById(R.id.hour);
 		Button download = (Button) dialog.findViewById(R.id.downloadBtn);
+		Button close = (Button) dialog.findViewById(R.id.buttonClose);
 
 		title.setText(ts.getTest_name());
 		date.setText(new Date(ts.getStart_date() * 1000).toString());
@@ -361,8 +362,14 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		download.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				dialog.dismiss();
+			}
+		});
 
+		close.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
 			}
 		});
 

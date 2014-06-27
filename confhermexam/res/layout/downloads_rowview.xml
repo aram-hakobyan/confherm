@@ -41,6 +41,16 @@
             android:textSize="20sp" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="90dp"
+        android:gravity="center_vertical"
+        android:visibility="invisible" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"

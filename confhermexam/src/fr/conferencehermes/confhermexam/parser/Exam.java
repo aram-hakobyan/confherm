@@ -6,8 +6,8 @@ public class Exam {
 	private String title;
 	private String shortTitle;
 	private String categoryType;
-	private int startDate;
-	private int endDate;
+	private long startDate;
+	private long endDate;
 	private int status;
 	private String description;
 
@@ -46,11 +46,11 @@ public class Exam {
 		this.categoryType = categoryType;
 	}
 
-	public int getStartDate() {
+	public long getStartDate() {
 		return startDate;
 	}
 
-	public void setStartDate(int startDate) {
+	public void setStartDate(long startDate) {
 		this.startDate = startDate;
 	}
 
@@ -70,11 +70,11 @@ public class Exam {
 		this.eventId = eventId;
 	}
 
-	public int getEndDate() {
+	public long getEndDate() {
 		return endDate;
 	}
 
-	public void setEndDate(int endDate) {
+	public void setEndDate(long endDate) {
 		this.endDate = endDate;
 	}
 

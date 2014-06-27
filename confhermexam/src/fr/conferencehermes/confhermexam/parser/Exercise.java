@@ -7,6 +7,7 @@ public class Exercise {
 	private int id;
 	private String name;
 	private String type;
+	private int exerciseType;
 	private String text;
 	private String intro;
 	private String teacher;
@@ -144,6 +145,14 @@ public class Exercise {
 
 	public void setFiles(HashMap<String, String> files) {
 		this.files = files;
+	}
+
+	public int getExerciseType() {
+		return exerciseType;
+	}
+
+	public void setExerciseType(int exerciseType) {
+		this.exerciseType = exerciseType;
 	}
 
 }

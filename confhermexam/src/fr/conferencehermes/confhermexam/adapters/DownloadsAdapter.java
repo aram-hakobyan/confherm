@@ -8,10 +8,6 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
-
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.content.Context;
@@ -23,14 +19,20 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
-import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
+
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
@@ -67,7 +69,7 @@ public class DownloadsAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, View view, ViewGroup viewGroup) {
-		ViewHolder holder;
+		final ViewHolder holder;
 
 		if (view == null) {
 			holder = new ViewHolder();
@@ -76,6 +78,8 @@ public class DownloadsAdapter extends BaseAdapter {
 			holder.desc = (TextView) view.findViewById(R.id.examDesc);
 			holder.btnAction = (Button) view.findViewById(R.id.buttonAction);
 			holder.btnRemove = (Button) view.findViewById(R.id.buttonRemove);
+			holder.progressBar = (ProgressBar) view
+					.findViewById(R.id.progressBar);
 
 			view.setTag(holder);
 		} else {
@@ -111,8 +115,26 @@ public class DownloadsAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					int status = mListItems.get(position).getStatus();
 					if (status == 2 || status == 3) {
-						downloadFile(mListItems.get(position).getDownloadUrl(),
-								mListItems.get(position).getName());
+						if (isDownloadManagerAvailable(c)) {
+							downloadFile(mListItems.get(position)
+									.getDownloadUrl(), mListItems.get(position)
+									.getName());
+
+							holder.progressBar.setVisibility(View.VISIBLE);
+							holder.btnAction.setVisibility(View.INVISIBLE);
+
+							Handler h = new Handler();
+							h.postDelayed(new Runnable() {
+								@Override
+								public void run() {
+									holder.progressBar
+											.setVisibility(View.INVISIBLE);
+									holder.btnAction
+											.setVisibility(View.VISIBLE);
+
+								}
+							}, 3000);
+						}
 					}
 
 				}
@@ -144,20 +166,20 @@ public class DownloadsAdapter extends BaseAdapter {
 		protected TextView desc;
 		protected Button btnAction;
 		protected Button btnRemove;
-
+		protected ProgressBar progressBar;
 	}
 
 	private void downloadFile(String url, String title) {
 		if (isDownloadManagerAvailable(c)) {
 			DownloadManager.Request request = new DownloadManager.Request(
 					Uri.parse(url));
-			request.setDescription("Downloading exam...");
-			request.setTitle(title);
+			// request.setDescription("Downloading exam...");
+			// .setTitle(title);
 			// in order for this if to run, you must use the android 3.2 to
 			// compile your app
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				request.allowScanningByMediaScanner();
-				request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+				// request.allowScanningByMediaScanner();
+				request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
 			}
 
 			String fileName = "file" + System.currentTimeMillis();
@@ -167,6 +189,7 @@ public class DownloadsAdapter extends BaseAdapter {
 			DownloadManager manager = (DownloadManager) c
 					.getSystemService(Context.DOWNLOAD_SERVICE);
 			manager.enqueue(request);
+
 		}
 	}
 

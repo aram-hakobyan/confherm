@@ -102,30 +102,31 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
                     android:layout_marginRight="30dp"
+                    android:gravity="center"
                     android:orientation="horizontal" >
 
                     <Button
                         android:id="@+id/btnImage"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
+                        android:layout_width="20dp"
+                        android:layout_height="18dp"
                         android:background="@drawable/ic_camera"
                         android:clickable="true" >
                     </Button>
 
                     <Button
                         android:id="@+id/btnAudio"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:layout_marginLeft="10dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="15dp"
                         android:background="@drawable/ic_sound"
                         android:clickable="true" >
                     </Button>
 
                     <Button
                         android:id="@+id/btnVideo"
-                        android:layout_width="15dp"
-                        android:layout_height="15dp"
-                        android:layout_marginLeft="10dp"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="15dp"
                         android:background="@drawable/ic_video"
                         android:clickable="true" >
                     </Button>
@@ -143,11 +144,11 @@
                         android:id="@+id/scrollView1"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="70dp"
-                        android:layout_weight="7" >
+                        android:layout_marginLeft="35dp"
+                        android:layout_weight="1" >
 
                         <LinearLayout
-                            android:id="@+id/answersLayout"
+                            android:id="@+id/correctionsLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical" >
@@ -158,12 +159,11 @@
                         android:id="@+id/scrollView2"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="30dp"
-                        android:layout_marginRight="20dp"
-                        android:layout_weight="3" >
+                        android:layout_marginRight="30dp"
+                        android:layout_weight="9" >
 
                         <LinearLayout
-                            android:id="@+id/correctionsLayout"
+                            android:id="@+id/answersLayout"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical" >
@@ -176,12 +176,12 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="right"
+                    android:layout_marginRight="25dp"
                     android:background="@color/app_main_color"
                     android:drawableLeft="@drawable/ic_check_white"
                     android:drawablePadding="10dp"
-                    android:layout_marginRight="25dp"
                     android:gravity="center"
-                    android:padding="5dp"
+                    android:padding="10dp"
                     android:text="VALIDER"
                     android:textColor="@android:color/white" />
 
@@ -192,6 +192,43 @@
                     android:layout_margin="20dp"
                     android:padding="20dp"
                     android:textColor="@color/app_main_color_dark" />
+
+                <LinearLayout
+                    android:id="@+id/correctionButtons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="30dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="invisible" >
+
+                    <Button
+                        android:id="@+id/btnImageCorrection"
+                        android:layout_width="20dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/ic_camera"
+                        android:clickable="true" >
+                    </Button>
+
+                    <Button
+                        android:id="@+id/btnAudioCorrection"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="15dp"
+                        android:background="@drawable/ic_sound"
+                        android:clickable="true" >
+                    </Button>
+
+                    <Button
+                        android:id="@+id/btnVideoCorrection"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="15dp"
+                        android:background="@drawable/ic_video"
+                        android:clickable="true" >
+                    </Button>
+                </LinearLayout>
             </LinearLayout>
         </ScrollView>
 
@@ -219,50 +256,49 @@
                 android:text="Temps exercice - "
                 android:textColor="@color/app_main_color" />
 
-            <ScrollView
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal" >
 
-                <LinearLayout
+                <Button
+                    android:id="@+id/ennouncer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" >
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/app_main_color"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="ENNOUNCER"
+                    android:textColor="@android:color/white"
+                    android:textSize="23sp" />
 
-                    <Button
-                        android:id="@+id/ennouncer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:background="@color/app_main_color"
-                        android:gravity="center"
-                        android:padding="5dp"
-                        android:text="ENNOUNCER"
-                        android:textColor="@android:color/white"
-                        android:textSize="23sp" />
+                <ListView
+                    android:id="@+id/questionsListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ennouncer"
+                    android:layout_marginTop="10dp"
+                    android:choiceMode="singleChoice"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="1dp"
+                    android:minHeight="250dp" >
+                </ListView>
 
-                    <ListView
-                        android:id="@+id/questionsListView"
-                        android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        android:layout_marginTop="10dp"
-                        android:choiceMode="singleChoice"
-                        android:divider="@android:color/transparent"
-                        android:dividerHeight="1dp" >
-                    </ListView>
-
-                    <Button
-                        android:id="@+id/abandonner"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:background="@color/app_main_color"
-                        android:gravity="center"
-                        android:padding="5dp"
-                        android:text="ABANDONNER"
-                        android:textColor="@android:color/white"
-                        android:textSize="23sp" />
-                </LinearLayout>
-            </ScrollView>
+                <Button
+                    android:id="@+id/abandonner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/questionsListView"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/app_main_color"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:text="ABANDONNER"
+                    android:textColor="@android:color/white"
+                    android:textSize="23sp" />
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
 

@@ -124,11 +124,15 @@ public class QuestionResponseActivity extends Activity implements
 
 	private boolean onPaused = false;
 	private boolean CORRECTED_ANSWERS = false;
+	private boolean DATA_SENT = false;
 
 	private SparseBooleanArray validAnswers;
 	private ArrayList<QuestionAnswer> questionAnswers;
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
+	private Button btnImageCorrection;
+	private Button btnAudioCorrection;
+	private Button btnVideoCorrection;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -211,6 +215,9 @@ public class QuestionResponseActivity extends Activity implements
 						try {
 							if (json.has("data") && json.get("data") != null) {
 								exercise = JSONParser.parseExercise(json);
+								if (exercise.getExerciseType() == 2) {
+									ennouncer.setVisibility(View.GONE);
+								}
 
 								adapter = new QuestionsAdapter(
 										QuestionResponseActivity.this, exercise
@@ -224,6 +231,7 @@ public class QuestionResponseActivity extends Activity implements
 								ViewTreeObserver vto = listview
 										.getViewTreeObserver();
 								vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+									@SuppressWarnings("deprecation")
 									@Override
 									public void onGlobalLayout() {
 										for (int i = 0; i < listview
@@ -422,23 +430,59 @@ public class QuestionResponseActivity extends Activity implements
 		if (files.get("image").isEmpty()) {
 			btnImage.setBackgroundResource(R.drawable.ic_camera_gray);
 			btnImage.setClickable(false);
+			btnImage.setAlpha(0.5f);
 		} else {
 			btnImage.setBackgroundResource(R.drawable.ic_camera);
 			btnImage.setClickable(true);
+			btnImage.setAlpha(1f);
 		}
 		if (files.get("sound").isEmpty()) {
 			btnAudio.setBackgroundResource(R.drawable.ic_sound_gray);
 			btnAudio.setClickable(false);
+			btnAudio.setAlpha(0.5f);
 		} else {
 			btnAudio.setBackgroundResource(R.drawable.ic_sound);
 			btnAudio.setClickable(true);
+			btnAudio.setAlpha(1f);
 		}
 		if (files.get("video").isEmpty()) {
 			btnVideo.setBackgroundResource(R.drawable.ic_video_gray);
 			btnVideo.setClickable(false);
+			btnVideo.setAlpha(0.5f);
 		} else {
 			btnVideo.setBackgroundResource(R.drawable.ic_video);
 			btnVideo.setClickable(true);
+			btnVideo.setAlpha(1f);
+		}
+	}
+
+	private void setCorrectionFileIcons(HashMap<String, String> files) {
+		if (files.get("image").isEmpty()) {
+			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera_gray);
+			btnImageCorrection.setClickable(false);
+			btnImageCorrection.setAlpha(0.5f);
+		} else {
+			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera);
+			btnImageCorrection.setClickable(true);
+			btnImageCorrection.setAlpha(1f);
+		}
+		if (files.get("sound").isEmpty()) {
+			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound_gray);
+			btnAudioCorrection.setClickable(false);
+			btnAudioCorrection.setAlpha(0.5f);
+		} else {
+			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound);
+			btnAudioCorrection.setClickable(true);
+			btnAudioCorrection.setAlpha(1f);
+		}
+		if (files.get("video").isEmpty()) {
+			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video_gray);
+			btnVideoCorrection.setClickable(false);
+			btnVideoCorrection.setAlpha(0.5f);
+		} else {
+			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video);
+			btnVideoCorrection.setClickable(true);
+			btnVideoCorrection.setAlpha(1f);
 		}
 	}
 
@@ -499,19 +543,6 @@ public class QuestionResponseActivity extends Activity implements
 		JSONTransmitter transmitter = new JSONTransmitter();
 		transmitter.execute(object);
 
-		/*
-		 * String url = "http://ecni.conference-hermes.fr/api/traninganswer";
-		 * aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>()
-		 * {
-		 * 
-		 * @Override public void callback(String url, JSONObject json,
-		 * AjaxStatus status) { Utilities.showOrHideActivityIndicator(
-		 * QuestionResponseActivity.this, 1, "Please wait..."); int score = 0;
-		 * if (json != null) { score = JSONParser.parseCorrections(json); }
-		 * TextView scoreText = (TextView) findViewById(R.id.score);
-		 * scoreText.setText("Score : " + String.valueOf(score));
-		 * makeCorrections(DataHolder.getInstance().getCorrections()); } });
-		 */
 	}
 
 	public class JSONTransmitter extends
@@ -559,7 +590,7 @@ public class QuestionResponseActivity extends Activity implements
 							showScoreDialog(score);
 							makeCorrections(score, DataHolder.getInstance()
 									.getCorrections());
-
+							DATA_SENT = true;
 						}
 					});
 
@@ -725,6 +756,17 @@ public class QuestionResponseActivity extends Activity implements
 
 		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
 		correctionText.setText(corrections.get(currentQuestionId).getText());
+		LinearLayout correctionButtons = (LinearLayout) findViewById(R.id.correctionButtons);
+		correctionButtons.setVisibility(View.VISIBLE);
+
+		btnImageCorrection = (Button) findViewById(R.id.btnImageCorrection);
+		btnAudioCorrection = (Button) findViewById(R.id.btnAudioCorrection);
+		btnVideoCorrection = (Button) findViewById(R.id.btnVideoCorrection);
+		btnImageCorrection.setOnClickListener(this);
+		btnAudioCorrection.setOnClickListener(this);
+		btnVideoCorrection.setOnClickListener(this);
+
+		setCorrectionFileIcons(currentQuestion.getCorrectionFiles());
 
 	}
 
@@ -845,10 +887,14 @@ public class QuestionResponseActivity extends Activity implements
 			break;
 		case R.id.abandonner:
 			try {
-				if (areAllAnswersValidated()) {
-					sendAnswers();
-				} else {
+				if (DATA_SENT) {
 					finish();
+				} else {
+					if (areAllAnswersValidated()) {
+						sendAnswers();
+					} else {
+						finish();
+					}
 				}
 			} catch (JSONException e) {
 				e.printStackTrace();
@@ -856,19 +902,31 @@ public class QuestionResponseActivity extends Activity implements
 			break;
 		case R.id.ennouncer:
 			if (exercise != null)
-				openDialog(exercise.getFiles());
+				openDialog(exercise.getFiles(), 0);
 			break;
 		case R.id.btnImage:
 			if (currentQuestion != null)
-				openDialog(currentQuestion.getFiles());
+				openDialog(currentQuestion.getFiles(), 1);
 			break;
 		case R.id.btnAudio:
 			if (currentQuestion != null)
-				openDialog(currentQuestion.getFiles());
+				openDialog(currentQuestion.getFiles(), 2);
 			break;
 		case R.id.btnVideo:
 			if (currentQuestion != null)
-				openDialog(currentQuestion.getFiles());
+				openDialog(currentQuestion.getFiles(), 3);
+			break;
+		case R.id.btnImageCorrection:
+			if (currentQuestion != null)
+				openDialog(currentQuestion.getCorrectionFiles(), 1);
+			break;
+		case R.id.btnAudioCorrection:
+			if (currentQuestion != null)
+				openDialog(currentQuestion.getCorrectionFiles(), 2);
+			break;
+		case R.id.btnVideoCorrection:
+			if (currentQuestion != null)
+				openDialog(currentQuestion.getCorrectionFiles(), 3);
 			break;
 
 		default:
@@ -932,7 +990,7 @@ public class QuestionResponseActivity extends Activity implements
 	};
 	private Dialog dialog = null;
 
-	public void openDialog(HashMap<String, String> files) {
+	public void openDialog(HashMap<String, String> files, int from) {
 		dialog = new Dialog(QuestionResponseActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
@@ -940,27 +998,36 @@ public class QuestionResponseActivity extends Activity implements
 		Button button1 = (Button) dialog.findViewById(R.id.button1);
 		Button button2 = (Button) dialog.findViewById(R.id.button2);
 		Button button3 = (Button) dialog.findViewById(R.id.button3);
+		Button close = (Button) dialog.findViewById(R.id.buttonClose2);
+		final TextView text = (TextView) dialog
+				.findViewById(R.id.ennouncerText);
 
 		if (files.get("image").isEmpty()) {
 			button1.setBackgroundResource(R.drawable.ic_camera_gray);
-			button1.setClickable(false);
+			button1.setEnabled(false);
+			button1.setAlpha(0.5f);
 		} else {
 			button1.setBackgroundResource(R.drawable.ic_camera);
-			button1.setClickable(true);
+			button1.setEnabled(true);
+			button1.setAlpha(1.0f);
 		}
 		if (files.get("sound").isEmpty()) {
 			button2.setBackgroundResource(R.drawable.ic_sound_gray);
-			button2.setClickable(false);
+			button2.setEnabled(false);
+			button2.setAlpha(0.5f);
 		} else {
 			button2.setBackgroundResource(R.drawable.ic_sound);
-			button2.setClickable(true);
+			button2.setEnabled(true);
+			button2.setAlpha(1f);
 		}
 		if (files.get("video").isEmpty()) {
 			button3.setBackgroundResource(R.drawable.ic_video_gray);
-			button3.setClickable(false);
+			button3.setEnabled(false);
+			button3.setAlpha(0.5f);
 		} else {
 			button3.setBackgroundResource(R.drawable.ic_video);
-			button3.setClickable(true);
+			button3.setEnabled(true);
+			button3.setAlpha(1f);
 		}
 
 		final String IMAGE_URL = files.get("image");
@@ -1039,6 +1106,74 @@ public class QuestionResponseActivity extends Activity implements
 				}).start();
 			}
 
+		switch (from) {
+		case 0:
+			text.setText(exercise.getText());
+			text.setVisibility(View.VISIBLE);
+			img.setVisibility(View.INVISIBLE);
+			video.setVisibility(View.INVISIBLE);
+			mc.setVisibility(View.INVISIBLE);
+			audioImage.setVisibility(View.INVISIBLE);
+			break;
+		case 1:
+			if (mediaPlayer != null) {
+				try {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.pause();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+			if (video.isPlaying()) {
+				video.stopPlayback();
+			}
+			img.setVisibility(View.VISIBLE);
+			video.setVisibility(View.INVISIBLE);
+			mc.setVisibility(View.INVISIBLE);
+			audioImage.setVisibility(View.INVISIBLE);
+			text.setVisibility(View.INVISIBLE);
+			break;
+		case 2:
+			img.setVisibility(View.INVISIBLE);
+			video.setVisibility(View.INVISIBLE);
+			mc.setVisibility(View.VISIBLE);
+			audioImage.setVisibility(View.VISIBLE);
+			text.setVisibility(View.INVISIBLE);
+			if (video.isPlaying()) {
+				video.stopPlayback();
+			}
+			try {
+				mediaPlayer.seekTo(0);
+				mediaPlayer.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+		case 3:
+			try {
+				if (mediaPlayer.isPlaying()) {
+					mediaPlayer.pause();
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			img.setVisibility(View.INVISIBLE);
+			video.setVisibility(View.VISIBLE);
+			mc.setVisibility(View.INVISIBLE);
+			audioImage.setVisibility(View.INVISIBLE);
+			text.setVisibility(View.INVISIBLE);
+
+			try {
+				video.start();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			break;
+		default:
+			break;
+		}
+
 		dialog.findViewById(R.id.button1).setOnClickListener(
 				new OnClickListener() {
 					@Override
@@ -1059,6 +1194,7 @@ public class QuestionResponseActivity extends Activity implements
 						video.setVisibility(View.INVISIBLE);
 						mc.setVisibility(View.INVISIBLE);
 						audioImage.setVisibility(View.INVISIBLE);
+						text.setVisibility(View.INVISIBLE);
 					}
 				});
 		dialog.findViewById(R.id.button2).setOnClickListener(
@@ -1068,6 +1204,7 @@ public class QuestionResponseActivity extends Activity implements
 						img.setVisibility(View.INVISIBLE);
 						video.setVisibility(View.INVISIBLE);
 						mc.setVisibility(View.VISIBLE);
+						text.setVisibility(View.INVISIBLE);
 						audioImage.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
@@ -1096,6 +1233,7 @@ public class QuestionResponseActivity extends Activity implements
 						video.setVisibility(View.VISIBLE);
 						mc.setVisibility(View.INVISIBLE);
 						audioImage.setVisibility(View.INVISIBLE);
+						text.setVisibility(View.INVISIBLE);
 
 						try {
 							video.start();
@@ -1104,6 +1242,13 @@ public class QuestionResponseActivity extends Activity implements
 						}
 					}
 				});
+
+		close.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
 
 		dialog.setOnDismissListener(new OnDismissListener() {
 			@Override
@@ -1141,14 +1286,10 @@ public class QuestionResponseActivity extends Activity implements
 	private void showScoreDialog(String score) {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				QuestionResponseActivity.this);
-		// create alert dialog
 		if (score.equalsIgnoreCase("")) {
-			score = "no any result yet";
-
-		}// set title
+			score = "No score available.";
+		}
 		alertDialogBuilder.setTitle("Final Score");
-
-		// set dialog message
 		alertDialogBuilder.setMessage(score).setCancelable(false)
 				.setNegativeButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -1171,7 +1312,7 @@ public class QuestionResponseActivity extends Activity implements
 		// set dialog message
 		alertDialogBuilder
 				.setMessage(
-						"You dropped out drop from examination , because you leave examen")
+						"You have been dropped out from examination, because you have left the exercise.")
 				.setCancelable(false)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {

@@ -70,8 +70,8 @@ public class JSONParser {
 					e.setEventId(obj.getInt("event_id"));
 					e.setTitle(obj.getString("exam_name"));
 					e.setCategoryType(obj.getString("category_type"));
-					e.setStartDate(obj.getInt("start_date"));
-					e.setEndDate(obj.getInt("end_date"));
+					e.setStartDate(obj.getLong("start_date"));
+					e.setEndDate(obj.getLong("end_date"));
 					e.setStatus(obj.getInt("status"));
 					exams.add(e);
 				}
@@ -295,6 +295,7 @@ public class JSONParser {
 				exercise.setId(data.getInt("exercise_id"));
 				exercise.setName(data.getString("name"));
 				exercise.setType(data.getString("type"));
+				exercise.setExerciseType(data.getInt("exercise_type"));
 				exercise.setText(data.getString("text"));
 				exercise.setTeacher(data.getString("created_by"));
 
