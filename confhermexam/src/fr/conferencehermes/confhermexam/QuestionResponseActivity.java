@@ -287,9 +287,9 @@ public class QuestionResponseActivity extends Activity implements
 					listview.getChildAt(i).setBackgroundColor(
 							getResources()
 									.getColor(R.color.app_main_color_dark));
-				else
-					listview.getChildAt(i).setBackgroundColor(
-							getResources().getColor(R.color.app_main_color));
+				//else
+				//	listview.getChildAt(i).setBackgroundColor(
+				//			getResources().getColor(R.color.app_main_color));
 			}
 		}
 
@@ -399,7 +399,7 @@ public class QuestionResponseActivity extends Activity implements
 				EditText editText = new EditText(QuestionResponseActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				editText.requestFocus();
+				
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 

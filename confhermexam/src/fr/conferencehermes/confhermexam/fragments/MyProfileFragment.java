@@ -15,8 +15,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import fr.conferencehermes.confhermexam.LoginActivity;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.Profile;
 import fr.conferencehermes.confhermexam.util.Constants;
 
@@ -61,32 +63,39 @@ public class MyProfileFragment extends Fragment {
 				getActivity().finish();
 			}
 		});
+		if (NetworkReachability.isReachable()) {
+			pFirsName.setText(pData.getFirstName());
+			pLastName.setText(pData.getLastName());
+			pUserName.setText("Username : " + pData.getUserName());
+			pEmailAdress.setText("Email : " + pData.getEmailAdress());
 
-		pFirsName.setText(pData.getFirstName());
-		pLastName.setText(pData.getLastName());
-		pUserName.setText("Username : " + pData.getUserName());
-		pEmailAdress.setText("Email : " + pData.getEmailAdress());
+			if (pData.getGroups().size() == 0) {
+				pGroups.setText("Groups : " + "no groups available");
+			} else {
+				Handler h = new Handler(getActivity().getMainLooper());
 
-		if (pData.getGroups().size() == 0) {
-			pGroups.setText("Groups : " + "no groups available");
-		} else {
-			Handler h = new Handler(getActivity().getMainLooper());
+				pGroups.setText("Groups : ");
+				for (Map.Entry<String, String> entry : pData.getGroups()
+						.entrySet()) {
+					String gKey = entry.getKey();
+					final String gValue = entry.getValue();
 
-			pGroups.setText("Groups : ");
-			for (Map.Entry<String, String> entry : pData.getGroups().entrySet()) {
-				String gKey = entry.getKey();
-				final String gValue = entry.getValue();
+					h.post(new Runnable() {
+						@Override
+						public void run() {
+							pGroups.append("\n" + gValue.toString());
+						}
+					});
 
-				h.post(new Runnable() {
-					@Override
-					public void run() {
-						pGroups.append("\n" + gValue.toString());
-					}
-				});
-
+				}
 			}
-		}
+		} else {
 
+			Toast.makeText(getActivity().getApplicationContext(),
+					"Check your internet connection", Toast.LENGTH_SHORT)
+					.show();
+
+		}
 		return pFragment;
 	}
 
