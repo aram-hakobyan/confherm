@@ -147,11 +147,7 @@ public class CorrectionActivity extends Activity implements
 		validAnswers = new SparseBooleanArray();
 		questionAnswers = new ArrayList<QuestionAnswer>();
 
-		// INITIALIZE RECEIVER
-		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-		filter.addAction(Intent.ACTION_SCREEN_OFF);
-		BroadcastReceiver mReceiver = new ScreenReceiver();
-		registerReceiver(mReceiver, filter);
+
 
 		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);

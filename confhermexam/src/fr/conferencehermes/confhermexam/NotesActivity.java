@@ -9,7 +9,6 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,10 +34,8 @@ import com.androidquery.callback.AjaxStatus;
 import fr.conferencehermes.confhermexam.adapters.ExerciseAdapter;
 import fr.conferencehermes.confhermexam.adapters.NotesAdapter;
 import fr.conferencehermes.confhermexam.parser.ExamExercise;
-import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.NotesResult;
-import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
 
 public class NotesActivity extends Activity {
