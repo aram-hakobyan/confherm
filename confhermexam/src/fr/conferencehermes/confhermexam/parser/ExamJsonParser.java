@@ -50,7 +50,8 @@ public class ExamJsonParser {
 				ArrayList<Exercise> exercises = new ArrayList<Exercise>();
 				JSONArray exercisesArr = obj.getJSONArray("exercises");
 				for (int j = 0; j < exercisesArr.length(); j++) {
-					Exercise ex = parseExercise(exercisesArr.getJSONObject(i));
+					Exercise ex = parseExercise(exercisesArr.getJSONObject(i),
+							e.getId());
 					exercises.add(ex);
 				}
 
@@ -63,13 +64,15 @@ public class ExamJsonParser {
 		return exams;
 	}
 
-	public static Exercise parseExercise(JSONObject data) throws JSONException {
+	public static Exercise parseExercise(JSONObject data, int examId)
+			throws JSONException {
 
 		Exercise exercise = new Exercise();
 		ArrayList<Question> questionsList = new ArrayList<Question>();
 		ArrayList<Integer> questionIds = new ArrayList<Integer>();
 
 		exercise.setId(data.getInt("exercise_id"));
+		exercise.setExamId(examId);
 		exercise.setName(data.getString("name"));
 		exercise.setType(data.getString("type"));
 		// exercise.setExerciseType(data.getInt("exercise_type"));
