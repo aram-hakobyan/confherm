@@ -248,7 +248,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			do {
 				Event event = new Event();
 				event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
@@ -262,6 +262,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				events.add(event);
 			} while (c.moveToNext());
+			c.close();
 		}
 
 		return events;
@@ -356,7 +357,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			do {
 				Exam exam = new Exam();
 				exam.setId(c.getInt(c.getColumnIndex(KEY_EXAM_ID)));
@@ -369,6 +370,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				exams.add(exam);
 			} while (c.moveToNext());
+			c.close();
 		}
 
 		return exams;
@@ -412,23 +414,25 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_EXAM_EVENT_ID + " = " + eventId;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
-		do {
-			if (c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID)) == eventId) {
-				Exam exam = new Exam();
-				exam.setId(c.getInt(c.getColumnIndex(KEY_EXAM_ID)));
-				exam.setEventId((c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID))));
-				exam.setStartDate(c.getInt(c
-						.getColumnIndex(KEY_EXAM_START_DATE)));
-				exam.setEndDate(c.getInt(c.getColumnIndex(KEY_EXAM_END_DATE)));
-				exam.setPassword(c.getString(c
-						.getColumnIndex(KEY_EXAM_PASSWORD)));
-				exams.add(exam);
-			}
+		if (c != null && c.moveToFirst()) {
+			do {
+				if (c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID)) == eventId) {
+					Exam exam = new Exam();
+					exam.setId(c.getInt(c.getColumnIndex(KEY_EXAM_ID)));
+					exam.setEventId((c.getInt(c
+							.getColumnIndex(KEY_EXAM_EVENT_ID))));
+					exam.setStartDate(c.getInt(c
+							.getColumnIndex(KEY_EXAM_START_DATE)));
+					exam.setEndDate(c.getInt(c
+							.getColumnIndex(KEY_EXAM_END_DATE)));
+					exam.setPassword(c.getString(c
+							.getColumnIndex(KEY_EXAM_PASSWORD)));
+					exams.add(exam);
+				}
 
-		} while (c.moveToNext());
-
+			} while (c.moveToNext());
+			c.close();
+		}
 		return exams;
 	}
 
@@ -443,6 +447,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_QUESTION_INPUT_COUNT, q.getInputCount());
 		values.put(KEY_QUESTION_TEXT, q.getQuestionText());
 		values.put(KEY_QUESTION_TYPE, q.getType());
+		values.put(KEY_QUESTION_EXERCISE_ID, q.getId());
 
 		// insert row
 		db.beginTransaction();
@@ -475,6 +480,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		Question q = new Question();
 		q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+		q.setExerciseId((c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID))));
 		q.setInputCount(c.getString(c.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
 		q.setQuestionText(c.getString(c.getColumnIndex(KEY_QUESTION_TEXT)));
 		q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
@@ -493,10 +499,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			do {
 				Question q = new Question();
 				q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+				q.setExerciseId((c.getInt(c
+						.getColumnIndex(KEY_QUESTION_EXERCISE_ID))));
 				q.setInputCount(c.getString(c
 						.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
 				q.setQuestionText(c.getString(c
@@ -505,6 +513,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				questions.add(q);
 			} while (c.moveToNext());
+			c.close();
 		}
 
 		return questions;
@@ -521,6 +530,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_QUESTION_INPUT_COUNT, q.getInputCount());
 		values.put(KEY_QUESTION_TEXT, q.getQuestionText());
 		values.put(KEY_QUESTION_TYPE, q.getType());
+		values.put(KEY_QUESTION_EXERCISE_ID, q.getExerciseId());
 
 		// updating row
 		return db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + " = ?",
@@ -547,22 +557,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_QUESTION_EXERCISE_ID + " = " + exerciseId;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
-		do {
-			if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == exerciseId) {
-				Question q = new Question();
-				q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
-				q.setInputCount(c.getString(c
-						.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
-				q.setQuestionText(c.getString(c
-						.getColumnIndex(KEY_QUESTION_TEXT)));
-				q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
-				questions.add(q);
-			}
+		if (c != null && c.moveToFirst()) {
+			do {
+				if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == exerciseId) {
+					Question q = new Question();
+					q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+					q.setInputCount(c.getString(c
+							.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
+					q.setQuestionText(c.getString(c
+							.getColumnIndex(KEY_QUESTION_TEXT)));
+					q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
+					questions.add(q);
+				}
 
-		} while (c.moveToNext());
+			} while (c.moveToNext());
 
+			c.close();
+		}
 		return questions;
 	}
 
@@ -629,7 +640,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			do {
 				HashMap<String, String> qFiles = new HashMap<String, String>();
 				qFiles.put("image",
@@ -641,6 +652,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				questionFiles.add(qFiles);
 			} while (c.moveToNext());
+			c.close();
 		}
 
 		return questionFiles;
@@ -724,13 +736,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 */
 	public ArrayList<Exercise> getAllExercise() {
 		ArrayList<Exercise> exercises = new ArrayList<Exercise>();
-		String selectQuery = "SELECT  * FROM " + TABLE_EXAMS;
+		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISES;
 
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor c = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			do {
 				Exercise exercise = new Exercise();
 				exercise.setId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ID)));
@@ -743,6 +755,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				exercises.add(exercise);
 			} while (c.moveToNext());
+			c.close();
 		}
 
 		return exercises;
@@ -786,23 +799,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_EXERCISE_EXAM_ID + " = " + examId;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
-		do {
-			if (c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID)) == examId) {
-				Exercise exercise = new Exercise();
-				exercise.setId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ID)));
-				exercise.setName((c.getString(c
-						.getColumnIndex(KEY_EXERCISE_NAME))));
-				exercise.setType(c.getString(c
-						.getColumnIndex(KEY_EXERCISE_TYPE)));
-				exercise.setTeacher(c.getString(c
-						.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
-				exercises.add(exercise);
-			}
+		if (c != null && c.moveToFirst()) {
+			do {
+				if (c.getInt(c.getColumnIndex(KEY_EXERCISE_EXAM_ID)) == examId) {
+					Exercise exercise = new Exercise();
+					exercise.setId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ID)));
+					exercise.setName((c.getString(c
+							.getColumnIndex(KEY_EXERCISE_NAME))));
+					exercise.setType(c.getString(c
+							.getColumnIndex(KEY_EXERCISE_TYPE)));
+					exercise.setTeacher(c.getString(c
+							.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
+					exercises.add(exercise);
+				}
 
-		} while (c.moveToNext());
-
+			} while (c.moveToNext());
+			c.close();
+		}
 		return exercises;
 	}
 
@@ -869,7 +882,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			do {
 				HashMap<String, String> eFiles = new HashMap<String, String>();
 				eFiles.put("image",
@@ -881,6 +894,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				files.add(eFiles);
 			} while (c.moveToNext());
+			c.close();
 		}
 
 		return files;
@@ -974,7 +988,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			do {
 				Profile p = new Profile();
 				p.setId(c.getInt(c.getColumnIndex(KEY_USER_ID)));
@@ -986,6 +1000,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				users.add(p);
 			} while (c.moveToNext());
+			c.close();
 		}
 
 		return users;
@@ -1078,7 +1093,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(selectQuery, null);
 
 		// looping through all rows and adding to list
-		if (c.moveToFirst()) {
+		if (c != null && c.moveToFirst()) {
 			do {
 				Answer a = new Answer();
 				a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
@@ -1088,6 +1103,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 				answers.add(a);
 			} while (c.moveToNext());
+			c.close();
 		}
 
 		return answers;
@@ -1129,20 +1145,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_ANSWER_QUESTION_ID + " = " + questionId;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
-		do {
-			if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == questionId) {
-				Answer a = new Answer();
-				a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
-				a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
-				a.setQuestionId(c.getInt(c
-						.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
-				answers.add(a);
-			}
+		if (c != null && c.moveToFirst()) {
+			do {
+				if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == questionId) {
+					Answer a = new Answer();
+					a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
+					a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
+					a.setQuestionId(c.getInt(c
+							.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
+					answers.add(a);
+				}
 
-		} while (c.moveToNext());
-
+			} while (c.moveToNext());
+			c.close();
+		}
 		return answers;
 	}
 }

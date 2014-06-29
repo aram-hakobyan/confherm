@@ -126,8 +126,8 @@ public class ExamJsonParser {
 			q.setId(qObj.getInt("question_id"));
 			q.setType(qObj.getString("question_type"));
 			q.setQuestionText(qObj.getString("question_text"));
-			q.setCorrection(qObj.getString("correction"));
 			q.setInputCount(qObj.getString("input_count"));
+			q.setExerciseId(exercise.getId());
 
 			HashMap<String, String> qFiles = new HashMap<String, String>();
 			JSONObject files = (JSONObject) qObj

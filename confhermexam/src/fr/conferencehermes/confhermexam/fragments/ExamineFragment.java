@@ -7,14 +7,18 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -22,6 +26,7 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
+import fr.conferencehermes.confhermexam.ExamExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
@@ -56,7 +61,7 @@ public class ExamineFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-
+				showPasswordAlert(exams.get(position).getId());
 			}
 
 		});
@@ -108,5 +113,36 @@ public class ExamineFragment extends Fragment {
 		db.closeDB();
 
 		return fragment;
+	}
+
+	private void showPasswordAlert(final int id) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle("Enter Password");
+
+		final EditText input = new EditText(getActivity());
+		input.setInputType(InputType.TYPE_CLASS_TEXT
+				| InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		builder.setView(input);
+
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if (!input.getText().toString().trim().isEmpty()) {
+					Intent intent = new Intent(getActivity(),
+							ExamExercisesActivity.class);
+					intent.putExtra("exam_id", id);
+					startActivity(intent);
+				}
+			}
+		});
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				});
+
+		builder.show();
 	}
 }
