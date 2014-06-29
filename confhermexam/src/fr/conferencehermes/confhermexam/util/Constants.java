@@ -23,6 +23,10 @@ public class Constants {
 	public static String CURRENT_EXAM_URL = "http://ecni.conference-hermes.fr/api/result";
 	public static String PLANNING_URL = "http://ecni.conference-hermes.fr/api/planning";
 
+	public static String EXAM_CORRECTIONS_URL = "http://ecni.conference-hermes.fr/api/exam_corrections";
+
+	public static String EXAM_EXERCISE_CORRECTIONS_URL = "http://ecni.conference-hermes.fr/api/exam_exercise_correction";
+
 	/********************************* Json Keys ***********************************/
 
 	public static String KEY_AUTH_TOKEN = "auth_key";

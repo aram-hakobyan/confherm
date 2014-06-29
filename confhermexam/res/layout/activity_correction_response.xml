@@ -1,0 +1,312 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
+    tools:context="fr.conferencehermes.confhermexam.fragments.DownloadsFragment" >
+
+    <RelativeLayout
+        android:id="@+id/headerExersice"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_alignParentTop="true"
+        android:background="@color/app_main_color_dark" >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="20dp"
+            android:src="@drawable/logo_with_text" >
+        </ImageView>
+
+        <TextView
+            android:id="@+id/score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:textColor="#fff"
+            android:textSize="20sp" />
+
+        <TextView
+            android:id="@+id/teacher"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="20dp"
+            android:layout_marginTop="20dp"
+            android:text="Teacher"
+            android:textColor="#fff" />
+
+        <TextView
+            android:id="@+id/examName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/teacher"
+            android:layout_marginRight="20dp"
+            android:text="Exam"
+            android:textColor="#fff" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/headerExersice"
+        android:orientation="horizontal" >
+
+        <ScrollView
+            android:id="@+id/scrollView4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" >
+
+            <LinearLayout
+                android:id="@+id/leftSideLayout"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp"
+                android:orientation="vertical"
+                android:paddingBottom="40dp" >
+
+                <TextView
+                    android:id="@+id/questionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="30dp"
+                    android:layout_marginTop="10dp"
+                    android:text="QUESTION"
+                    android:textColor="@color/app_main_color"
+                    android:textSize="20sp" />
+
+                <ScrollView
+                    android:id="@+id/scrollviewQR"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="20dp"
+                    android:layout_marginLeft="70dp"
+                    android:layout_marginTop="10dp" >
+
+                    <TextView
+                        android:id="@+id/question"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/lorem_ipsum"
+                        android:textSize="16sp" />
+                </ScrollView>
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="30dp"
+                    android:gravity="center"
+                    android:orientation="horizontal" >
+
+                    <Button
+                        android:id="@+id/btnImage"
+                        android:layout_width="20dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/ic_camera"
+                        android:clickable="true" >
+                    </Button>
+
+                    <Button
+                        android:id="@+id/btnAudio"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="15dp"
+                        android:background="@drawable/ic_sound"
+                        android:clickable="true" >
+                    </Button>
+
+                    <Button
+                        android:id="@+id/btnVideo"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="15dp"
+                        android:background="@drawable/ic_video"
+                        android:clickable="true" >
+                    </Button>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="40dp"
+                    android:layout_marginTop="30dp"
+                    android:orientation="horizontal"
+                    android:weightSum="10" >
+
+                    <ScrollView
+                        android:id="@+id/scrollView1"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="35dp"
+                        android:layout_weight="1" >
+
+                        <LinearLayout
+                            android:id="@+id/correctionsLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+                        </LinearLayout>
+                    </ScrollView>
+
+                    <ScrollView
+                        android:id="@+id/scrollView2"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginRight="30dp"
+                        android:layout_weight="9" >
+
+                        <LinearLayout
+                            android:id="@+id/answersLayout"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+                        </LinearLayout>
+                    </ScrollView>
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/validerBtn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="25dp"
+                    android:background="@color/app_main_color"
+                    android:drawableLeft="@drawable/ic_check_white"
+                    android:drawablePadding="10dp"
+                    android:gravity="center"
+                    android:padding="10dp"
+                    android:text="VALIDER"
+                    android:textColor="@android:color/white" />
+
+                <TextView
+                    android:id="@+id/correctionAnswer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="20dp"
+                    android:padding="20dp"
+                    android:textColor="@color/app_main_color_dark" />
+
+                <LinearLayout
+                    android:id="@+id/correctionButtons"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_marginRight="30dp"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:visibility="invisible" >
+
+                    <Button
+                        android:id="@+id/btnImageCorrection"
+                        android:layout_width="20dp"
+                        android:layout_height="18dp"
+                        android:background="@drawable/ic_camera"
+                        android:clickable="true" >
+                    </Button>
+
+                    <Button
+                        android:id="@+id/btnAudioCorrection"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="15dp"
+                        android:background="@drawable/ic_sound"
+                        android:clickable="true" >
+                    </Button>
+
+                    <Button
+                        android:id="@+id/btnVideoCorrection"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginLeft="15dp"
+                        android:background="@drawable/ic_video"
+                        android:clickable="true" >
+                    </Button>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="15dp"
+            android:layout_weight="2"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/temps1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:text="Temps epreuve - "
+                android:textColor="@color/app_main_color" />
+
+            <TextView
+                android:id="@+id/temps2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="10dp"
+                android:text="Temps exercice - "
+                android:textColor="@color/app_main_color" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical" >
+
+                <Button
+                    android:id="@+id/ennouncer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/app_main_color"
+                    android:gravity="center"
+                    android:padding="5dp"
+                    android:layout_weight="0.5"
+                    android:text="ENNOUNCER"
+                    android:textColor="@android:color/white"
+                    android:textSize="23sp" />
+
+        
+
+                    <ListView
+                        android:id="@+id/questionsListView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/ennouncer"
+                        android:layout_marginTop="10dp"
+                        android:choiceMode="singleChoice"
+                             android:layout_weight="10"
+                        android:divider="@android:color/transparent"
+                        android:dividerHeight="1dp"
+                        android:minHeight="250dp" >
+                    </ListView>
+      
+
+                <Button
+                    android:id="@+id/abandonner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/questionsListView"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/app_main_color"
+                    android:gravity="center"
+                    android:padding="5dp"
+                         android:layout_weight="0.5"
+                    android:text="ABANDONNER"
+                    android:textColor="@android:color/white"
+                    android:textSize="23sp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
