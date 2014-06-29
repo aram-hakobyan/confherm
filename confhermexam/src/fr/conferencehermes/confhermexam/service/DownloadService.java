@@ -1,6 +1,7 @@
 package fr.conferencehermes.confhermexam.service;
 
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,14 +65,20 @@ public class DownloadService extends IntentService {
 				title = params[1];
 				URL url = new URL(urlToDownload);
 				URLConnection connection = url.openConnection();
-				connection.connect();
+				connection.connect();  
 
 				int fileLength = connection.getContentLength();
 				path = Environment.getExternalStorageDirectory()
 						.getAbsolutePath();
+				
+				
 				path += "/temp/android/data/";
-				path += title;
 
+				File mFolder = new File(path);
+				if (!mFolder.exists()) {
+					mFolder.mkdirs();
+				}
+				path += title;
 				InputStream input = new BufferedInputStream(url.openStream());
 				OutputStream output = new FileOutputStream(path);
 

@@ -10,6 +10,8 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import fr.conferencehermes.confhermexam.CorrectionActivity;
+import fr.conferencehermes.confhermexam.CorrectionExercisesActivity;
 import fr.conferencehermes.confhermexam.NotesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.Result;
@@ -59,12 +61,22 @@ public class ResultsAdapter extends BaseAdapter {
 					c.startActivity(intent);
 				}
 			});
+
+			holder.desc.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					Intent intent = new Intent(c, CorrectionExercisesActivity.class);
+					intent.putExtra("exam_id", itemID);
+					c.startActivity(intent);
+				}
+			});
+
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
 		String stringItem = (String) mListItems.get(position).getExamName();
-		
+
 		if (stringItem != null) {
 			if (holder.name != null) {
 				holder.name.setText(stringItem);
@@ -72,7 +84,6 @@ public class ResultsAdapter extends BaseAdapter {
 				holder.status.setText("Note & Stats");
 			}
 		}
-
 
 		return view;
 

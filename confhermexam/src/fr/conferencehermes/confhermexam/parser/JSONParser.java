@@ -296,7 +296,7 @@ public class JSONParser {
 				exercise.setId(data.getInt("exercise_id"));
 				exercise.setName(data.getString("name"));
 				exercise.setType(data.getString("type"));
-				exercise.setExerciseType(data.getInt("exercise_type"));
+				exercise.setExerciseType(data.getInt("type"));
 				exercise.setText(data.getString("text"));
 				exercise.setTeacher(data.getString("created_by"));
 
@@ -515,4 +515,66 @@ public class JSONParser {
 
 	}
 
+	public static ArrayList<CorrectionsExercise> parseCorrectionsExercises(
+			JSONObject json) {
+		ArrayList<CorrectionsExercise> corExercises = new ArrayList<CorrectionsExercise>();
+
+		try {
+			if (json.has(Constants.KEY_DATA)
+					&& json.get(Constants.KEY_DATA) != null) {
+
+				JSONArray exObj = json.getJSONArray("data");
+				for (int i = 0; i < exObj.length(); i++) {
+					CorrectionsExercise t = new CorrectionsExercise();
+					JSONObject obj = exObj.getJSONObject(i);
+
+					t.setExam_id(obj.getInt("exam_id"));
+					t.setExercise_id(obj.getInt("exercise_id"));
+					t.setName(obj.getString("name"));
+
+					corExercises.add(t);
+
+				}
+
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return corExercises;
+	}
+
+	
+	public static ArrayList<CorrectionsExercise> parseCorrectionsQuestionAnswers(
+			JSONObject json) {
+		ArrayList<CorrectionsExercise> corExercises = new ArrayList<CorrectionsExercise>();
+
+		try {
+			if (json.has(Constants.KEY_DATA)
+					&& json.get(Constants.KEY_DATA) != null) {
+
+				JSONArray exObj = json.getJSONArray("data");
+				for (int i = 0; i < exObj.length(); i++) {
+					CorrectionsExercise t = new CorrectionsExercise();
+					JSONObject obj = exObj.getJSONObject(i);
+
+					t.setExam_id(obj.getInt("exam_id"));
+					t.setExercise_id(obj.getInt("exercise_id"));
+					t.setName(obj.getString("name"));
+
+					corExercises.add(t);
+
+				}
+
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return corExercises;
+	}
+	
+	
+	
+	
 }

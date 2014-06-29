@@ -33,6 +33,7 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.ExerciseAdapter;
 import fr.conferencehermes.confhermexam.adapters.NotesAdapter;
+import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.ExamExercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.NotesResult;
@@ -88,14 +89,12 @@ public class NotesActivity extends Activity {
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
 
-
-
 		listviewEx.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 
-				selectExersiceBackground(listEx.get(position), position,true);
+				selectExersiceBackground(listEx.get(position), position, true);
 				globalTest.setBackgroundColor(getResources().getColor(
 						R.color.global_normal_color));
 
@@ -103,8 +102,6 @@ public class NotesActivity extends Activity {
 			}
 
 		});
-
-
 
 		globalTest.setOnClickListener(new OnClickListener() {
 
@@ -116,10 +113,10 @@ public class NotesActivity extends Activity {
 
 				globalTest.setBackgroundColor(getResources().getColor(
 						R.color.app_main_color_dark));
-				
-				if (listViewLastPosition != -1)
-				selectExersiceBackground(listEx.get(listViewLastPosition), listViewLastPosition,false);
 
+				if (listViewLastPosition != -1)
+					selectExersiceBackground(listEx.get(listViewLastPosition),
+							listViewLastPosition, false);
 
 			}
 		});
@@ -205,64 +202,73 @@ public class NotesActivity extends Activity {
 			}
 		});
 
-		AQuery aqExersice = new AQuery(NotesActivity.this);
+		if (NetworkReachability.isReachable()) {
+			AQuery aqExersice = new AQuery(NotesActivity.this);
 
-		HashMap<String, Object> paramsExersice = new HashMap<String, Object>();
+			HashMap<String, Object> paramsExersice = new HashMap<String, Object>();
 
-		paramsExersice.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+			paramsExersice.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		paramsExersice.put(Constants.KEY_EXAM_ID, paramExamId);
+			paramsExersice.put(Constants.KEY_EXAM_ID, paramExamId);
 
-		aqExersice.ajax(Constants.CURRENT_EXAM_URL, paramsExersice,
-				JSONObject.class, new AjaxCallback<JSONObject>() {
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
-						if (json.toString() == null)
+			aqExersice.ajax(Constants.CURRENT_EXAM_URL, paramsExersice,
+					JSONObject.class, new AjaxCallback<JSONObject>() {
+						@Override
+						public void callback(String url, JSONObject json,
+								AjaxStatus status) {
+							if (json.toString() == null)
 
-							System.out.println(json.toString());
-						try {
-							if (json.has(Constants.KEY_STATUS)
-									&& json.get(Constants.KEY_STATUS) != null) {
-								if (json.getInt("status") == 200) {
-									// pData =
-									listEx = JSONParser.parseExamExercise(json);
+								System.out.println(json.toString());
+							try {
+								if (json.has(Constants.KEY_STATUS)
+										&& json.get(Constants.KEY_STATUS) != null) {
+									if (json.getInt("status") == 200) {
+										// pData =
+										listEx = JSONParser
+												.parseExamExercise(json);
 
-									if (listEx.size() != 0) {
-										adapterEx = new ExerciseAdapter(
-												NotesActivity.this, listEx);
-										listviewEx.setAdapter(adapterEx);
+										if (listEx.size() != 0) {
+											adapterEx = new ExerciseAdapter(
+													NotesActivity.this, listEx);
+											listviewEx.setAdapter(adapterEx);
 
-										teacherName
-												.setText(ExamExercise.created_by);
-										examName.setText(ExamExercise.exam_name);
+											teacherName
+													.setText(ExamExercise.created_by);
+											examName.setText(ExamExercise.exam_name);
+
+										} else {
+
+											Toast.makeText(
+													NotesActivity.this
+															.getApplicationContext(),
+													"No Any Result",
+													Toast.LENGTH_SHORT).show();
+										}
 
 									} else {
 
 										Toast.makeText(
 												NotesActivity.this
 														.getApplicationContext(),
-												"No Any Result",
+												json.getInt("status"),
 												Toast.LENGTH_SHORT).show();
+   
 									}
 
-								} else {
-
-									Toast.makeText(
-											NotesActivity.this
-													.getApplicationContext(),
-											json.getInt("status"),
-											Toast.LENGTH_SHORT).show();
-
 								}
+							} catch (JSONException e) {
+								e.printStackTrace();
 
 							}
-						} catch (JSONException e) {
-							e.printStackTrace();
+						};
+					});
+		} else {
 
-						}
-					};
-				});
+			Toast.makeText(getApplicationContext(),
+					"Check your internet connection", Toast.LENGTH_SHORT)
+					.show();
+
+		}
 
 	}
 
@@ -287,10 +293,9 @@ public class NotesActivity extends Activity {
 								getResources().getColor(
 										R.color.excercise_selected_color));
 					else
-						listviewEx.getChildAt(i)
-								.setBackgroundColor(
-										getResources().getColor(
-												R.color.excercise_normal_color));
+						listviewEx.getChildAt(i).setBackgroundColor(
+								getResources().getColor(
+										R.color.excercise_normal_color));
 				}
 			}
 
@@ -307,15 +312,13 @@ public class NotesActivity extends Activity {
 			if (wantedChild >= 0 && wantedChild < listviewEx.getChildCount()) {
 				for (int i = 0; i < listviewEx.getChildCount(); i++) {
 					if (i == wantedChild)
-						listviewEx.getChildAt(i)
-								.setBackgroundColor(
-										getResources().getColor(
-												R.color.excercise_normal_color));
+						listviewEx.getChildAt(i).setBackgroundColor(
+								getResources().getColor(
+										R.color.excercise_normal_color));
 					else
-						listviewEx.getChildAt(i)
-								.setBackgroundColor(
-										getResources().getColor(
-												R.color.excercise_normal_color));
+						listviewEx.getChildAt(i).setBackgroundColor(
+								getResources().getColor(
+										R.color.excercise_normal_color));
 				}
 			}
 

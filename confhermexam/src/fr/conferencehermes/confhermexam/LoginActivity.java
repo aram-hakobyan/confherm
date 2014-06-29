@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 import fr.conferencehermes.confhermexam.connection.BaseNetworkManager;
+import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.connectionhelper.ActionDelegate;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestCreator;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestHelper;
@@ -57,36 +58,49 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		loginContentLayout = (LinearLayout) findViewById(R.id.loginContentLayout);
 		progressBarLogin = (ProgressBar) findViewById(R.id.progressBarLogin);
 
-		authKeyEditor = getPreferences(MODE_PRIVATE).edit();
+		if (NetworkReachability.isReachable()) {
 
-		if (lData != null) {
-			authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
-					lData.getAuthKey());
-		}
-		authKeyEditor.commit();
+			authKeyEditor = getPreferences(MODE_PRIVATE).edit();
 
-		logoutPrefs = getSharedPreferences("logoutPrefs", MODE_PRIVATE);
-		boolean logout = logoutPrefs.getBoolean(
-				Constants.LOGOUT_SHAREDPREFS_KEY, false);
-		Log.i("Utils1111", logout + "");
-		if (logout == false) {
-			loginAction();
+			if (lData != null) {
+				authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
+						lData.getAuthKey());
+			}
+			authKeyEditor.commit();
 
-		} else {
-
-			loginContentLayout.setVisibility(View.VISIBLE);
-			progressBarLogin.setVisibility(View.GONE);
-		}
-
-		Button loginButton = (Button) findViewById(R.id.loginButton);
-		loginButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
+			logoutPrefs = getSharedPreferences("logoutPrefs", MODE_PRIVATE);
+			boolean logout = logoutPrefs.getBoolean(
+					Constants.LOGOUT_SHAREDPREFS_KEY, false);
+			Log.i("Utils1111", logout + "");
+			if (logout == false) {
 				loginAction();
 
-			}
-		});
+			} else {
 
+				loginContentLayout.setVisibility(View.VISIBLE);
+				progressBarLogin.setVisibility(View.GONE);
+			}
+
+			Button loginButton = (Button) findViewById(R.id.loginButton);
+			loginButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					loginAction();
+
+				}
+			});
+		} else {
+			authKeyPrefs = getPreferences(MODE_PRIVATE);
+			String restoredAuthKey = authKeyPrefs.getString(
+					Constants.AUTHKEY_SHAREDPREFS_KEY, null);
+			if (restoredAuthKey != null) {
+
+				Intent hIntent = new Intent(getApplicationContext(), HomeActivity.class);
+				startActivity(hIntent);
+				finish();
+			}
+
+		}
 	}
 
 	@Override
@@ -109,8 +123,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		String restoredAuthKey = authKeyPrefs.getString(
 				Constants.AUTHKEY_SHAREDPREFS_KEY, null);
 
-		final String uname = "STUDENT";// username.getText().toString().trim();
-		final String pass = "123456";// password.getText().toString().trim();
+		final String uname = username.getText().toString().trim();
+		final String pass =  password.getText().toString().trim();
 		RequestCreator creator = new RequestCreator();
 		if (restoredAuthKey != null) {
 			logonOrAuth = Constants.SERVER_URL_AUTH;

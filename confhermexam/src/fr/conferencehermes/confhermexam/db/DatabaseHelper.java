@@ -557,6 +557,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_QUESTION_EXERCISE_ID + " = " + exerciseId;
 
 		Cursor c = db.rawQuery(selectQuery, null);
+
 		if (c != null && c.moveToFirst()) {
 			do {
 				if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == exerciseId) {
@@ -567,6 +568,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					q.setQuestionText(c.getString(c
 							.getColumnIndex(KEY_QUESTION_TEXT)));
 					q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
+					q.setExerciseId(exerciseId);
 					questions.add(q);
 				}
 

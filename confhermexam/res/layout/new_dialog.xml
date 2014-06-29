@@ -7,11 +7,12 @@
 
     <Button
         android:id="@+id/buttonClose2"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
+        android:padding="15dp"
         android:background="@drawable/exam_x" />
 
     <TextView
@@ -60,21 +61,21 @@
             android:id="@+id/button1"
             android:layout_width="20dp"
             android:layout_height="18dp"
-            android:layout_margin="10dp"
+            android:layout_margin="15dp"
             android:background="@drawable/ic_camera" />
 
         <Button
             android:id="@+id/button2"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_margin="10dp"
+            android:layout_margin="15dp"
             android:background="@drawable/ic_sound" />
 
         <Button
             android:id="@+id/button3"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_margin="10dp"
+            android:layout_margin="15dp"
             android:background="@drawable/ic_video" />
     </LinearLayout>
 

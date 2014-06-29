@@ -31,12 +31,10 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -79,23 +77,20 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
-import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
-public class QuestionResponseActivity extends Activity implements
-		OnClickListener {
+public class CorrectionActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
 	private ListView listview;
 	private QuestionsAdapter adapter;
@@ -138,20 +133,14 @@ public class QuestionResponseActivity extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_question_response);
+		setContentView(R.layout.activity_correction_response);
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		aq = new AQuery(QuestionResponseActivity.this);
+		aq = new AQuery(CorrectionActivity.this);
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
 		validAnswers = new SparseBooleanArray();
 		questionAnswers = new ArrayList<QuestionAnswer>();
-
-		// INITIALIZE RECEIVER
-		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-		filter.addAction(Intent.ACTION_SCREEN_OFF);
-		BroadcastReceiver mReceiver = new ScreenReceiver();
-		registerReceiver(mReceiver, filter);
 
 		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);
@@ -175,12 +164,6 @@ public class QuestionResponseActivity extends Activity implements
 		ennouncer.setOnClickListener(this);
 		valider.setOnClickListener(this);
 
-		CounterClass timer = new CounterClass(Utilities.readLong(
-				QuestionResponseActivity.this, "millisUntilFinished", 7200000),
-				1000);
-		timer.start();
-
-		startTime = SystemClock.uptimeMillis();
 		customHandler.postDelayed(updateTimerThread, 0);
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -199,80 +182,100 @@ public class QuestionResponseActivity extends Activity implements
 
 		});
 
-		AQuery aq = new AQuery(QuestionResponseActivity.this);
+	//	DatabaseHelper dbHelper = new DatabaseHelper(CorrectionActivity.this);
+	//	Log.i("QUESTIOS FROM DB",
+			//	dbHelper.getAllQuestionsByExerciseId(exercise_id) + "");
+	//	adapter = new QuestionsAdapter(CorrectionActivity.this,
+		//		dbHelper.getAllQuestionsByExerciseId(exercise_id));
 
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
-		params.put("exercise_id", exercise_id);
+	
 
-		aq.ajax(Constants.TRAINING_EXERCISE_URL, params, JSONObject.class,
-				new AjaxCallback<JSONObject>() {
+		//
+		// listview.setAdapter(adapter);
+		// examName.setText(exercise.getName());
+		// teacher.setText("Teacher "
+		// + exercise.getTeacher());
 
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
+/*		ViewTreeObserver vto = listview.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void onGlobalLayout() {
+				for (int i = 0; i < listview.getChildCount(); i++) {
+					if (i == 0)
+						listview.getChildAt(i).setBackgroundColor(
+								getResources().getColor(
+										R.color.app_main_color_dark));
+					else
+						listview.getChildAt(i)
+								.setBackgroundColor(
+										getResources().getColor(
+												R.color.app_main_color));
+				}
 
-						try {
-							if (json.has("data") && json.get("data") != null) {
-								exercise = JSONParser.parseExercise(json);
-								if (exercise.getExerciseType() == 2) {
-									ennouncer.setVisibility(View.GONE);
-								}
+				listview.getViewTreeObserver().removeGlobalOnLayoutListener(
+						this);
+			}
+		});
 
-								adapter = new QuestionsAdapter(
-										QuestionResponseActivity.this, exercise
-												.getQuestions());
+		questions = exercise.getQuestions();
+		if (!questions.isEmpty()) {
 
-								listview.setAdapter(adapter);
-								examName.setText(exercise.getName());
-								teacher.setText("Teacher "
-										+ exercise.getTeacher());
+			for (int i = 0; i < questions.size(); i++) {
+				questionAnswers.add(null);
+			}
+			selectQuestion(questions.get(0), 0);
 
-								ViewTreeObserver vto = listview
-										.getViewTreeObserver();
-								vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-									@SuppressWarnings("deprecation")
-									@Override
-									public void onGlobalLayout() {
-										for (int i = 0; i < listview
-												.getChildCount(); i++) {
-											if (i == 0)
-												listview.getChildAt(i)
-														.setBackgroundColor(
-																getResources()
-																		.getColor(
-																				R.color.app_main_color_dark));
-											else
-												listview.getChildAt(i)
-														.setBackgroundColor(
-																getResources()
-																		.getColor(
-																				R.color.app_main_color));
-										}
+		}*/
 
-										listview.getViewTreeObserver()
-												.removeGlobalOnLayoutListener(
-														this);
-									}
-								});
-
-								questions = exercise.getQuestions();
-								if (!questions.isEmpty()) {
-
-									for (int i = 0; i < questions.size(); i++) {
-										questionAnswers.add(null);
-									}
-									selectQuestion(questions.get(0), 0);
-
-								}
-
-							}
-						} catch (JSONException e) {
-							e.printStackTrace();
-
-						}
-					}
-				});
+		/*
+		 * AQuery aq = new AQuery(CorrectionActivity.this);
+		 * 
+		 * Map<String, Object> params = new HashMap<String, Object>();
+		 * params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		 * params.put("exercise_id", exercise_id);
+		 * 
+		 * aq.ajax(Constants.TRAINING_EXERCISE_URL, params, JSONObject.class,
+		 * new AjaxCallback<JSONObject>() {
+		 * 
+		 * @Override public void callback(String url, JSONObject json,
+		 * AjaxStatus status) {
+		 * 
+		 * try { if (json.has("data") && json.get("data") != null) { exercise =
+		 * JSONParser.parseExercise(json); if (exercise.getExerciseType() == 2)
+		 * { ennouncer.setVisibility(View.GONE); }
+		 * 
+		 * 
+		 * 
+		 * listview.setAdapter(adapter); examName.setText(exercise.getName());
+		 * teacher.setText("Teacher " + exercise.getTeacher());
+		 * 
+		 * ViewTreeObserver vto = listview .getViewTreeObserver();
+		 * vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		 * 
+		 * @SuppressWarnings("deprecation")
+		 * 
+		 * @Override public void onGlobalLayout() { for (int i = 0; i < listview
+		 * .getChildCount(); i++) { if (i == 0) listview.getChildAt(i)
+		 * .setBackgroundColor( getResources() .getColor(
+		 * R.color.app_main_color_dark)); else listview.getChildAt(i)
+		 * .setBackgroundColor( getResources() .getColor(
+		 * R.color.app_main_color)); }
+		 * 
+		 * listview.getViewTreeObserver() .removeGlobalOnLayoutListener( this);
+		 * } });
+		 * 
+		 * questions = exercise.getQuestions(); if (!questions.isEmpty()) {
+		 * 
+		 * for (int i = 0; i < questions.size(); i++) {
+		 * questionAnswers.add(null); } selectQuestion(questions.get(0), 0);
+		 * 
+		 * }
+		 * 
+		 * } } catch (JSONException e) { e.printStackTrace();
+		 * 
+		 * } } });
+		 */
 
 	}
 
@@ -287,9 +290,9 @@ public class QuestionResponseActivity extends Activity implements
 					listview.getChildAt(i).setBackgroundColor(
 							getResources()
 									.getColor(R.color.app_main_color_dark));
-				//else
-				//	listview.getChildAt(i).setBackgroundColor(
-				//			getResources().getColor(R.color.app_main_color));
+				// else
+				// listview.getChildAt(i).setBackgroundColor(
+				// getResources().getColor(R.color.app_main_color));
 			}
 		}
 
@@ -308,7 +311,7 @@ public class QuestionResponseActivity extends Activity implements
 
 		// Single choice answer
 		if (q.getType().equalsIgnoreCase("2")) {
-			mRadioGroup = new RadioGroup(QuestionResponseActivity.this);
+			mRadioGroup = new RadioGroup(CorrectionActivity.this);
 			mRadioGroup.setOrientation(RadioGroup.VERTICAL);
 			for (int i = answersCount - 1; i >= 0; i--) {
 				RadioButton newRadioButton = new RadioButton(this);
@@ -334,12 +337,11 @@ public class QuestionResponseActivity extends Activity implements
 			ArrayList<String> answers = null;
 
 			for (int i = 0; i < answersCount; i++) {
-				checkBoxLayout = new LinearLayout(QuestionResponseActivity.this);
+				checkBoxLayout = new LinearLayout(CorrectionActivity.this);
 				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
-				final CheckBox checkBox = new CheckBox(
-						QuestionResponseActivity.this);
+				final CheckBox checkBox = new CheckBox(CorrectionActivity.this);
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
-				TextView text = new TextView(QuestionResponseActivity.this);
+				TextView text = new TextView(CorrectionActivity.this);
 				text.setText(q.getAnswers().get(i).getAnswer());
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -396,10 +398,10 @@ public class QuestionResponseActivity extends Activity implements
 			editTextsArray.clear();
 			int count = Integer.valueOf(q.getInputCount());
 			for (int i = 0; i < count; i++) {
-				EditText editText = new EditText(QuestionResponseActivity.this);
+				EditText editText = new EditText(CorrectionActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				
+
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
@@ -524,7 +526,7 @@ public class QuestionResponseActivity extends Activity implements
 	}
 
 	public void sendAnswers() throws JSONException {
-		Utilities.showOrHideActivityIndicator(QuestionResponseActivity.this, 0,
+		Utilities.showOrHideActivityIndicator(CorrectionActivity.this, 0,
 				"Please wait...");
 		Map<String, String> params = new HashMap<String, String>();
 		JSONObject object = new JSONObject();
@@ -602,8 +604,8 @@ public class QuestionResponseActivity extends Activity implements
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				Utilities.showOrHideActivityIndicator(
-						QuestionResponseActivity.this, 1, "Please wait...");
+				Utilities.showOrHideActivityIndicator(CorrectionActivity.this,
+						1, "Please wait...");
 			}
 			return null;
 		}
@@ -656,7 +658,7 @@ public class QuestionResponseActivity extends Activity implements
 		}
 
 		for (int j = 0; j < answerCount; j++) {
-			ImageView img = new ImageView(QuestionResponseActivity.this);
+			ImageView img = new ImageView(CorrectionActivity.this);
 
 			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
 					30, 30);
@@ -877,7 +879,7 @@ public class QuestionResponseActivity extends Activity implements
 								currentQuestionId);
 					}
 				} else
-					Toast.makeText(QuestionResponseActivity.this,
+					Toast.makeText(CorrectionActivity.this,
 							"Please select at least one answer.",
 							Toast.LENGTH_SHORT).show();
 			} catch (JSONException e) {
@@ -948,8 +950,8 @@ public class QuestionResponseActivity extends Activity implements
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(QuestionResponseActivity.this,
-					"millisUntilFinished", millisUntilFinished);
+			Utilities.writeLong(CorrectionActivity.this, "millisUntilFinished",
+					millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
 					TimeUnit.MILLISECONDS.toHours(millis),
@@ -991,7 +993,7 @@ public class QuestionResponseActivity extends Activity implements
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {
-		dialog = new Dialog(QuestionResponseActivity.this);
+		dialog = new Dialog(CorrectionActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
 
@@ -1039,8 +1041,7 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = new MediaController(
-				QuestionResponseActivity.this);
+		final MediaController mc = new MediaController(CorrectionActivity.this);
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -1285,7 +1286,7 @@ public class QuestionResponseActivity extends Activity implements
 
 	private void showScoreDialog(String score) {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				QuestionResponseActivity.this);
+				CorrectionActivity.this);
 		if (score.equalsIgnoreCase("")) {
 			score = "No score available.";
 		}
@@ -1304,7 +1305,7 @@ public class QuestionResponseActivity extends Activity implements
 
 	private void showAlertDialog() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				QuestionResponseActivity.this);
+				CorrectionActivity.this);
 
 		// set title
 		alertDialogBuilder.setTitle("You have been dropped out");
@@ -1317,12 +1318,11 @@ public class QuestionResponseActivity extends Activity implements
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 
-						Intent intentHome = new Intent(
-								QuestionResponseActivity.this,
+						Intent intentHome = new Intent(CorrectionActivity.this,
 								HomeActivity.class);
 						startActivity(intentHome);
 
-						QuestionResponseActivity.this.finish();
+						CorrectionActivity.this.finish();
 						onPaused = false;
 					}
 				});
