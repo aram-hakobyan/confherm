@@ -1,6 +1,7 @@
 package fr.conferencehermes.confhermexam.db;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -8,8 +9,12 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exam;
+import fr.conferencehermes.confhermexam.parser.Exercise;
+import fr.conferencehermes.confhermexam.parser.Profile;
+import fr.conferencehermes.confhermexam.parser.Question;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -55,7 +60,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EXERCISE_NAME = "name";
 	private static final String KEY_EXERCISE_TYPE = "type";
 	private static final String KEY_EXERCISE_CREATED_BY = "createdBy";
-	private static final String KEY_EXERCISE__EXAM_ID = "examId";
+	private static final String KEY_EXERCISE_EXAM_ID = "examId";
 
 	// QUESTION_FILES column names
 	private static final String KEY_QUESTION_FILES_ID = "questionId";
@@ -109,7 +114,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String CREATE_TABLE_EXERCISE = "CREATE TABLE "
 			+ TABLE_EXERCISES + "(" + KEY_EXERCISE_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_EXERCISE_NAME + " TEXT," + KEY_EXERCISE_TYPE + " TEXT,"
-			+ KEY_EXERCISE_CREATED_BY + " TEXT," + KEY_EXERCISE__EXAM_ID
+			+ KEY_EXERCISE_CREATED_BY + " TEXT," + KEY_EXERCISE_EXAM_ID
 			+ " INTEGER" + ")";
 
 	// QuestionFiles table create statement
@@ -170,6 +175,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		// create new tables
 		onCreate(db);
+	}
+
+	// closing database
+	public void closeDB() {
+		SQLiteDatabase db = this.getReadableDatabase();
+		if (db != null && db.isOpen())
+			db.close();
 	}
 
 	/*
@@ -300,7 +312,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.beginTransaction();
 		long exam_id = -1;
 		try {
-			exam_id = db.insert(TABLE_EXAMS, null, values);
+			exam_id = db.insertWithOnConflict(TABLE_EXAMS, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
 			db.setTransactionSuccessful();
 		} finally {
 			db.endTransaction();
@@ -419,10 +432,717 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		return exams;
 	}
 
-	// closing database
-	public void closeDB() {
+	/*
+	 * Creating an question
+	 */
+	public long createQuestion(Question q) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_QUESTION_ID, q.getId());
+		values.put(KEY_QUESTION_INPUT_COUNT, q.getInputCount());
+		values.put(KEY_QUESTION_TEXT, q.getQuestionText());
+		values.put(KEY_QUESTION_TYPE, q.getType());
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_QUESTIONS, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single question
+	 */
+	public Question getQuestion(long question_id) {
+
 		SQLiteDatabase db = this.getReadableDatabase();
-		if (db != null && db.isOpen())
-			db.close();
+		String selectQuery = "SELECT  * FROM " + TABLE_QUESTIONS + " WHERE "
+				+ KEY_QUESTION_ID + " = " + question_id;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+
+		Question q = new Question();
+		q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+		q.setInputCount(c.getString(c.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
+		q.setQuestionText(c.getString(c.getColumnIndex(KEY_QUESTION_TEXT)));
+		q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
+
+		return q;
+	}
+
+	/*
+	 * getting all questions
+	 */
+	public ArrayList<Question> getAllQuestions() {
+		ArrayList<Question> questions = new ArrayList<Question>();
+		String selectQuery = "SELECT  * FROM " + TABLE_QUESTIONS;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c.moveToFirst()) {
+			do {
+				Question q = new Question();
+				q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+				q.setInputCount(c.getString(c
+						.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
+				q.setQuestionText(c.getString(c
+						.getColumnIndex(KEY_QUESTION_TEXT)));
+				q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
+
+				questions.add(q);
+			} while (c.moveToNext());
+		}
+
+		return questions;
+	}
+
+	/*
+	 * Updating a question
+	 */
+	public int updateQuestion(Question q) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_QUESTION_ID, q.getId());
+		values.put(KEY_QUESTION_INPUT_COUNT, q.getInputCount());
+		values.put(KEY_QUESTION_TEXT, q.getQuestionText());
+		values.put(KEY_QUESTION_TYPE, q.getType());
+
+		// updating row
+		return db.update(TABLE_QUESTIONS, values, KEY_QUESTION_ID + " = ?",
+				new String[] { String.valueOf(q.getId()) });
+	}
+
+	/*
+	 * Deleting a question
+	 */
+	public void deleteQuestion(long question_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_QUESTIONS, KEY_QUESTION_ID + " = ?",
+				new String[] { String.valueOf(question_id) });
+	}
+
+	/*
+	 * getting all questions by exercise id
+	 */
+	public ArrayList<Question> getAllQuestionsByExerciseId(int exerciseId) {
+		ArrayList<Question> questions = new ArrayList<Question>();
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_QUESTIONS + " WHERE "
+				+ KEY_QUESTION_EXERCISE_ID + " = " + exerciseId;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+		do {
+			if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == exerciseId) {
+				Question q = new Question();
+				q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+				q.setInputCount(c.getString(c
+						.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
+				q.setQuestionText(c.getString(c
+						.getColumnIndex(KEY_QUESTION_TEXT)));
+				q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
+				questions.add(q);
+			}
+
+		} while (c.moveToNext());
+
+		return questions;
+	}
+
+	/*
+	 * Creating a question file
+	 */
+	public long createQuestionFile(Question q) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_QUESTION_FILES_ID, q.getId());
+		values.put(KEY_QUESTION_FILES_AUDIO, q.getFiles().get("sound"));
+		values.put(KEY_QUESTION_FILES_IMAGE, q.getFiles().get("image"));
+		values.put(KEY_QUESTION_FILES_VIDEO, q.getFiles().get("video"));
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_QUESTION_FILES, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single question files by question id
+	 */
+	public HashMap<String, String> getQuestionFile(long question_id) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_QUESTION_FILES
+				+ " WHERE " + KEY_QUESTION_FILES_ID + " = " + question_id;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+
+		HashMap<String, String> qFiles = new HashMap<String, String>();
+		qFiles.put("image",
+				c.getString(c.getColumnIndex(KEY_QUESTION_FILES_IMAGE)));
+		qFiles.put("sound",
+				c.getString(c.getColumnIndex(KEY_QUESTION_FILES_AUDIO)));
+		qFiles.put("video",
+				c.getString(c.getColumnIndex(KEY_QUESTION_FILES_VIDEO)));
+
+		return qFiles;
+	}
+
+	/*
+	 * getting all question files
+	 */
+	public ArrayList<HashMap<String, String>> getAllQuestionFiles() {
+		ArrayList<HashMap<String, String>> questionFiles = new ArrayList<HashMap<String, String>>();
+		String selectQuery = "SELECT  * FROM " + TABLE_QUESTION_FILES;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c.moveToFirst()) {
+			do {
+				HashMap<String, String> qFiles = new HashMap<String, String>();
+				qFiles.put("image",
+						c.getString(c.getColumnIndex(KEY_QUESTION_FILES_IMAGE)));
+				qFiles.put("sound",
+						c.getString(c.getColumnIndex(KEY_QUESTION_FILES_AUDIO)));
+				qFiles.put("video",
+						c.getString(c.getColumnIndex(KEY_QUESTION_FILES_VIDEO)));
+
+				questionFiles.add(qFiles);
+			} while (c.moveToNext());
+		}
+
+		return questionFiles;
+	}
+
+	/*
+	 * Updating a question file
+	 */
+	public int updateQuestionFiles(Question q) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_QUESTION_FILES_ID, q.getId());
+		values.put(KEY_QUESTION_FILES_AUDIO, q.getFiles().get("sound"));
+		values.put(KEY_QUESTION_FILES_IMAGE, q.getFiles().get("image"));
+		values.put(KEY_QUESTION_FILES_VIDEO, q.getFiles().get("video"));
+
+		// updating row
+		return db.update(TABLE_QUESTION_FILES, values, KEY_QUESTION_FILES_ID
+				+ " = ?", new String[] { String.valueOf(q.getId()) });
+	}
+
+	/*
+	 * Deleting a question file
+	 */
+	public void deleteQuestionFiles(long question_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_QUESTION_FILES, KEY_QUESTION_FILES_ID + " = ?",
+				new String[] { String.valueOf(question_id) });
+	}
+
+	public long createExercise(Exercise exercise) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_EXERCISE_ID, exercise.getId());
+		values.put(KEY_EXERCISE_NAME, exercise.getName());
+		values.put(KEY_EXERCISE_TYPE, exercise.getType());
+		values.put(KEY_EXERCISE_CREATED_BY, exercise.getTeacher());
+		values.put(KEY_EXERCISE_EXAM_ID, exercise.getExamId());
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_EXERCISES, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single exercise
+	 */
+	public Exercise getExercise(long exercise_id) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISES + " WHERE "
+				+ KEY_EXERCISE_ID + " = " + exercise_id;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+
+		Exercise exercise = new Exercise();
+		exercise.setId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ID)));
+		exercise.setName((c.getString(c.getColumnIndex(KEY_EXERCISE_NAME))));
+		exercise.setType(c.getString(c.getColumnIndex(KEY_EXERCISE_TYPE)));
+		exercise.setTeacher(c.getString(c
+				.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
+
+		return exercise;
+	}
+
+	/*
+	 * getting all exercises
+	 */
+	public ArrayList<Exercise> getAllExercise() {
+		ArrayList<Exercise> exercises = new ArrayList<Exercise>();
+		String selectQuery = "SELECT  * FROM " + TABLE_EXAMS;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c.moveToFirst()) {
+			do {
+				Exercise exercise = new Exercise();
+				exercise.setId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ID)));
+				exercise.setName((c.getString(c
+						.getColumnIndex(KEY_EXERCISE_NAME))));
+				exercise.setType(c.getString(c
+						.getColumnIndex(KEY_EXERCISE_TYPE)));
+				exercise.setTeacher(c.getString(c
+						.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
+
+				exercises.add(exercise);
+			} while (c.moveToNext());
+		}
+
+		return exercises;
+	}
+
+	/*
+	 * Updating an exercise
+	 */
+	public int updateExercise(Exercise exercise) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_EXERCISE_ID, exercise.getId());
+		values.put(KEY_EXERCISE_NAME, exercise.getName());
+		values.put(KEY_EXERCISE_TYPE, exercise.getType());
+		values.put(KEY_EXERCISE_CREATED_BY, exercise.getTeacher());
+		values.put(KEY_EXERCISE_EXAM_ID, exercise.getExamId());
+
+		// updating row
+		return db.update(TABLE_EXERCISES, values, KEY_EXERCISE_ID + " = ?",
+				new String[] { String.valueOf(exercise.getId()) });
+	}
+
+	/*
+	 * Deleting an exercise
+	 */
+	public void deleteExercise(long exercise_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_EXERCISES, KEY_EXERCISE_ID + " = ?",
+				new String[] { String.valueOf(exercise_id) });
+	}
+
+	/*
+	 * getting all exercises by exam id
+	 */
+	public ArrayList<Exercise> getAllExercisesByExamId(int examId) {
+		ArrayList<Exercise> exercises = new ArrayList<Exercise>();
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISES + " WHERE "
+				+ KEY_EXERCISE_EXAM_ID + " = " + examId;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+		do {
+			if (c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID)) == examId) {
+				Exercise exercise = new Exercise();
+				exercise.setId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ID)));
+				exercise.setName((c.getString(c
+						.getColumnIndex(KEY_EXERCISE_NAME))));
+				exercise.setType(c.getString(c
+						.getColumnIndex(KEY_EXERCISE_TYPE)));
+				exercise.setTeacher(c.getString(c
+						.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
+				exercises.add(exercise);
+			}
+
+		} while (c.moveToNext());
+
+		return exercises;
+	}
+
+	/*
+	 * Creating a EXERCISE file
+	 */
+	public long createExerciseFile(Exercise e) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_EXERCISE_FILES_ID, e.getId());
+		values.put(KEY_EXERCISE_FILES_AUDIO, e.getFiles().get("sound"));
+		values.put(KEY_EXERCISE_FILES_IMAGE, e.getFiles().get("image"));
+		values.put(KEY_EXERCISE_FILES_VIDEO, e.getFiles().get("video"));
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_EXERCISE_FILES, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single EXERCISE files by EXERCISE id
+	 */
+	public HashMap<String, String> getExerciseFile(long exercise_id) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISE_FILES
+				+ " WHERE " + KEY_EXERCISE_FILES_ID + " = " + exercise_id;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+
+		HashMap<String, String> eFiles = new HashMap<String, String>();
+		eFiles.put("image",
+				c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_IMAGE)));
+		eFiles.put("sound",
+				c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_AUDIO)));
+		eFiles.put("video",
+				c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_VIDEO)));
+
+		return eFiles;
+	}
+
+	/*
+	 * getting all EXERCISE files
+	 */
+	public ArrayList<HashMap<String, String>> getAllExerciseFiles() {
+		ArrayList<HashMap<String, String>> files = new ArrayList<HashMap<String, String>>();
+		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISE_FILES;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c.moveToFirst()) {
+			do {
+				HashMap<String, String> eFiles = new HashMap<String, String>();
+				eFiles.put("image",
+						c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_IMAGE)));
+				eFiles.put("sound",
+						c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_AUDIO)));
+				eFiles.put("video",
+						c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_VIDEO)));
+
+				files.add(eFiles);
+			} while (c.moveToNext());
+		}
+
+		return files;
+	}
+
+	/*
+	 * Updating an EXERCISE file
+	 */
+	public int updateExerciseFiles(Exercise e) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_EXERCISE_FILES_ID, e.getId());
+		values.put(KEY_EXERCISE_FILES_AUDIO, e.getFiles().get("sound"));
+		values.put(KEY_EXERCISE_FILES_IMAGE, e.getFiles().get("image"));
+		values.put(KEY_EXERCISE_FILES_VIDEO, e.getFiles().get("video"));
+
+		// updating row
+		return db.update(TABLE_EXERCISE_FILES, values, KEY_EXERCISE_FILES_ID
+				+ " = ?", new String[] { String.valueOf(e.getId()) });
+	}
+
+	/*
+	 * Deleting a question file
+	 */
+	public void deleteExerciseFiles(long exercise_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_EXERCISE_FILES, KEY_EXERCISE_FILES_ID + " = ?",
+				new String[] { String.valueOf(exercise_id) });
+	}
+
+	/*
+	 * Creating a User
+	 */
+	public long createUser(Profile p) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_USER_ID, p.getId());
+		values.put(KEY_USER_EMAIL, p.getEmailAdress());
+		values.put(KEY_USER_FIRSTNAME, p.getFirstName());
+		values.put(KEY_USER_LASTNAME, p.getLastName());
+		values.put(KEY_USERNAME, p.getUserName());
+		// values.put(KEY_USER_GROUPS, event.getValidation());
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_USERS, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single user
+	 */
+	public Profile getUser(long user_id) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_USERS + " WHERE "
+				+ KEY_USER_ID + " = " + user_id;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+
+		Profile p = new Profile();
+		p.setId(c.getInt(c.getColumnIndex(KEY_USER_ID)));
+		p.setFirstName((c.getString(c.getColumnIndex(KEY_USER_FIRSTNAME))));
+		p.setLastName(c.getString(c.getColumnIndex(KEY_USER_LASTNAME)));
+		p.setUserName(c.getString(c.getColumnIndex(KEY_USERNAME)));
+		p.setEmailAdress(c.getString(c.getColumnIndex(KEY_USER_EMAIL)));
+
+		return p;
+	}
+
+	/*
+	 * getting all users
+	 */
+	public ArrayList<Profile> getAllUsers() {
+		ArrayList<Profile> users = new ArrayList<Profile>();
+		String selectQuery = "SELECT  * FROM " + TABLE_EVENTS;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c.moveToFirst()) {
+			do {
+				Profile p = new Profile();
+				p.setId(c.getInt(c.getColumnIndex(KEY_USER_ID)));
+				p.setFirstName((c.getString(c
+						.getColumnIndex(KEY_USER_FIRSTNAME))));
+				p.setLastName(c.getString(c.getColumnIndex(KEY_USER_LASTNAME)));
+				p.setUserName(c.getString(c.getColumnIndex(KEY_USERNAME)));
+				p.setEmailAdress(c.getString(c.getColumnIndex(KEY_USER_EMAIL)));
+
+				users.add(p);
+			} while (c.moveToNext());
+		}
+
+		return users;
+	}
+
+	/*
+	 * Updating a user
+	 */
+	public int updateUser(Profile p) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_USER_ID, p.getId());
+		values.put(KEY_USER_EMAIL, p.getEmailAdress());
+		values.put(KEY_USER_FIRSTNAME, p.getFirstName());
+		values.put(KEY_USER_LASTNAME, p.getLastName());
+		values.put(KEY_USERNAME, p.getUserName());
+		// values.put(KEY_USER_GROUPS, event.getValidation());
+
+		// updating row
+		return db.update(TABLE_USERS, values, KEY_USER_ID + " = ?",
+				new String[] { String.valueOf(p.getId()) });
+	}
+
+	/*
+	 * Deleting a user
+	 */
+	public void deleteUser(long user_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_USERS, KEY_USER_ID + " = ?",
+				new String[] { String.valueOf(user_id) });
+	}
+
+	/*
+	 * Creating an answer
+	 */
+	public long createAnswer(Answer a) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_ANSWER_ID, a.getId());
+		values.put(KEY_ANSWER_NAME, a.getAnswer());
+		values.put(KEY_ANSWER_QUESTION_ID, a.getQuestionId());
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_ANSWERS, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single answer
+	 */
+	public Answer getAnswer(long answer_id) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_ANSWERS + " WHERE "
+				+ KEY_ANSWER_ID + " = " + answer_id;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+
+		Answer a = new Answer();
+		a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
+		a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
+		a.setQuestionId(c.getInt(c.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
+
+		return a;
+	}
+
+	/*
+	 * getting all answers
+	 */
+	public ArrayList<Answer> getAllAnswers() {
+		ArrayList<Answer> answers = new ArrayList<Answer>();
+		String selectQuery = "SELECT  * FROM " + TABLE_QUESTIONS;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c.moveToFirst()) {
+			do {
+				Answer a = new Answer();
+				a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
+				a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
+				a.setQuestionId(c.getInt(c
+						.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
+
+				answers.add(a);
+			} while (c.moveToNext());
+		}
+
+		return answers;
+	}
+
+	/*
+	 * Updating an answer
+	 */
+	public int updateAnswer(Answer a) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_ANSWER_ID, a.getId());
+		values.put(KEY_ANSWER_NAME, a.getAnswer());
+		values.put(KEY_ANSWER_QUESTION_ID, a.getQuestionId());
+
+		// updating row
+		return db.update(TABLE_ANSWERS, values, KEY_ANSWER_ID + " = ?",
+				new String[] { String.valueOf(a.getId()) });
+	}
+
+	/*
+	 * Deleting an answer
+	 */
+	public void deleteAnswer(long answer_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_ANSWERS, KEY_ANSWER_ID + " = ?",
+				new String[] { String.valueOf(answer_id) });
+	}
+
+	/*
+	 * getting all answers by question id
+	 */
+	public ArrayList<Answer> getAllAnswersByQuestionId(int questionId) {
+		ArrayList<Answer> answers = new ArrayList<Answer>();
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_ANSWERS + " WHERE "
+				+ KEY_ANSWER_QUESTION_ID + " = " + questionId;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null)
+			c.moveToFirst();
+		do {
+			if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == questionId) {
+				Answer a = new Answer();
+				a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
+				a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
+				a.setQuestionId(c.getInt(c
+						.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
+				answers.add(a);
+			}
+
+		} while (c.moveToNext());
+
+		return answers;
 	}
 }

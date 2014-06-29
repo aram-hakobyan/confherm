@@ -18,9 +18,12 @@ import org.json.JSONObject;
 
 import android.content.Context;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.ExamJsonParser;
+import fr.conferencehermes.confhermexam.parser.Exercise;
+import fr.conferencehermes.confhermexam.parser.Question;
 
 public class UnzipUtility {
 	DatabaseHelper db;
@@ -72,6 +75,8 @@ public class UnzipUtility {
 			e.printStackTrace();
 		}
 
+		// Store data in SQLite database
+
 		if (event != null) {
 			db = new DatabaseHelper(context);
 			db.createEvent(event);
@@ -79,6 +84,25 @@ public class UnzipUtility {
 			ArrayList<Exam> exams = event.getExams();
 			for (int i = 0; i < exams.size(); i++) {
 				db.createExam(exams.get(i));
+
+				ArrayList<Exercise> exercises = exams.get(i).getExercises();
+				for (int j = 0; j < exercises.size(); j++) {
+					db.createExercise(exercises.get(j));
+					db.createExerciseFile(exercises.get(j));
+
+					ArrayList<Question> questions = exercises.get(j)
+							.getQuestions();
+					for (int k = 0; k < questions.size(); k++) {
+						db.createQuestion(questions.get(k));
+						db.createQuestionFile(questions.get(k));
+
+						ArrayList<Answer> answers = questions.get(k)
+								.getAnswers();
+						for (int l = 0; l < answers.size(); l++) {
+							db.createAnswer(answers.get(l));
+						}
+					}
+				}
 			}
 
 			db.closeDB();
