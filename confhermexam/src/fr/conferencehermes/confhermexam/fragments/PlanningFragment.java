@@ -3,8 +3,10 @@ package fr.conferencehermes.confhermexam.fragments;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,7 +15,8 @@ import android.app.Dialog;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.format.DateFormat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -83,7 +86,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		SAT = (TextView) fragment.findViewById(R.id.textView6);
 		SUN = (TextView) fragment.findViewById(R.id.textView7);
 
-		Calendar cal = Calendar.getInstance();
+		Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("France"));
 		cal.set(Calendar.HOUR_OF_DAY, 7);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
@@ -124,7 +127,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 										&& json.get("data") != null) {
 									timeSlotsArray = JSONParser
 											.parsePlannig(json);
-									Calendar cal = Calendar.getInstance();
+									Calendar cal = new GregorianCalendar(
+											TimeZone.getTimeZone("France"));
 									if (!timeSlotsArray.isEmpty()) {
 										for (int i = 0; i < timeSlotsArray
 												.size(); i++) {
@@ -149,7 +153,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 	}
 
 	private void setCalendarHeader(long mills) {
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = new GregorianCalendar(
+				TimeZone.getTimeZone("France"));
 		calendar.setTimeInMillis(mills);
 		MON.setText("LUN "
 				+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
@@ -187,14 +192,30 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 				+ String.valueOf(calendar.get(Calendar.YEAR)));
 	}
 
+	private String timeConverter(int time) {
+		if (time > 9)
+			return String.valueOf(time);
+		else
+			return "0" + String.valueOf(time);
+	}
+
 	private void drawTimeSlot(final TimeSlot timeSlot, int day) {
 
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = new GregorianCalendar(
+				TimeZone.getTimeZone("France"));
 		calendar.setTimeInMillis(timeSlot.getStart_date() * 1000);
+		final String startTimeString = timeConverter(calendar
+				.get(Calendar.HOUR_OF_DAY))
+				+ ":"
+				+ timeConverter(calendar.get(Calendar.MINUTE));
 		int STARTING_HOUR = calendar.get(Calendar.HOUR_OF_DAY);
 		if (STARTING_HOUR < 6 || STARTING_HOUR > 22)
 			return;
 		calendar.setTimeInMillis(timeSlot.getEnd_date() * 1000);
+		final String endTimeString = timeConverter(calendar
+				.get(Calendar.HOUR_OF_DAY))
+				+ ":"
+				+ timeConverter(calendar.get(Calendar.MINUTE));
 		int ENDING_HOUR = calendar.get(Calendar.HOUR_OF_DAY);
 
 		int CALENDAR_HEIGHT_PX = layoutContainer.getHeight()
@@ -210,12 +231,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		timeSlotText.setTextColor(Color.WHITE);
 		timeSlotText.setGravity(Gravity.CENTER);
 
-		timeSlotText.setText(DateFormat.format("hh:mm",
-				new Date(timeSlot.getStart_date() * 1000)).toString()
-				+ " - "
-				+ DateFormat.format("hh:mm",
-						new Date(timeSlot.getEnd_date() * 1000)).toString()
-				+ "\n" + timeSlot.getTest_name());
+		timeSlotText.setText(startTimeString + " - " + endTimeString + "\n"
+				+ timeSlot.getTest_name());
 
 		RelativeLayout calendarMenu = (RelativeLayout) fragment
 				.findViewById(R.id.calendarMenu);
@@ -261,7 +278,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		timeSlotText.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				openDialog(timeSlot);
+				openDialog(timeSlot, startTimeString, endTimeString);
 			}
 		});
 
@@ -269,7 +286,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 
 	}
 
-	public void openDialog(TimeSlot ts) {
+	public void openDialog(final TimeSlot ts, String startTime, String endTime) {
 		final Dialog dialog = new Dialog(getActivity());
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.planning_dialog);
@@ -290,7 +307,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		adress.setText(ts.getPlace());
 		city.setText(ts.getAcademy());
 
-		Calendar calendar = Calendar.getInstance();
+		Calendar calendar = new GregorianCalendar(
+				TimeZone.getTimeZone("France"));
 		calendar.setTimeInMillis(ts.getStart_date() * 1000);
 		String DAY_TEXT = "";
 		switch (calendar.get(Calendar.DAY_OF_WEEK)) {
@@ -320,12 +338,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 				+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
 				+ String.valueOf(calendar.get(Calendar.MONTH) + 1) + "/"
 				+ String.valueOf(calendar.get(Calendar.YEAR)));
-		hour.setText("De "
-				+ DateFormat.format("hh:mm",
-						new Date(ts.getStart_date() * 1000)).toString()
-				+ " a "
-				+ DateFormat.format("hh:mm", new Date(ts.getEnd_date() * 1000))
-						.toString());
+		hour.setText("De " + startTime + " a " + endTime);
 
 		switch (ts.getStatus()) {
 		case 1:
@@ -363,6 +376,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			@Override
 			public void onClick(View v) {
 				dialog.dismiss();
+				openExams(ts);
 			}
 		});
 
@@ -382,6 +396,17 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 							R.dimen.planning_dialog_height));
 		}
 
+	}
+
+	private void openExams(TimeSlot ts) {
+		Bundle bundle = new Bundle();
+		bundle.putInt("timeslot_id", ts.getTimeslot_id());
+		DownloadsFragment fragobj = new DownloadsFragment();
+		fragobj.setArguments(bundle);
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		FragmentTransaction fragmentTransaction = fm.beginTransaction();
+		fragmentTransaction.replace(R.id.fragmentContainer, fragobj);
+		fragmentTransaction.commit();
 	}
 
 	private void changeWeek(boolean IS_NEXT) {

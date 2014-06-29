@@ -2,24 +2,20 @@ package fr.conferencehermes.confhermexam.adapters;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.graphics.Color;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.ResultReceiver;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -36,6 +32,7 @@ import com.androidquery.callback.AjaxStatus;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
+import fr.conferencehermes.confhermexam.service.DownloadService;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
@@ -43,6 +40,7 @@ public class DownloadsAdapter extends BaseAdapter {
 	private ArrayList<DownloadInstance> mListItems;
 	private LayoutInflater mLayoutInflater;
 	private Context c;
+	private AQuery aq;
 
 	public DownloadsAdapter(Context context,
 			ArrayList<DownloadInstance> arrayList) {
@@ -50,6 +48,7 @@ public class DownloadsAdapter extends BaseAdapter {
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.c = context;
+		aq = new AQuery(c);
 	}
 
 	@Override
@@ -115,26 +114,13 @@ public class DownloadsAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					int status = mListItems.get(position).getStatus();
 					if (status == 2 || status == 3) {
-						if (isDownloadManagerAvailable(c)) {
-							downloadFile(mListItems.get(position)
-									.getDownloadUrl(), mListItems.get(position)
-									.getName());
 
-							holder.progressBar.setVisibility(View.VISIBLE);
-							holder.btnAction.setVisibility(View.INVISIBLE);
+						downloadFile(mListItems.get(position).getDownloadUrl(),
+								mListItems.get(position).getName());
 
-							Handler h = new Handler();
-							h.postDelayed(new Runnable() {
-								@Override
-								public void run() {
-									holder.progressBar
-											.setVisibility(View.INVISIBLE);
-									holder.btnAction
-											.setVisibility(View.VISIBLE);
+						holder.progressBar.setVisibility(View.VISIBLE);
+						holder.btnAction.setVisibility(View.INVISIBLE);
 
-								}
-							}, 3000);
-						}
 					}
 
 				}
@@ -169,56 +155,67 @@ public class DownloadsAdapter extends BaseAdapter {
 		protected ProgressBar progressBar;
 	}
 
-	private void downloadFile(String url, String title) {
-		if (isDownloadManagerAvailable(c)) {
-			DownloadManager.Request request = new DownloadManager.Request(
-					Uri.parse(url));
-			// request.setDescription("Downloading exam...");
-			// .setTitle(title);
-			// in order for this if to run, you must use the android 3.2 to
-			// compile your app
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-				// request.allowScanningByMediaScanner();
-				request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_HIDDEN);
+	private void downloadFile(String url, final String title) {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put("device_id", Utilities.getDeviceId(c));
+
+		aq.ajax(url, params, JSONObject.class, new AjaxCallback<JSONObject>() {
+			@Override
+			public void callback(String url, JSONObject json, AjaxStatus status) {
+
+				try {
+					if (json.has("data") && json.get("data") != null) {
+						// downloadZip(json.getString("data"));
+						// DownloadTask downloadTask = new DownloadTask(c);
+						// downloadTask.execute(json.getString("data"), title);
+						Intent intent = new Intent(c, DownloadService.class);
+						intent.putExtra("url", json.getString("data"));
+						intent.putExtra("title", title);
+						intent.putExtra("receiver", new DownloadReceiver(
+								new Handler()));
+						c.startService(intent);
+					}
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+
+				}
 			}
+		});
 
-			String fileName = "file" + System.currentTimeMillis();
-			request.setDestinationInExternalPublicDir(
-					Environment.DIRECTORY_DOWNLOADS, fileName);
-			// get download service and enqueue file
-			DownloadManager manager = (DownloadManager) c
-					.getSystemService(Context.DOWNLOAD_SERVICE);
-			manager.enqueue(request);
-
-		}
 	}
 
-	public static boolean isDownloadManagerAvailable(Context context) {
-		try {
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD) {
-				return false;
+	private class DownloadReceiver extends ResultReceiver {
+		public DownloadReceiver(Handler handler) {
+			super(handler);
+		}
+
+		@Override
+		protected void onReceiveResult(int resultCode, Bundle resultData) {
+			super.onReceiveResult(resultCode, resultData);
+			if (resultCode == DownloadService.UPDATE_PROGRESS) {
+				int progress = resultData.getInt("progress");
+				/*
+				 * Toast.makeText(c, "Downloaded " + String.valueOf(progress) +
+				 * "%", Toast.LENGTH_SHORT).show();
+				 */
+				Log.d("DOWNLOADED: ", String.valueOf(progress));
+				if (progress == 100) {
+
+				}
 			}
-			Intent intent = new Intent(Intent.ACTION_MAIN);
-			intent.addCategory(Intent.CATEGORY_LAUNCHER);
-			intent.setClassName("com.android.providers.downloads.ui",
-					"com.android.providers.downloads.ui.DownloadList");
-			List<ResolveInfo> list = context.getPackageManager()
-					.queryIntentActivities(intent,
-							PackageManager.MATCH_DEFAULT_ONLY);
-			return list.size() > 0;
-		} catch (Exception e) {
-			return false;
 		}
 	}
 
 	private void showDialog(final int pos) {
 		AlertDialog.Builder b = new AlertDialog.Builder(c)
-				.setTitle("Delete files?")
+				.setTitle("Remove file?")
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
-								removeFile(mListItems.get(pos).getDownloadUrl());
+								removeFile(mListItems.get(pos).getRemoveUrl());
 							}
 						})
 				.setNegativeButton("Cancel",
@@ -257,4 +254,5 @@ public class DownloadsAdapter extends BaseAdapter {
 			}
 		});
 	}
+
 }

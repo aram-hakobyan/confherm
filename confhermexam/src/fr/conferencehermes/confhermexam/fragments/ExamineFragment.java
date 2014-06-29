@@ -24,6 +24,7 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
@@ -36,6 +37,8 @@ public class ExamineFragment extends Fragment {
 	ExamsAdapter adapter;
 	ArrayList<Exam> exams;
 	ProgressBar progressBarExamin;
+	AQuery aq;
+	DatabaseHelper db;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -43,6 +46,8 @@ public class ExamineFragment extends Fragment {
 		View fragment = inflater.inflate(R.layout.activity_examine, container,
 				false);
 
+		aq = new AQuery(getActivity());
+		db = new DatabaseHelper(getActivity());
 		progressBarExamin = (ProgressBar) fragment
 				.findViewById(R.id.progressBarExamin);
 
@@ -56,39 +61,51 @@ public class ExamineFragment extends Fragment {
 
 		});
 
-		AQuery aq = new AQuery(getActivity());
+		if (Utilities.isNetworkAvailable(getActivity())) {
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+			params.put("device_id", Utilities.getDeviceId(getActivity()));
 
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
-		params.put("device_id", Utilities.getDeviceId(getActivity()));
-
-		aq.ajax(Constants.EXAM_LIST_URL, params, JSONObject.class,
-				new AjaxCallback<JSONObject>() {
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
-
-						try {
-							System.out.println(json);
-							if (json.has("data") && json.get("data") != null) {
-								exams = JSONParser.parseExams(json);
-								if (adapter == null) {
-									adapter = new ExamsAdapter(getActivity(),
-											exams);
-								} else {
-									adapter.notifyDataSetChanged();
+			aq.ajax(Constants.EXAM_LIST_URL, params, JSONObject.class,
+					new AjaxCallback<JSONObject>() {
+						@Override
+						public void callback(String url, JSONObject json,
+								AjaxStatus status) {
+							try {
+								if (json.has("data")
+										&& json.get("data") != null) {
+									exams = JSONParser.parseExams(json);
+									if (adapter == null) {
+										adapter = new ExamsAdapter(
+												getActivity(), exams);
+									} else {
+										adapter.notifyDataSetChanged();
+									}
+									listview.setAdapter(adapter);
+									progressBarExamin.setVisibility(View.GONE);
+									listview.setVisibility(View.VISIBLE);
 								}
-								listview.setAdapter(adapter);
-								progressBarExamin.setVisibility(View.GONE);
-								listview.setVisibility(View.VISIBLE);
+
+							} catch (JSONException e) {
+								e.printStackTrace();
+
 							}
-
-						} catch (JSONException e) {
-							e.printStackTrace();
-
 						}
-					}
-				});
+					});
+		} else {
+
+			exams = db.getAllExams();
+			if (adapter == null) {
+				adapter = new ExamsAdapter(getActivity(), exams);
+			} else {
+				adapter.notifyDataSetChanged();
+			}
+			listview.setAdapter(adapter);
+			progressBarExamin.setVisibility(View.GONE);
+			listview.setVisibility(View.VISIBLE);
+
+		}
+		db.closeDB();
 
 		return fragment;
 	}

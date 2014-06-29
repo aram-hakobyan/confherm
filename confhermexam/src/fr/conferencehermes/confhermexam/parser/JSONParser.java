@@ -99,6 +99,7 @@ public class JSONParser {
 					d.setDownloadUrl(obj.getString("download_url"));
 					d.setRemoveUrl(obj.getString("remove_url"));
 					d.setStatus(obj.getInt("status"));
+					d.setLastEditTime(obj.getLong("last_edit_time"));
 					downloads.add(d);
 				}
 			}

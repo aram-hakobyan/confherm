@@ -9,6 +9,7 @@ import org.json.JSONObject;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import fr.conferencehermes.confhermexam.adapters.DownloadsAdapter;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class DownloadsFragment extends Fragment {
@@ -34,6 +36,7 @@ public class DownloadsFragment extends Fragment {
 	AQuery aq;
 
 	ProgressBar progressBarTelecharge;
+	protected int id = 0;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -69,6 +72,14 @@ public class DownloadsFragment extends Fragment {
 								listview.setAdapter(adapter);
 								progressBarTelecharge.setVisibility(View.GONE);
 								listview.setVisibility(View.VISIBLE);
+
+								int timeslotId = -1;
+								Bundle arguments = getArguments();
+								if (arguments != null)
+									timeslotId = arguments.getInt(
+											"timeslot_id", -1);
+								if (timeslotId != -1)
+									selectCurrentEventDownload(timeslotId);
 							}
 
 						} catch (JSONException e) {
@@ -79,6 +90,55 @@ public class DownloadsFragment extends Fragment {
 				});
 
 		return fragment;
+	}
+
+	private void selectCurrentEventDownload(final int eventId) {
+
+		if (listview != null) {
+			ArrayList<DownloadInstance> downloads = DataHolder.getInstance()
+					.getDownloads();
+			for (int i = 0; i < downloads.size(); i++) {
+				DownloadInstance d = (DownloadInstance) downloads.get(i);
+				if (eventId == d.getEventId()) {
+					id = i;
+					break;
+				}
+
+			}
+
+			listview.post(new Runnable() {
+				@Override
+				public void run() {
+					listview.setSelection(id);
+				}
+			});
+
+			listview.postDelayed(new Runnable() {
+				int wantedPosition, wantedChild;
+
+				@Override
+				public void run() {
+					wantedPosition = id;
+					int firstPosition = listview.getFirstVisiblePosition()
+							- listview.getHeaderViewsCount();
+					wantedChild = wantedPosition - firstPosition;
+					View wantedView = listview.getChildAt(wantedChild);
+					if (wantedView != null) {
+						wantedView.requestFocus();
+						wantedView.setBackgroundColor(getResources().getColor(
+								R.color.app_main_color));
+					}
+
+					if (wantedChild < 0
+							|| wantedChild >= listview.getChildCount()) {
+						Log.w("TAG",
+								"Unable to get view for desired position, because it's not being displayed on screen.");
+						return;
+					}
+				}
+			}, 400);
+
+		}
 	}
 
 }

@@ -6,6 +6,7 @@ public class DownloadInstance {
 	private String name;
 	private String downloadUrl;
 	private String removeUrl;
+	private long lastEditTime;
 
 	public int getEventId() {
 		return eventId;
@@ -45,6 +46,14 @@ public class DownloadInstance {
 
 	public void setRemoveUrl(String removeUrl) {
 		this.removeUrl = removeUrl;
+	}
+
+	public long getLastEditTime() {
+		return lastEditTime;
+	}
+
+	public void setLastEditTime(long lastEditTime) {
+		this.lastEditTime = lastEditTime;
 	}
 
 }

@@ -1,5 +1,7 @@
 package fr.conferencehermes.confhermexam.parser;
 
+import java.util.ArrayList;
+
 public class Exam {
 	private int id;
 	private int eventId;
@@ -10,8 +12,11 @@ public class Exam {
 	private long endDate;
 	private int status;
 	private String description;
+	private String password;
+	private ArrayList<Exercise> exercises;
 
-	public Exam() {
+	public void Exam() {
+		setExercises(new ArrayList<Exercise>());
 	}
 
 	public int getId() {
@@ -84,5 +89,21 @@ public class Exam {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public ArrayList<Exercise> getExercises() {
+		return exercises;
+	}
+
+	public void setExercises(ArrayList<Exercise> exercises) {
+		this.exercises = exercises;
 	}
 }
