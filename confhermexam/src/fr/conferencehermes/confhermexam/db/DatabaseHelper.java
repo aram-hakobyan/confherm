@@ -547,6 +547,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_QUESTION_EXERCISE_ID + " = " + exerciseId;
 
 		Cursor c = db.rawQuery(selectQuery, null);
+		
 		if (c != null)
 			c.moveToFirst();
 		do {

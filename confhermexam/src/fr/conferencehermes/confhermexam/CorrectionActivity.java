@@ -31,12 +31,10 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -79,23 +77,20 @@ import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.androidquery.AQuery;
-import com.androidquery.callback.AjaxCallback;
-import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
-import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
-public class CorrectionActivity extends Activity implements
-		OnClickListener {
+public class CorrectionActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
 	private ListView listview;
 	private QuestionsAdapter adapter;
@@ -147,8 +142,6 @@ public class CorrectionActivity extends Activity implements
 		validAnswers = new SparseBooleanArray();
 		questionAnswers = new ArrayList<QuestionAnswer>();
 
-
-
 		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);
 		temps2 = (TextView) findViewById(R.id.temps2);
@@ -171,7 +164,6 @@ public class CorrectionActivity extends Activity implements
 		ennouncer.setOnClickListener(this);
 		valider.setOnClickListener(this);
 
-
 		customHandler.postDelayed(updateTimerThread, 0);
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -190,80 +182,100 @@ public class CorrectionActivity extends Activity implements
 
 		});
 
-		AQuery aq = new AQuery(CorrectionActivity.this);
+	//	DatabaseHelper dbHelper = new DatabaseHelper(CorrectionActivity.this);
+	//	Log.i("QUESTIOS FROM DB",
+			//	dbHelper.getAllQuestionsByExerciseId(exercise_id) + "");
+	//	adapter = new QuestionsAdapter(CorrectionActivity.this,
+		//		dbHelper.getAllQuestionsByExerciseId(exercise_id));
 
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
-		params.put("exercise_id", exercise_id);
+	
 
-		aq.ajax(Constants.TRAINING_EXERCISE_URL, params, JSONObject.class,
-				new AjaxCallback<JSONObject>() {
+		//
+		// listview.setAdapter(adapter);
+		// examName.setText(exercise.getName());
+		// teacher.setText("Teacher "
+		// + exercise.getTeacher());
 
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
+/*		ViewTreeObserver vto = listview.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void onGlobalLayout() {
+				for (int i = 0; i < listview.getChildCount(); i++) {
+					if (i == 0)
+						listview.getChildAt(i).setBackgroundColor(
+								getResources().getColor(
+										R.color.app_main_color_dark));
+					else
+						listview.getChildAt(i)
+								.setBackgroundColor(
+										getResources().getColor(
+												R.color.app_main_color));
+				}
 
-						try {
-							if (json.has("data") && json.get("data") != null) {
-								exercise = JSONParser.parseExercise(json);
-								if (exercise.getExerciseType() == 2) {
-									ennouncer.setVisibility(View.GONE);
-								}
+				listview.getViewTreeObserver().removeGlobalOnLayoutListener(
+						this);
+			}
+		});
 
-								adapter = new QuestionsAdapter(
-										CorrectionActivity.this, exercise
-												.getQuestions());
+		questions = exercise.getQuestions();
+		if (!questions.isEmpty()) {
 
-								listview.setAdapter(adapter);
-								examName.setText(exercise.getName());
-								teacher.setText("Teacher "
-										+ exercise.getTeacher());
+			for (int i = 0; i < questions.size(); i++) {
+				questionAnswers.add(null);
+			}
+			selectQuestion(questions.get(0), 0);
 
-								ViewTreeObserver vto = listview
-										.getViewTreeObserver();
-								vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-									@SuppressWarnings("deprecation")
-									@Override
-									public void onGlobalLayout() {
-										for (int i = 0; i < listview
-												.getChildCount(); i++) {
-											if (i == 0)
-												listview.getChildAt(i)
-														.setBackgroundColor(
-																getResources()
-																		.getColor(
-																				R.color.app_main_color_dark));
-											else
-												listview.getChildAt(i)
-														.setBackgroundColor(
-																getResources()
-																		.getColor(
-																				R.color.app_main_color));
-										}
+		}*/
 
-										listview.getViewTreeObserver()
-												.removeGlobalOnLayoutListener(
-														this);
-									}
-								});
-
-								questions = exercise.getQuestions();
-								if (!questions.isEmpty()) {
-
-									for (int i = 0; i < questions.size(); i++) {
-										questionAnswers.add(null);
-									}
-									selectQuestion(questions.get(0), 0);
-
-								}
-
-							}
-						} catch (JSONException e) {
-							e.printStackTrace();
-
-						}
-					}
-				});
+		/*
+		 * AQuery aq = new AQuery(CorrectionActivity.this);
+		 * 
+		 * Map<String, Object> params = new HashMap<String, Object>();
+		 * params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		 * params.put("exercise_id", exercise_id);
+		 * 
+		 * aq.ajax(Constants.TRAINING_EXERCISE_URL, params, JSONObject.class,
+		 * new AjaxCallback<JSONObject>() {
+		 * 
+		 * @Override public void callback(String url, JSONObject json,
+		 * AjaxStatus status) {
+		 * 
+		 * try { if (json.has("data") && json.get("data") != null) { exercise =
+		 * JSONParser.parseExercise(json); if (exercise.getExerciseType() == 2)
+		 * { ennouncer.setVisibility(View.GONE); }
+		 * 
+		 * 
+		 * 
+		 * listview.setAdapter(adapter); examName.setText(exercise.getName());
+		 * teacher.setText("Teacher " + exercise.getTeacher());
+		 * 
+		 * ViewTreeObserver vto = listview .getViewTreeObserver();
+		 * vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		 * 
+		 * @SuppressWarnings("deprecation")
+		 * 
+		 * @Override public void onGlobalLayout() { for (int i = 0; i < listview
+		 * .getChildCount(); i++) { if (i == 0) listview.getChildAt(i)
+		 * .setBackgroundColor( getResources() .getColor(
+		 * R.color.app_main_color_dark)); else listview.getChildAt(i)
+		 * .setBackgroundColor( getResources() .getColor(
+		 * R.color.app_main_color)); }
+		 * 
+		 * listview.getViewTreeObserver() .removeGlobalOnLayoutListener( this);
+		 * } });
+		 * 
+		 * questions = exercise.getQuestions(); if (!questions.isEmpty()) {
+		 * 
+		 * for (int i = 0; i < questions.size(); i++) {
+		 * questionAnswers.add(null); } selectQuestion(questions.get(0), 0);
+		 * 
+		 * }
+		 * 
+		 * } } catch (JSONException e) { e.printStackTrace();
+		 * 
+		 * } } });
+		 */
 
 	}
 
@@ -278,9 +290,9 @@ public class CorrectionActivity extends Activity implements
 					listview.getChildAt(i).setBackgroundColor(
 							getResources()
 									.getColor(R.color.app_main_color_dark));
-				//else
-				//	listview.getChildAt(i).setBackgroundColor(
-				//			getResources().getColor(R.color.app_main_color));
+				// else
+				// listview.getChildAt(i).setBackgroundColor(
+				// getResources().getColor(R.color.app_main_color));
 			}
 		}
 
@@ -327,8 +339,7 @@ public class CorrectionActivity extends Activity implements
 			for (int i = 0; i < answersCount; i++) {
 				checkBoxLayout = new LinearLayout(CorrectionActivity.this);
 				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
-				final CheckBox checkBox = new CheckBox(
-						CorrectionActivity.this);
+				final CheckBox checkBox = new CheckBox(CorrectionActivity.this);
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
 				TextView text = new TextView(CorrectionActivity.this);
 				text.setText(q.getAnswers().get(i).getAnswer());
@@ -390,7 +401,7 @@ public class CorrectionActivity extends Activity implements
 				EditText editText = new EditText(CorrectionActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				
+
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
@@ -593,8 +604,8 @@ public class CorrectionActivity extends Activity implements
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				Utilities.showOrHideActivityIndicator(
-						CorrectionActivity.this, 1, "Please wait...");
+				Utilities.showOrHideActivityIndicator(CorrectionActivity.this,
+						1, "Please wait...");
 			}
 			return null;
 		}
@@ -939,8 +950,8 @@ public class CorrectionActivity extends Activity implements
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(CorrectionActivity.this,
-					"millisUntilFinished", millisUntilFinished);
+			Utilities.writeLong(CorrectionActivity.this, "millisUntilFinished",
+					millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
 					TimeUnit.MILLISECONDS.toHours(millis),
@@ -1030,8 +1041,7 @@ public class CorrectionActivity extends Activity implements
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = new MediaController(
-				CorrectionActivity.this);
+		final MediaController mc = new MediaController(CorrectionActivity.this);
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -1308,8 +1318,7 @@ public class CorrectionActivity extends Activity implements
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 
-						Intent intentHome = new Intent(
-								CorrectionActivity.this,
+						Intent intentHome = new Intent(CorrectionActivity.this,
 								HomeActivity.class);
 						startActivity(intentHome);
 

@@ -3,6 +3,8 @@ package fr.conferencehermes.confhermexam.adapters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +43,7 @@ public class DownloadsAdapter extends BaseAdapter {
 	private LayoutInflater mLayoutInflater;
 	private Context c;
 	private AQuery aq;
+	int donwloadProcent = 0;
 
 	public DownloadsAdapter(Context context,
 			ArrayList<DownloadInstance> arrayList) {
@@ -80,6 +83,9 @@ public class DownloadsAdapter extends BaseAdapter {
 			holder.progressBar = (ProgressBar) view
 					.findViewById(R.id.progressBar);
 
+			//holder.downloadProgressNumber = (TextView) view
+				//	.findViewById(R.id.downloadProgressNumber);
+
 			view.setTag(holder);
 		} else {
 			holder = (ViewHolder) view.getTag();
@@ -89,7 +95,10 @@ public class DownloadsAdapter extends BaseAdapter {
 		if (stringItem != null) {
 			if (holder.name != null) {
 				holder.name.setText(stringItem);
+
 			}
+
+
 
 			int status = mListItems.get(position).getStatus();
 			if (status == 1) {
@@ -121,6 +130,9 @@ public class DownloadsAdapter extends BaseAdapter {
 						holder.progressBar.setVisibility(View.VISIBLE);
 						holder.btnAction.setVisibility(View.INVISIBLE);
 
+						holder.downloadProgressNumber.setText(String
+								.valueOf(donwloadProcent));
+						
 					}
 
 				}
@@ -153,6 +165,7 @@ public class DownloadsAdapter extends BaseAdapter {
 		protected Button btnAction;
 		protected Button btnRemove;
 		protected ProgressBar progressBar;
+		public TextView downloadProgressNumber;
 	}
 
 	private void downloadFile(String url, final String title) {
@@ -196,10 +209,7 @@ public class DownloadsAdapter extends BaseAdapter {
 			super.onReceiveResult(resultCode, resultData);
 			if (resultCode == DownloadService.UPDATE_PROGRESS) {
 				int progress = resultData.getInt("progress");
-				/*
-				 * Toast.makeText(c, "Downloaded " + String.valueOf(progress) +
-				 * "%", Toast.LENGTH_SHORT).show();
-				 */
+				donwloadProcent = progress;
 				Log.d("DOWNLOADED: ", String.valueOf(progress));
 				if (progress == 100) {
 
