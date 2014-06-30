@@ -58,7 +58,7 @@
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="fr.conferencehermes.confhermexam.QuestionResponseQCMActivity"
+            android:name="fr.conferencehermes.confhermexam.ExaminationActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>

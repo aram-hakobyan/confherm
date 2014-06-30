@@ -91,6 +91,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
+		cal.setFirstDayOfWeek(Calendar.MONDAY);
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		currentTime = cal.getTimeInMillis() / 1000;
 		cal.add(Calendar.WEEK_OF_YEAR, 1);
@@ -192,30 +193,23 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 				+ String.valueOf(calendar.get(Calendar.YEAR)));
 	}
 
-	private String timeConverter(int time) {
-		if (time > 9)
-			return String.valueOf(time);
-		else
-			return "0" + String.valueOf(time);
-	}
-
 	private void drawTimeSlot(final TimeSlot timeSlot, int day) {
 
 		Calendar calendar = new GregorianCalendar(
 				TimeZone.getTimeZone("France"));
 		calendar.setTimeInMillis(timeSlot.getStart_date() * 1000);
-		final String startTimeString = timeConverter(calendar
+		final String startTimeString = Utilities.timeConverter(calendar
 				.get(Calendar.HOUR_OF_DAY))
 				+ ":"
-				+ timeConverter(calendar.get(Calendar.MINUTE));
+				+ Utilities.timeConverter(calendar.get(Calendar.MINUTE));
 		int STARTING_HOUR = calendar.get(Calendar.HOUR_OF_DAY);
 		if (STARTING_HOUR < 6 || STARTING_HOUR > 22)
 			return;
 		calendar.setTimeInMillis(timeSlot.getEnd_date() * 1000);
-		final String endTimeString = timeConverter(calendar
+		final String endTimeString = Utilities.timeConverter(calendar
 				.get(Calendar.HOUR_OF_DAY))
 				+ ":"
-				+ timeConverter(calendar.get(Calendar.MINUTE));
+				+ Utilities.timeConverter(calendar.get(Calendar.MINUTE));
 		int ENDING_HOUR = calendar.get(Calendar.HOUR_OF_DAY);
 
 		int CALENDAR_HEIGHT_PX = layoutContainer.getHeight()

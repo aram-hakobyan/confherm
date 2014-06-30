@@ -56,7 +56,7 @@ public class ExamJsonParser {
 				ArrayList<Exercise> exercises = new ArrayList<Exercise>();
 				JSONArray exercisesArr = obj.getJSONArray("exercises");
 				for (int j = 0; j < exercisesArr.length(); j++) {
-					Exercise ex = parseExercise(exercisesArr.getJSONObject(i),
+					Exercise ex = parseExercise(exercisesArr.getJSONObject(j),
 							e.getId());
 					exercises.add(ex);
 				}

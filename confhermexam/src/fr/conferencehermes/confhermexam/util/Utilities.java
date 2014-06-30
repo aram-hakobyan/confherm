@@ -100,6 +100,13 @@ public class Utilities {
 		return (int) dp;
 	}
 
+	public static String timeConverter(int time) {
+		if (time > 9)
+			return String.valueOf(time);
+		else
+			return "0" + String.valueOf(time);
+	}
+
 	public static void selectFrag(FragmentActivity a, int PAGE_ID) {
 		Fragment fr = null;
 
