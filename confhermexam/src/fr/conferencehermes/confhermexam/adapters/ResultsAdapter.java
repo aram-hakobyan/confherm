@@ -10,32 +10,22 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+import fr.conferencehermes.confhermexam.CorrectionActivity;
 import fr.conferencehermes.confhermexam.CorrectionExercisesActivity;
 import fr.conferencehermes.confhermexam.NotesActivity;
 import fr.conferencehermes.confhermexam.R;
-import fr.conferencehermes.confhermexam.db.DatabaseHelper;
-import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Result;
 
 public class ResultsAdapter extends BaseAdapter {
 	private ArrayList<Result> mListItems;
 	private LayoutInflater mLayoutInflater;
 	private Context c;
-	DatabaseHelper db;
-	ArrayList<Exam> dbExams;
 
 	public ResultsAdapter(Context context, ArrayList<Result> rList) {
 		mListItems = rList;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.c = context;
-		db = new DatabaseHelper(context);
-		try {
-			dbExams = db.getAllExams();
-		} finally {
-
-			db.closeDB();
-		}
 	}
 
 	@Override
@@ -57,9 +47,6 @@ public class ResultsAdapter extends BaseAdapter {
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		ViewHolder holder;
 		final int itemID = (int) mListItems.get(position).getExamId();
-
-		final int eventID = dbExams.get(position).getEventId();
-
 		if (view == null) {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.resultat_rowview, null);
@@ -78,9 +65,8 @@ public class ResultsAdapter extends BaseAdapter {
 			holder.desc.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(c,
-							CorrectionExercisesActivity.class);
-					intent.putExtra("event_id", eventID);
+					Intent intent = new Intent(c, CorrectionExercisesActivity.class);
+					intent.putExtra("exam_id", itemID);
 					c.startActivity(intent);
 				}
 			});

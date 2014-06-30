@@ -45,14 +45,14 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 	GridView gvMain;
 	ArrayAdapter<String> adapter;
 	ArrayList<CorrectionsExercise> corExercises;
-	int event_id;
+	int exam_id;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_exersice);
-		event_id = getIntent().getIntExtra("event_id", 0);
+		exam_id = getIntent().getIntExtra("exam_id", 0);
 
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
@@ -62,8 +62,8 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 				int exersice_id = corExercises.get(position).getExercise_id();
-				// int exam_id = corExercises.get(position).getExam_id();
-				openExamCorrection(exersice_id, event_id);
+				int exam_id = corExercises.get(position).getExam_id();
+				openExamCorrection(exersice_id, exam_id);
 			}
 
 		});
@@ -72,7 +72,7 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
-		params.put("exam_id", event_id);
+		params.put("exam_id", exam_id);
 
 		aq.ajax(Constants.EXAM_CORRECTIONS_URL, params, JSONObject.class,
 				new AjaxCallback<JSONObject>() {

@@ -75,16 +75,12 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private Exercise exercise;
 	private ArrayList<Question> questions;
 	private LinearLayout answersLayout, correctionsLayout;
-	private Button btnImage, btnAudio, btnVideo, abandonner, ennouncer,
-			valider;
+	private Button btnImage, btnAudio, btnVideo, abandonner, ennouncer;
 	private int exercise_id, exam_id, event_id;
-	private TextView temps1;
-	private TextView temps2;
+
 	private TextView teacher;
 	private TextView examName;
-	private Handler customHandler = new Handler();
-	long updatedTime = 0L, timeSwapBuff = 0L, timeInMilliseconds = 0L,
-			startTime;
+
 	Question currentQuestion;
 	ArrayList<Answer> currentQuestionAnswers;
 	int currentQuestionId = 0;
@@ -113,7 +109,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_question_response);
+		setContentView(R.layout.activity_correction_response);
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		aq = new AQuery(CorrectionActivity.this);
@@ -123,8 +119,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		questionAnswers = new ArrayList<QuestionAnswer>();
 
 		editTextsArray = new ArrayList<EditText>();
-		temps1 = (TextView) findViewById(R.id.temps1);
-		temps2 = (TextView) findViewById(R.id.temps2);
+
 		teacher = (TextView) findViewById(R.id.teacher);
 		examName = (TextView) findViewById(R.id.examName);
 		btnImage = (Button) findViewById(R.id.btnImage);
@@ -139,13 +134,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		abandonner = (Button) findViewById(R.id.abandonner);
 		ennouncer = (Button) findViewById(R.id.ennouncer);
-		valider = (Button) findViewById(R.id.validerBtn);
+
 		abandonner.setOnClickListener(this);
 		ennouncer.setOnClickListener(this);
-		valider.setOnClickListener(this);
 
-		startTime = SystemClock.uptimeMillis();
-		customHandler.postDelayed(updateTimerThread, 0);
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
@@ -166,14 +158,16 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		db = new DatabaseHelper(CorrectionActivity.this);
 
+		db.getAllQuestions();
+
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
 		if (exercise.getExerciseType() == 2) {
 			ennouncer.setVisibility(View.GONE);
 		}
 
-		questions = db.getAllQuestionsByExerciseId(0);
-	//db.getAllQuestions();
+		questions = db.getAllQuestionsByExerciseId(exercise_id);
+		// db.getAllQuestions();
 		adapter = new QuestionsAdapter(CorrectionActivity.this, questions);
 
 		listview.setAdapter(adapter);
@@ -222,7 +216,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 					getResources().getColor(R.color.app_main_color_dark));
 			for (int i = 0; i < listview.getChildCount(); i++) {
 
-			}
+			} 
 		}
 
 		currentQuestionId = position;
@@ -506,32 +500,20 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-		case R.id.validerBtn:
-			try {
-				if (isValidAnswer()) {
-					saveValidation();
-					saveQuestionAnswers();
-					ANSWERED_QUESTIONS_COUNT++;
-					if (areAllAnswersValidated()) {
-						abandonner.setText("SUBMIT");
-						valider.setVisibility(View.GONE);
-						SEND_DATA = true;
-					}
-
-					if (currentQuestionId < questions.size() - 1) {
-						currentQuestionId++;
-						selectQuestion(questions.get(currentQuestionId),
-								currentQuestionId);
-					}
-				} else
-					Toast.makeText(CorrectionActivity.this,
-							"Please select at least one answer.",
-							Toast.LENGTH_SHORT).show();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			validAnswers.put(currentQuestionId, true);
-			break;
+		/*
+		 * case R.id.validerBtn: try { if (isValidAnswer()) { saveValidation();
+		 * saveQuestionAnswers(); ANSWERED_QUESTIONS_COUNT++; if
+		 * (areAllAnswersValidated()) { abandonner.setText("SUBMIT");
+		 * 
+		 * SEND_DATA = true; }
+		 * 
+		 * if (currentQuestionId < questions.size() - 1) { currentQuestionId++;
+		 * selectQuestion(questions.get(currentQuestionId), currentQuestionId);
+		 * } } else Toast.makeText(CorrectionActivity.this,
+		 * "Please select at least one answer.", Toast.LENGTH_SHORT).show(); }
+		 * catch (JSONException e) { e.printStackTrace(); }
+		 * validAnswers.put(currentQuestionId, true); break;
+		 */
 		case R.id.abandonner:
 			try {
 				if (SEND_DATA)
@@ -565,31 +547,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 	}
 
-	private Runnable updateTimerThread = new Runnable() {
-		public void run() {
-			timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-			updatedTime = timeSwapBuff + timeInMilliseconds;
-			int secs = (int) (updatedTime / 1000);
-			int mins = secs / 60;
-			secs = secs % 60;
-
-			String hms = String.format(
-					"%02d:%02d:%02d",
-					TimeUnit.MILLISECONDS.toHours(updatedTime),
-					TimeUnit.MILLISECONDS.toMinutes(updatedTime)
-							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-									.toHours(updatedTime)),
-					TimeUnit.MILLISECONDS.toSeconds(updatedTime)
-							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-									.toMinutes(updatedTime)));
-
-			// temps2.setText("" + mins + ":" + String.format("%02d", secs));
-			temps2.setText("Temps exam - " + hms);
-			customHandler.postDelayed(this, 0);
-
-		}
-
-	};
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {
