@@ -1,14 +1,11 @@
 package fr.conferencehermes.confhermexam;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -184,7 +181,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				selectQuestion(questions.get(position), position);
+				// selectQuestion(questions.get(position), position);
 			}
 
 		});
@@ -193,12 +190,14 @@ public class QuestionResponseQCMActivity extends Activity implements
 
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
+		System.out.println("exerciseFiles***" + exerciseFiles);
 		if (exercise.getExerciseType() == 2) {
 			ennouncer.setVisibility(View.GONE);
 		}
 
+		questions = db.getAllQuestionsByExerciseId(exercise_id);
 		adapter = new QuestionsAdapter(QuestionResponseQCMActivity.this,
-				exercise.getQuestions());
+				questions);
 
 		listview.setAdapter(adapter);
 		examName.setText(exercise.getName());
@@ -226,9 +225,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			}
 		});
 
-		questions = db.getAllQuestionsByExerciseId(exercise_id);
 		if (!questions.isEmpty()) {
-
 			for (int i = 0; i < questions.size(); i++) {
 				questionAnswers.add(null);
 			}
@@ -245,19 +242,15 @@ public class QuestionResponseQCMActivity extends Activity implements
 		int wantedChild = wantedPosition - firstPosition;
 		if (wantedChild >= 0 && wantedChild < listview.getChildCount()) {
 			for (int i = 0; i < listview.getChildCount(); i++) {
-				if (i == wantedChild)
-					listview.getChildAt(i).setBackgroundColor(
-							getResources()
-									.getColor(R.color.app_main_color_dark));
-				else
-					listview.getChildAt(i).setBackgroundColor(
-							getResources().getColor(R.color.app_main_color));
+				listview.getChildAt(i).setBackgroundColor(
+						getResources().getColor(R.color.app_main_color_dark));
 			}
 		}
 
 		currentQuestionId = position;
 		currentQuestion = q;
-		currentQuestionFiles = db.getQuestionFile(currentQuestionId);
+		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
+		System.out.println("currentQuestionFiles******" + currentQuestionFiles);
 
 		answersLayout.removeAllViews();
 		correctionsLayout.removeAllViews();
@@ -266,10 +259,18 @@ public class QuestionResponseQCMActivity extends Activity implements
 		title.setText("QUESTION " + String.valueOf(position + 1));
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
-		setFileIcons(currentQuestionFiles);
+		if (currentQuestionFiles != null)
+			setFileIcons(currentQuestionFiles);
 
-		currentQuestionAnswers = db
-				.getAllAnswersByQuestionId(currentQuestionId);
+		currentQuestionAnswers = db.getAllAnswersByQuestionId(currentQuestion
+				.getId());
+
+		for (int i = 0; i < db.getAllAnswers().size(); i++) {
+			System.out.println("Question id "
+					+ db.getAllAnswers().get(i).getQuestionId());
+			System.out.println("id" + db.getAllAnswers().get(i).getId());
+		}
+
 		int answersCount = currentQuestionAnswers.size();
 
 		// Single choice answer
@@ -278,7 +279,8 @@ public class QuestionResponseQCMActivity extends Activity implements
 			mRadioGroup.setOrientation(RadioGroup.VERTICAL);
 			for (int i = answersCount - 1; i >= 0; i--) {
 				RadioButton newRadioButton = new RadioButton(this);
-				newRadioButton.setText(q.getAnswers().get(i).getAnswer());
+				newRadioButton.setText(currentQuestionAnswers.get(i)
+						.getAnswer());
 				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
 						RadioGroup.LayoutParams.WRAP_CONTENT,
@@ -307,7 +309,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 						QuestionResponseQCMActivity.this);
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
 				TextView text = new TextView(QuestionResponseQCMActivity.this);
-				text.setText(q.getAnswers().get(i).getAnswer());
+				text.setText(currentQuestionAnswers.get(i).getAnswer());
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -317,7 +319,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 				checkBoxLayout.addView(text, layoutParams);
 				answersLayout.addView(checkBoxLayout);
 
-				checkBox.setTag(q.getAnswers().get(i).getId());
+				checkBox.setTag(currentQuestionAnswers.get(i).getId());
 				checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 					@Override
 					public void onCheckedChanged(CompoundButton buttonView,
@@ -391,7 +393,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 	}
 
 	private void setFileIcons(HashMap<String, String> files) {
-		if (files.get("image").isEmpty()) {
+		if (files.get("image") == null) {
 			btnImage.setBackgroundResource(R.drawable.ic_camera_gray);
 			btnImage.setClickable(false);
 			btnImage.setAlpha(0.5f);
@@ -400,7 +402,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			btnImage.setClickable(true);
 			btnImage.setAlpha(1f);
 		}
-		if (files.get("sound").isEmpty()) {
+		if (files.get("sound") == null) {
 			btnAudio.setBackgroundResource(R.drawable.ic_sound_gray);
 			btnAudio.setClickable(false);
 			btnAudio.setAlpha(0.5f);
@@ -409,7 +411,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			btnAudio.setClickable(true);
 			btnAudio.setAlpha(1f);
 		}
-		if (files.get("video").isEmpty()) {
+		if (files.get("video") == null) {
 			btnVideo.setBackgroundResource(R.drawable.ic_video_gray);
 			btnVideo.setClickable(false);
 			btnVideo.setAlpha(0.5f);
@@ -458,13 +460,11 @@ public class QuestionResponseQCMActivity extends Activity implements
 	}
 
 	public void sendAnswers() throws JSONException {
-		Utilities.showOrHideActivityIndicator(QuestionResponseQCMActivity.this,
-				0, "Please wait...");
 		Map<String, String> params = new HashMap<String, String>();
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
 
-		data.put("training_id", training_id);
+		data.put("exam_id", training_id);
 		data.put("exercise_id", exercise.getId());
 		data.put("type", exercise.getType());
 
@@ -482,7 +482,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 	public class JSONTransmitter extends
 			AsyncTask<JSONObject, JSONObject, JSONObject> {
 
-		String url = "http://ecni.conference-hermes.fr/api/traninganswer";
+		String url = "http://ecni.conference-hermes.fr/api/examanswer";
 
 		@Override
 		protected JSONObject doInBackground(JSONObject... data) {
@@ -567,7 +567,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 				int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
 				View radioButton = mRadioGroup.findViewById(radioButtonID);
 				int idx = mRadioGroup.indexOfChild(radioButton);
-				int answerId = currentQuestion.getAnswers().get(idx).getId();
+				int answerId = currentQuestionAnswers.get(idx).getId();
 				answers.put(answerId);
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
@@ -671,33 +671,30 @@ public class QuestionResponseQCMActivity extends Activity implements
 			break;
 		case R.id.abandonner:
 			try {
-				if (DATA_SENT) {
-					finish();
-				} else {
-					if (areAllAnswersValidated()) {
-						sendAnswers();
-					} else {
-						finish();
-					}
-				}
+				if (Utilities
+						.isNetworkAvailable(QuestionResponseQCMActivity.this))
+					sendAnswers();
+
+				finish();
+
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
 			break;
 		case R.id.ennouncer:
-			if (exercise != null)
+			if (exerciseFiles != null)
 				openDialog(exerciseFiles, 0);
 			break;
 		case R.id.btnImage:
-			if (currentQuestion != null)
+			if (currentQuestionFiles != null)
 				openDialog(currentQuestionFiles, 1);
 			break;
 		case R.id.btnAudio:
-			if (currentQuestion != null)
+			if (currentQuestionFiles != null)
 				openDialog(currentQuestionFiles, 2);
 			break;
 		case R.id.btnVideo:
-			if (currentQuestion != null)
+			if (currentQuestionFiles != null)
 				openDialog(currentQuestionFiles, 3);
 			break;
 
@@ -774,7 +771,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 		final TextView text = (TextView) dialog
 				.findViewById(R.id.ennouncerText);
 
-		if (files.get("image").isEmpty()) {
+		if (files.get("image") == null) {
 			button1.setBackgroundResource(R.drawable.ic_camera_gray);
 			button1.setEnabled(false);
 			button1.setAlpha(0.5f);
@@ -783,7 +780,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			button1.setEnabled(true);
 			button1.setAlpha(1.0f);
 		}
-		if (files.get("sound").isEmpty()) {
+		if (files.get("sound") == null) {
 			button2.setBackgroundResource(R.drawable.ic_sound_gray);
 			button2.setEnabled(false);
 			button2.setAlpha(0.5f);
@@ -792,7 +789,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			button2.setEnabled(true);
 			button2.setAlpha(1f);
 		}
-		if (files.get("video").isEmpty()) {
+		if (files.get("video") == null) {
 			button3.setBackgroundResource(R.drawable.ic_video_gray);
 			button3.setEnabled(false);
 			button3.setAlpha(0.5f);
@@ -805,7 +802,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 		final String IMAGE_URL = files.get("image");
 		final String AUDIO_URL = files.get("sound");
 		final String VIDEO_URL = files.get("video");
-		VIDEO_URL.replaceAll(" ", "%20");
+
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
 		final ImageView audioImage = (ImageView) dialog
 				.findViewById(R.id.sound_icon);
@@ -835,6 +832,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			}
 		if (VIDEO_URL != null)
 			if (!VIDEO_URL.isEmpty()) {
+				// VIDEO_URL.replaceAll(" ", "%20");
 				mc.setAnchorView(video);
 				Uri videoURI = Uri.parse(VIDEO_URL);
 				video.setMediaController(mc);
@@ -844,38 +842,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 
 		if (IMAGE_URL != null)
 			if (!IMAGE_URL.isEmpty()) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							URL url = new URL(IMAGE_URL);
-							URLConnection conn = url.openConnection();
-							HttpURLConnection httpConn = (HttpURLConnection) conn;
-							httpConn.setRequestMethod("GET");
-							httpConn.connect();
-							if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-								InputStream inputStream = httpConn
-										.getInputStream();
-								final Bitmap bitmap = BitmapFactory
-										.decodeStream(inputStream);
-								inputStream.close();
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										img.setImageBitmap(bitmap);
-										img.refreshDrawableState();
-										img.invalidate();
-									}
-								});
-
-							}
-						} catch (MalformedURLException e1) {
-							e1.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}).start();
+				img.setImageURI(Uri.parse(new File(IMAGE_URL).toString()));
 			}
 
 		switch (from) {

@@ -41,9 +41,11 @@ public class ExamineFragment extends Fragment {
 	ListView listview;
 	ExamsAdapter adapter;
 	ArrayList<Exam> exams;
+	ArrayList<Exam> dbExams;
 	ProgressBar progressBarExamin;
 	AQuery aq;
 	DatabaseHelper db;
+	ArrayList<Integer> downloadedExamIds;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,15 +55,23 @@ public class ExamineFragment extends Fragment {
 
 		aq = new AQuery(getActivity());
 		db = new DatabaseHelper(getActivity());
+		dbExams = db.getAllExams();
+		downloadedExamIds = new ArrayList<Integer>();
+		for (int i = 0; i < dbExams.size(); i++) {
+			downloadedExamIds.add(dbExams.get(i).getId());
+		}
+
 		progressBarExamin = (ProgressBar) fragment
 				.findViewById(R.id.progressBarExamin);
-
 		listview = (ListView) fragment.findViewById(R.id.listViewExamine);
 		listview.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				showPasswordAlert(exams.get(position).getId());
+				if (exams != null)
+					showPasswordAlert(exams.get(position).getId());
+				else if (dbExams != null)
+					showPasswordAlert(dbExams.get(position).getId());
 			}
 
 		});
@@ -80,9 +90,11 @@ public class ExamineFragment extends Fragment {
 								if (json.has("data")
 										&& json.get("data") != null) {
 									exams = JSONParser.parseExams(json);
+
 									if (adapter == null) {
 										adapter = new ExamsAdapter(
-												getActivity(), exams);
+												getActivity(), exams,
+												downloadedExamIds);
 									} else {
 										adapter.notifyDataSetChanged();
 									}
@@ -99,9 +111,8 @@ public class ExamineFragment extends Fragment {
 					});
 		} else {
 
-			exams = db.getAllExams();
 			if (adapter == null) {
-				adapter = new ExamsAdapter(getActivity(), exams);
+				adapter = new ExamsAdapter(getActivity(), dbExams, null);
 			} else {
 				adapter.notifyDataSetChanged();
 			}

@@ -44,6 +44,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	// EXAM column names
 	private static final String KEY_EXAM_ID = "examId";
+	private static final String KEY_EXAM_NAME = "examName";
 	private static final String KEY_EXAM_EVENT_ID = "eventId";
 	private static final String KEY_EXAM_START_DATE = "startDate";
 	private static final String KEY_EXAM_END_DATE = "endDate";
@@ -101,7 +102,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ TABLE_EXAMS + "(" + KEY_EXAM_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_EXAM_EVENT_ID + " INTEGER," + KEY_EXAM_START_DATE
 			+ " INTEGER," + KEY_EXAM_END_DATE + " INTEGER," + KEY_EXAM_PASSWORD
-			+ " TEXT" + ")";
+			+ " TEXT," + KEY_EXAM_NAME + " TEXT" + ")";
 
 	// ExerciseFiles table create statement
 	private static final String CREATE_TABLE_EXERCISE_FILES = "CREATE TABLE "
@@ -222,17 +223,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_EVENT_ID + " = " + event_id;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
 
 		Event event = new Event();
-		event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
-		event.setAuthor((c.getString(c.getColumnIndex(KEY_EVENT_AUTHOR))));
-		event.setCreationDate(c.getInt(c
-				.getColumnIndex(KEY_EVENT_CREATION_DATE)));
-		event.setName(c.getString(c.getColumnIndex(KEY_EVENT_NAME)));
-		event.setTestId(c.getInt(c.getColumnIndex(KEY_EVENT_TEST_ID)));
-		event.setValidation(c.getInt(c.getColumnIndex(KEY_EVENT_VALIDATION)));
+		if (c != null && c.moveToFirst()) {
+			event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
+			event.setAuthor((c.getString(c.getColumnIndex(KEY_EVENT_AUTHOR))));
+			event.setCreationDate(c.getInt(c
+					.getColumnIndex(KEY_EVENT_CREATION_DATE)));
+			event.setName(c.getString(c.getColumnIndex(KEY_EVENT_NAME)));
+			event.setTestId(c.getInt(c.getColumnIndex(KEY_EVENT_TEST_ID)));
+			event.setValidation(c.getInt(c.getColumnIndex(KEY_EVENT_VALIDATION)));
+			c.close();
+		}
 
 		return event;
 	}
@@ -308,6 +310,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_PASSWORD, exam.getPassword());
 		values.put(KEY_EXAM_START_DATE, exam.getStartDate());
 		values.put(KEY_EXAM_END_DATE, (int) exam.getEndDate());
+		values.put(KEY_EXAM_NAME, exam.getTitle());
 
 		// insert row
 		db.beginTransaction();
@@ -333,15 +336,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_EXAM_ID + " = " + exam_id;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
 
 		Exam exam = new Exam();
-		exam.setId(c.getInt(c.getColumnIndex(KEY_EXAM_ID)));
-		exam.setEventId((c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID))));
-		exam.setStartDate(c.getInt(c.getColumnIndex(KEY_EXAM_START_DATE)));
-		exam.setEndDate(c.getInt(c.getColumnIndex(KEY_EXAM_END_DATE)));
-		exam.setPassword(c.getString(c.getColumnIndex(KEY_EXAM_PASSWORD)));
+		if (c != null && c.moveToFirst()) {
+			exam.setId(c.getInt(c.getColumnIndex(KEY_EXAM_ID)));
+			exam.setEventId((c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID))));
+			exam.setStartDate(c.getInt(c.getColumnIndex(KEY_EXAM_START_DATE)));
+			exam.setEndDate(c.getInt(c.getColumnIndex(KEY_EXAM_END_DATE)));
+			exam.setPassword(c.getString(c.getColumnIndex(KEY_EXAM_PASSWORD)));
+			exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
+			c.close();
+		}
 
 		return exam;
 	}
@@ -367,6 +372,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				exam.setEndDate(c.getInt(c.getColumnIndex(KEY_EXAM_END_DATE)));
 				exam.setPassword(c.getString(c
 						.getColumnIndex(KEY_EXAM_PASSWORD)));
+				exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
 
 				exams.add(exam);
 			} while (c.moveToNext());
@@ -388,6 +394,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_EVENT_ID, exam.getEventId());
 		values.put(KEY_EXAM_PASSWORD, exam.getPassword());
 		values.put(KEY_EXAM_START_DATE, exam.getStartDate());
+		values.put(KEY_EXAM_NAME, exam.getTitle());
 
 		// updating row
 		return db.update(TABLE_EVENTS, values, KEY_EVENT_ID + " = ?",
@@ -427,6 +434,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 							.getColumnIndex(KEY_EXAM_END_DATE)));
 					exam.setPassword(c.getString(c
 							.getColumnIndex(KEY_EXAM_PASSWORD)));
+					exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
 					exams.add(exam);
 				}
 
@@ -447,7 +455,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_QUESTION_INPUT_COUNT, q.getInputCount());
 		values.put(KEY_QUESTION_TEXT, q.getQuestionText());
 		values.put(KEY_QUESTION_TYPE, q.getType());
-		values.put(KEY_QUESTION_EXERCISE_ID, q.getId());
+		values.put(KEY_QUESTION_EXERCISE_ID, q.getExerciseId());
 
 		// insert row
 		db.beginTransaction();
@@ -475,16 +483,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_QUESTION_ID + " = " + question_id;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
 
 		Question q = new Question();
-		q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
-		q.setExerciseId((c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID))));
-		q.setInputCount(c.getString(c.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
-		q.setQuestionText(c.getString(c.getColumnIndex(KEY_QUESTION_TEXT)));
-		q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
-
+		if (c != null && c.moveToFirst()) {
+			q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+			q.setExerciseId((c.getInt(c
+					.getColumnIndex(KEY_QUESTION_EXERCISE_ID))));
+			q.setInputCount(c.getString(c
+					.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
+			q.setQuestionText(c.getString(c.getColumnIndex(KEY_QUESTION_TEXT)));
+			q.setType(c.getString(c.getColumnIndex(KEY_QUESTION_TYPE)));
+			c.close();
+		}
 		return q;
 	}
 
@@ -615,18 +625,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getReadableDatabase();
 		String selectQuery = "SELECT  * FROM " + TABLE_QUESTION_FILES
 				+ " WHERE " + KEY_QUESTION_FILES_ID + " = " + question_id;
+		HashMap<String, String> qFiles = new HashMap<String, String>();
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
-
-		HashMap<String, String> qFiles = new HashMap<String, String>();
-		qFiles.put("image",
-				c.getString(c.getColumnIndex(KEY_QUESTION_FILES_IMAGE)));
-		qFiles.put("sound",
-				c.getString(c.getColumnIndex(KEY_QUESTION_FILES_AUDIO)));
-		qFiles.put("video",
-				c.getString(c.getColumnIndex(KEY_QUESTION_FILES_VIDEO)));
+		if (c != null && c.moveToFirst()) {
+			qFiles.put("image",
+					c.getString(c.getColumnIndex(KEY_QUESTION_FILES_IMAGE)));
+			qFiles.put("sound",
+					c.getString(c.getColumnIndex(KEY_QUESTION_FILES_AUDIO)));
+			qFiles.put("video",
+					c.getString(c.getColumnIndex(KEY_QUESTION_FILES_VIDEO)));
+		}
 
 		return qFiles;
 	}
@@ -718,18 +727,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		SQLiteDatabase db = this.getReadableDatabase();
 		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISES + " WHERE "
 				+ KEY_EXERCISE_ID + " = " + exercise_id;
-
-		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
-
 		Exercise exercise = new Exercise();
-		exercise.setId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ID)));
-		exercise.setName((c.getString(c.getColumnIndex(KEY_EXERCISE_NAME))));
-		exercise.setType(c.getString(c.getColumnIndex(KEY_EXERCISE_TYPE)));
-		exercise.setTeacher(c.getString(c
-				.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
+		Cursor c = db.rawQuery(selectQuery, null);
 
+		if (c != null && c.moveToFirst()) {
+			exercise.setId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ID)));
+			exercise.setName((c.getString(c.getColumnIndex(KEY_EXERCISE_NAME))));
+			exercise.setType(c.getString(c.getColumnIndex(KEY_EXERCISE_TYPE)));
+			exercise.setTeacher(c.getString(c
+					.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
+		}
 		return exercise;
 	}
 
@@ -859,16 +866,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ " WHERE " + KEY_EXERCISE_FILES_ID + " = " + exercise_id;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
 
 		HashMap<String, String> eFiles = new HashMap<String, String>();
-		eFiles.put("image",
-				c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_IMAGE)));
-		eFiles.put("sound",
-				c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_AUDIO)));
-		eFiles.put("video",
-				c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_VIDEO)));
+
+		if (c != null && c.moveToFirst()) {
+			eFiles.put("image",
+					c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_IMAGE)));
+			eFiles.put("sound",
+					c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_AUDIO)));
+			eFiles.put("video",
+					c.getString(c.getColumnIndex(KEY_EXERCISE_FILES_VIDEO)));
+			c.close();
+		}
 
 		return eFiles;
 	}
@@ -966,15 +975,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_USER_ID + " = " + user_id;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
-
 		Profile p = new Profile();
-		p.setId(c.getInt(c.getColumnIndex(KEY_USER_ID)));
-		p.setFirstName((c.getString(c.getColumnIndex(KEY_USER_FIRSTNAME))));
-		p.setLastName(c.getString(c.getColumnIndex(KEY_USER_LASTNAME)));
-		p.setUserName(c.getString(c.getColumnIndex(KEY_USERNAME)));
-		p.setEmailAdress(c.getString(c.getColumnIndex(KEY_USER_EMAIL)));
+		if (c != null && c.moveToFirst()) {
+			p.setId(c.getInt(c.getColumnIndex(KEY_USER_ID)));
+			p.setFirstName((c.getString(c.getColumnIndex(KEY_USER_FIRSTNAME))));
+			p.setLastName(c.getString(c.getColumnIndex(KEY_USER_LASTNAME)));
+			p.setUserName(c.getString(c.getColumnIndex(KEY_USERNAME)));
+			p.setEmailAdress(c.getString(c.getColumnIndex(KEY_USER_EMAIL)));
+			c.close();
+		}
 
 		return p;
 	}
@@ -1073,13 +1082,14 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				+ KEY_ANSWER_ID + " = " + answer_id;
 
 		Cursor c = db.rawQuery(selectQuery, null);
-		if (c != null)
-			c.moveToFirst();
 
 		Answer a = new Answer();
-		a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
-		a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
-		a.setQuestionId(c.getInt(c.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
+		if (c != null && c.moveToFirst()) {
+			a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
+			a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
+			a.setQuestionId(c.getInt(c.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
+			c.close();
+		}
 
 		return a;
 	}
@@ -1089,7 +1099,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	 */
 	public ArrayList<Answer> getAllAnswers() {
 		ArrayList<Answer> answers = new ArrayList<Answer>();
-		String selectQuery = "SELECT  * FROM " + TABLE_QUESTIONS;
+		String selectQuery = "SELECT  * FROM " + TABLE_ANSWERS;
 
 		SQLiteDatabase db = this.getReadableDatabase();
 		Cursor c = db.rawQuery(selectQuery, null);
@@ -1149,14 +1159,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Cursor c = db.rawQuery(selectQuery, null);
 		if (c != null && c.moveToFirst()) {
 			do {
-				if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == questionId) {
-					Answer a = new Answer();
-					a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
-					a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
-					a.setQuestionId(c.getInt(c
-							.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
-					answers.add(a);
-				}
+				Answer a = new Answer();
+				a.setId((c.getInt(c.getColumnIndex(KEY_ANSWER_ID))));
+				a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
+				a.setQuestionId(c.getInt(c
+						.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
+				answers.add(a);
 
 			} while (c.moveToNext());
 			c.close();

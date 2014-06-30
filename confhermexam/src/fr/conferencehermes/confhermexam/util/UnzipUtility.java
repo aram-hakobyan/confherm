@@ -3,6 +3,7 @@ package fr.conferencehermes.confhermexam.util;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -70,7 +71,8 @@ public class UnzipUtility {
 		Event event = null;
 		try {
 			JSONObject json = getJsonFromTextFile(fileUrl, destDirectory);
-			event = ExamJsonParser.parseExamData(json);
+			event = ExamJsonParser.parseExamData(json,
+					(destDirectory + File.separator));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -158,6 +160,9 @@ public class UnzipUtility {
 
 		} finally {
 			stream.close();
+			if (!file.delete()) {
+				new FileNotFoundException("Failed to delete file: " + file);
+			}
 		}
 
 		return new JSONObject(jString);

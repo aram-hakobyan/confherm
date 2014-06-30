@@ -12,7 +12,6 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.zip.GZIPInputStream;
 
 import org.apache.http.Header;
@@ -34,7 +33,6 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -42,21 +40,16 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.SystemClock;
 import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.ViewTreeObserver;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -80,8 +73,6 @@ import com.androidquery.AQuery;
 
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
-import fr.conferencehermes.confhermexam.db.DatabaseHelper;
-import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
@@ -99,9 +90,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private LinearLayout answersLayout, correctionsLayout;
 	private Button btnImage, btnAudio, btnVideo, abandonner, ennouncer,
 			valider;
-	private int exercise_id, training_id;
-	private TextView temps1;
-	private TextView temps2;
+	private int exercise_id, training_id;	
 	private TextView teacher;
 	private TextView examName;
 	private Handler customHandler = new Handler();
@@ -117,11 +106,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	int ANSWERED_QUESTIONS_COUNT = 0;
 	ArrayList<EditText> editTextsArray;
 
-	private boolean onPaused = false;
+	
 	private boolean CORRECTED_ANSWERS = false;
-	private boolean DATA_SENT = false;
+	
 
-	private SparseBooleanArray validAnswers;
+	
 	private ArrayList<QuestionAnswer> questionAnswers;
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
@@ -138,13 +127,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		aq = new AQuery(CorrectionActivity.this);
 		answersArray = new JSONArray();
-		multipleAnswers = new ArrayList<Integer>();
-		validAnswers = new SparseBooleanArray();
+		multipleAnswers = new ArrayList<Integer>();		
 		questionAnswers = new ArrayList<QuestionAnswer>();
 
-		editTextsArray = new ArrayList<EditText>();
-		temps1 = (TextView) findViewById(R.id.temps1);
-		temps2 = (TextView) findViewById(R.id.temps2);
+		editTextsArray = new ArrayList<EditText>();		
 		teacher = (TextView) findViewById(R.id.teacher);
 		examName = (TextView) findViewById(R.id.examName);
 		btnImage = (Button) findViewById(R.id.btnImage);
@@ -164,7 +150,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		ennouncer.setOnClickListener(this);
 		valider.setOnClickListener(this);
 
-		customHandler.postDelayed(updateTimerThread, 0);
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
@@ -182,13 +167,12 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		});
 
-	//	DatabaseHelper dbHelper = new DatabaseHelper(CorrectionActivity.this);
-	//	Log.i("QUESTIOS FROM DB",
-			//	dbHelper.getAllQuestionsByExerciseId(exercise_id) + "");
-	//	adapter = new QuestionsAdapter(CorrectionActivity.this,
-		//		dbHelper.getAllQuestionsByExerciseId(exercise_id));
-
-	
+		// DatabaseHelper dbHelper = new
+		// DatabaseHelper(CorrectionActivity.this);
+		// Log.i("QUESTIOS FROM DB",
+		// dbHelper.getAllQuestionsByExerciseId(exercise_id) + "");
+		// adapter = new QuestionsAdapter(CorrectionActivity.this,
+		// dbHelper.getAllQuestionsByExerciseId(exercise_id));
 
 		//
 		// listview.setAdapter(adapter);
@@ -196,37 +180,29 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		// teacher.setText("Teacher "
 		// + exercise.getTeacher());
 
-/*		ViewTreeObserver vto = listview.getViewTreeObserver();
-		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-			@SuppressWarnings("deprecation")
-			@Override
-			public void onGlobalLayout() {
-				for (int i = 0; i < listview.getChildCount(); i++) {
-					if (i == 0)
-						listview.getChildAt(i).setBackgroundColor(
-								getResources().getColor(
-										R.color.app_main_color_dark));
-					else
-						listview.getChildAt(i)
-								.setBackgroundColor(
-										getResources().getColor(
-												R.color.app_main_color));
-				}
-
-				listview.getViewTreeObserver().removeGlobalOnLayoutListener(
-						this);
-			}
-		});
-
-		questions = exercise.getQuestions();
-		if (!questions.isEmpty()) {
-
-			for (int i = 0; i < questions.size(); i++) {
-				questionAnswers.add(null);
-			}
-			selectQuestion(questions.get(0), 0);
-
-		}*/
+		/*
+		 * ViewTreeObserver vto = listview.getViewTreeObserver();
+		 * vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		 * 
+		 * @SuppressWarnings("deprecation")
+		 * 
+		 * @Override public void onGlobalLayout() { for (int i = 0; i <
+		 * listview.getChildCount(); i++) { if (i == 0)
+		 * listview.getChildAt(i).setBackgroundColor( getResources().getColor(
+		 * R.color.app_main_color_dark)); else listview.getChildAt(i)
+		 * .setBackgroundColor( getResources().getColor(
+		 * R.color.app_main_color)); }
+		 * 
+		 * listview.getViewTreeObserver().removeGlobalOnLayoutListener( this); }
+		 * });
+		 * 
+		 * questions = exercise.getQuestions(); if (!questions.isEmpty()) {
+		 * 
+		 * for (int i = 0; i < questions.size(); i++) {
+		 * questionAnswers.add(null); } selectQuestion(questions.get(0), 0);
+		 * 
+		 * }
+		 */
 
 		/*
 		 * AQuery aq = new AQuery(CorrectionActivity.this);
@@ -591,8 +567,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						public void run() {
 							showScoreDialog(score);
 							makeCorrections(score, DataHolder.getInstance()
-									.getCorrections());
-							DATA_SENT = true;
+									.getCorrections());							
 						}
 					});
 
@@ -772,135 +747,14 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 	}
 
-	private void saveQuestionAnswers() throws JSONException {
-		JSONObject questionAnswer = new JSONObject();
-		questionAnswer.put("question_id", currentQuestion.getId());
-		questionAnswer.put("question_type", currentQuestion.getType());
-
-		JSONArray answers = new JSONArray();
-
-		try {
-			if (currentQuestion.getType().equalsIgnoreCase("2")) {
-
-				int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
-				View radioButton = mRadioGroup.findViewById(radioButtonID);
-				int idx = mRadioGroup.indexOfChild(radioButton);
-				int answerId = currentQuestion.getAnswers().get(idx).getId();
-				answers.put(answerId);
-
-			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-				for (int i = 0; i < multipleAnswers.size(); i++) {
-					answers.put(multipleAnswers.get(i));
-				}
-				multipleAnswers.clear();
-			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-				for (EditText editText : editTextsArray) {
-					if (editText.getText().length() != 0) {
-						answers.put(editText.getText());
-					} else {
-						answers.put("");
-					}
-				}
-
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		questionAnswer.put("answers", answers);
-		answersArray.put(questionAnswer);
-	}
-
-	private void saveValidation() {
-		QuestionAnswer qa = new QuestionAnswer();
-		if (currentQuestion.getType().equalsIgnoreCase("2")) {
-			qa.setType(2);
-			int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
-			View radioButton = mRadioGroup.findViewById(radioButtonID);
-			int idx = mRadioGroup.indexOfChild(radioButton);
-			qa.setSingleAnswerPosition(idx);
-		} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-			qa.setType(1);
-			ArrayList<Integer> mAnswers = new ArrayList<Integer>(
-					multipleAnswers);
-			qa.setMultiAnswerPositions(mAnswers);
-		} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-			qa.setType(3);
-			for (int e = 0; e < editTextsArray.size(); e++) {
-				qa.getTextAnswers().add(e,
-						editTextsArray.get(e).getText().toString());
-			}
-		}
-
-		questionAnswers.set(currentQuestionId, qa);
-	}
-
-	private boolean isValidAnswer() {
-		if (currentQuestion.getType().equalsIgnoreCase("2")) {
-			return mRadioGroup.getCheckedRadioButtonId() != -1;
-		} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-			return !multipleAnswers.isEmpty();
-		} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-			for (EditText editText : editTextsArray) {
-				if (editText.getText().length() != 0) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	private boolean areAllAnswersValidated() {
-		int count = 0;
-		for (int i = 0; i < questionAnswers.size(); i++) {
-			if (questionAnswers.get(i) != null)
-				count++;
-		}
-
-		return count == questions.size();
-	}
-
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.validerBtn:
-			try {
-				if (isValidAnswer()) {
-					saveValidation();
-					saveQuestionAnswers();
-					ANSWERED_QUESTIONS_COUNT++;
-					if (areAllAnswersValidated()) {
-						abandonner.setText("SUBMIT");
-						valider.setVisibility(View.GONE);
-					}
 
-					if (currentQuestionId < questions.size() - 1) {
-						currentQuestionId++;
-						selectQuestion(questions.get(currentQuestionId),
-								currentQuestionId);
-					}
-				} else
-					Toast.makeText(CorrectionActivity.this,
-							"Please select at least one answer.",
-							Toast.LENGTH_SHORT).show();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			validAnswers.put(currentQuestionId, true);
 			break;
 		case R.id.abandonner:
-			try {
-				if (DATA_SENT) {
-					finish();
-				} else {
-					if (areAllAnswersValidated()) {
-						sendAnswers();
-					} else {
-						finish();
-					}
-				}
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			finish();
 			break;
 		case R.id.ennouncer:
 			if (exercise != null)
@@ -937,59 +791,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 	}
 
-	public class CounterClass extends CountDownTimer {
-		public CounterClass(long millisInFuture, long countDownInterval) {
-			super(millisInFuture, countDownInterval);
-		}
-
-		@Override
-		public void onFinish() {
-			temps1.setText("");
-		}
-
-		@Override
-		public void onTick(long millisUntilFinished) {
-			long millis = millisUntilFinished;
-			Utilities.writeLong(CorrectionActivity.this, "millisUntilFinished",
-					millisUntilFinished);
-			String hms = String.format(
-					"%02d:%02d:%02d",
-					TimeUnit.MILLISECONDS.toHours(millis),
-					TimeUnit.MILLISECONDS.toMinutes(millis)
-							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-									.toHours(millis)),
-					TimeUnit.MILLISECONDS.toSeconds(millis)
-							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-									.toMinutes(millis)));
-			temps1.setText("Temps epreuve - " + hms);
-		}
-	}
-
-	private Runnable updateTimerThread = new Runnable() {
-		public void run() {
-			timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-			updatedTime = timeSwapBuff + timeInMilliseconds;
-			int secs = (int) (updatedTime / 1000);
-			int mins = secs / 60;
-			secs = secs % 60;
-
-			String hms = String.format(
-					"%02d:%02d:%02d",
-					TimeUnit.MILLISECONDS.toHours(updatedTime),
-					TimeUnit.MILLISECONDS.toMinutes(updatedTime)
-							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-									.toHours(updatedTime)),
-					TimeUnit.MILLISECONDS.toSeconds(updatedTime)
-							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-									.toMinutes(updatedTime)));
-
-			// temps2.setText("" + mins + ":" + String.format("%02d", secs));
-			temps2.setText("Temps exercice - " + hms);
-			customHandler.postDelayed(this, 0);
-
-		}
-
-	};
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {
@@ -1301,73 +1102,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		// show it
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		alertDialog.show();
-	}
-
-	private void showAlertDialog() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				CorrectionActivity.this);
-
-		// set title
-		alertDialogBuilder.setTitle("You have been dropped out");
-
-		// set dialog message
-		alertDialogBuilder
-				.setMessage(
-						"You have been dropped out from examination, because you have left the exercise.")
-				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-
-						Intent intentHome = new Intent(CorrectionActivity.this,
-								HomeActivity.class);
-						startActivity(intentHome);
-
-						CorrectionActivity.this.finish();
-						onPaused = false;
-					}
-				});
-
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
-
-		// show it
-		alertDialog.show();
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		// ONLY WHEN SCREEN TURNS ON
-		if (!ScreenReceiver.wasScreenOn) {
-			// THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
-
-		} else {
-			// THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT
-			// CHANGED
-			System.out.println("SCREEN TURNED ON");
-		}
-
-		if (onPaused == true) {
-			showAlertDialog();
-		}
-
-	}
-
-	@Override
-	protected void onPause() {
-
-		onPaused = true;
-
-		// WHEN THE SCREEN IS ABOUT TO TURN OFF
-		if (ScreenReceiver.wasScreenOn) {
-			// THIS IS THE CASE WHEN ONPAUSE() IS CALLED BY THE SYSTEM DUE TO A
-			// SCREEN STATE CHANGE
-			System.out.println("SCREEN TURNED OFF");
-		} else {
-			// THIS IS WHEN ONPAUSE() IS CALLED WHEN THE SCREEN STATE HAS NOT
-			// CHANGED
-		}
-		super.onPause();
 	}
 
 }
