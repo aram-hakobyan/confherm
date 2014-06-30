@@ -87,7 +87,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 	private void openExercise(int id) {
 		Intent intent = new Intent(ExamExercisesActivity.this,
-				QuestionResponseQCMActivity.class);
+				ExaminationActivity.class);
 		intent.putExtra("exercise_id", id);
 		startActivity(intent);
 	}

@@ -32,8 +32,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -85,8 +83,7 @@ import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
-public class QuestionResponseQCMActivity extends Activity implements
-		OnClickListener {
+public class ExaminationActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
 	private ListView listview;
 	private QuestionsAdapter adapter;
@@ -134,7 +131,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 		setContentView(R.layout.activity_question_response);
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		aq = new AQuery(QuestionResponseQCMActivity.this);
+		aq = new AQuery(ExaminationActivity.this);
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
 		validAnswers = new SparseBooleanArray();
@@ -163,8 +160,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 		valider.setOnClickListener(this);
 
 		CounterClass timer = new CounterClass(Utilities.readLong(
-				QuestionResponseQCMActivity.this, "millisUntilFinished",
-				7200000), 1000);
+				ExaminationActivity.this, "millisUntilFinished", 7200000), 1000);
 		timer.start();
 
 		startTime = SystemClock.uptimeMillis();
@@ -186,7 +182,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 
 		});
 
-		db = new DatabaseHelper(QuestionResponseQCMActivity.this);
+		db = new DatabaseHelper(ExaminationActivity.this);
 
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
@@ -196,8 +192,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 		}
 
 		questions = db.getAllQuestionsByExerciseId(exercise_id);
-		adapter = new QuestionsAdapter(QuestionResponseQCMActivity.this,
-				questions);
+		adapter = new QuestionsAdapter(ExaminationActivity.this, questions);
 
 		listview.setAdapter(adapter);
 		examName.setText(exercise.getName());
@@ -241,9 +236,10 @@ public class QuestionResponseQCMActivity extends Activity implements
 				- listview.getHeaderViewsCount();
 		int wantedChild = wantedPosition - firstPosition;
 		if (wantedChild >= 0 && wantedChild < listview.getChildCount()) {
+			listview.getChildAt(wantedChild).setBackgroundColor(
+					getResources().getColor(R.color.app_main_color_dark));
 			for (int i = 0; i < listview.getChildCount(); i++) {
-				listview.getChildAt(i).setBackgroundColor(
-						getResources().getColor(R.color.app_main_color_dark));
+
 			}
 		}
 
@@ -275,7 +271,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 
 		// Single choice answer
 		if (q.getType().equalsIgnoreCase("2")) {
-			mRadioGroup = new RadioGroup(QuestionResponseQCMActivity.this);
+			mRadioGroup = new RadioGroup(ExaminationActivity.this);
 			mRadioGroup.setOrientation(RadioGroup.VERTICAL);
 			for (int i = answersCount - 1; i >= 0; i--) {
 				RadioButton newRadioButton = new RadioButton(this);
@@ -302,13 +298,11 @@ public class QuestionResponseQCMActivity extends Activity implements
 			ArrayList<String> answers = null;
 
 			for (int i = 0; i < answersCount; i++) {
-				checkBoxLayout = new LinearLayout(
-						QuestionResponseQCMActivity.this);
+				checkBoxLayout = new LinearLayout(ExaminationActivity.this);
 				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
-				final CheckBox checkBox = new CheckBox(
-						QuestionResponseQCMActivity.this);
+				final CheckBox checkBox = new CheckBox(ExaminationActivity.this);
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
-				TextView text = new TextView(QuestionResponseQCMActivity.this);
+				TextView text = new TextView(ExaminationActivity.this);
 				text.setText(currentQuestionAnswers.get(i).getAnswer());
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -364,8 +358,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			editTextsArray.clear();
 			int count = Integer.valueOf(q.getInputCount());
 			for (int i = 0; i < count; i++) {
-				EditText editText = new EditText(
-						QuestionResponseQCMActivity.this);
+				EditText editText = new EditText(ExaminationActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
 				editText.requestFocus();
@@ -533,8 +526,8 @@ public class QuestionResponseQCMActivity extends Activity implements
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				Utilities.showOrHideActivityIndicator(
-						QuestionResponseQCMActivity.this, 1, "Please wait...");
+				Utilities.showOrHideActivityIndicator(ExaminationActivity.this,
+						1, "Please wait...");
 			}
 			return null;
 		}
@@ -661,7 +654,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 								currentQuestionId);
 					}
 				} else
-					Toast.makeText(QuestionResponseQCMActivity.this,
+					Toast.makeText(ExaminationActivity.this,
 							"Please select at least one answer.",
 							Toast.LENGTH_SHORT).show();
 			} catch (JSONException e) {
@@ -671,8 +664,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 			break;
 		case R.id.abandonner:
 			try {
-				if (Utilities
-						.isNetworkAvailable(QuestionResponseQCMActivity.this))
+				if (Utilities.isNetworkAvailable(ExaminationActivity.this))
 					sendAnswers();
 
 				finish();
@@ -717,7 +709,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(QuestionResponseQCMActivity.this,
+			Utilities.writeLong(ExaminationActivity.this,
 					"millisUntilFinished", millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
@@ -751,7 +743,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 									.toMinutes(updatedTime)));
 
 			// temps2.setText("" + mins + ":" + String.format("%02d", secs));
-			temps2.setText("Temps exercice - " + hms);
+			temps2.setText("Temps exam - " + hms);
 			customHandler.postDelayed(this, 0);
 
 		}
@@ -760,7 +752,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {
-		dialog = new Dialog(QuestionResponseQCMActivity.this);
+		dialog = new Dialog(ExaminationActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
 
@@ -808,8 +800,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = new MediaController(
-				QuestionResponseQCMActivity.this);
+		final MediaController mc = new MediaController(ExaminationActivity.this);
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -1024,7 +1015,7 @@ public class QuestionResponseQCMActivity extends Activity implements
 
 	private void showAlertDialog() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				QuestionResponseQCMActivity.this);
+				ExaminationActivity.this);
 
 		// set title
 		alertDialogBuilder.setTitle("You have been dropped out");
@@ -1038,11 +1029,10 @@ public class QuestionResponseQCMActivity extends Activity implements
 					public void onClick(DialogInterface dialog, int id) {
 
 						Intent intentHome = new Intent(
-								QuestionResponseQCMActivity.this,
-								HomeActivity.class);
+								ExaminationActivity.this, HomeActivity.class);
 						startActivity(intentHome);
 
-						QuestionResponseQCMActivity.this.finish();
+						ExaminationActivity.this.finish();
 						onPaused = false;
 					}
 				});
