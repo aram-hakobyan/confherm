@@ -69,9 +69,11 @@ public class ExamineFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				if (exams != null)
-					showPasswordAlert(exams.get(position).getId());
+					showPasswordAlert(exams.get(position).getId(),
+							exams.get(position).getEventId());
 				else if (dbExams != null)
-					showPasswordAlert(dbExams.get(position).getId());
+					showPasswordAlert(dbExams.get(position).getId(), dbExams
+							.get(position).getEventId());
 			}
 
 		});
@@ -126,7 +128,7 @@ public class ExamineFragment extends Fragment {
 		return fragment;
 	}
 
-	private void showPasswordAlert(final int id) {
+	private void showPasswordAlert(final int id, final int eventId) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle("Enter Password");
 
@@ -142,6 +144,7 @@ public class ExamineFragment extends Fragment {
 					Intent intent = new Intent(getActivity(),
 							ExamExercisesActivity.class);
 					intent.putExtra("exam_id", id);
+					intent.putExtra("event_id", eventId);
 					startActivity(intent);
 				}
 			}

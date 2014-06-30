@@ -31,6 +31,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 	ArrayList<Exercise> exercises;
 	TextView timerText;
 	DatabaseHelper db;
+	private int examId;
+	private int eventId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +56,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 		});
 
-		int examId = getIntent().getIntExtra("exam_id", -1);
+		examId = getIntent().getIntExtra("exam_id", -1);
+		eventId = getIntent().getIntExtra("event_id", -1);
 		exercises = db.getAllExercisesByExamId(examId);
 		String[] data = new String[exercises.size()];
 		for (int i = 0; i < exercises.size(); i++) {
@@ -89,6 +92,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		Intent intent = new Intent(ExamExercisesActivity.this,
 				ExaminationActivity.class);
 		intent.putExtra("exercise_id", id);
+		intent.putExtra("exam_id", examId);
+		intent.putExtra("event_id", eventId);
 		startActivity(intent);
 	}
 

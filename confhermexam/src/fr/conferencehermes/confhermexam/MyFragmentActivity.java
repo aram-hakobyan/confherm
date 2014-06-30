@@ -1,5 +1,8 @@
 package fr.conferencehermes.confhermexam;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -16,6 +19,7 @@ import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
 import fr.conferencehermes.confhermexam.fragments.TrainingsFragment;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class MyFragmentActivity extends FragmentActivity implements
@@ -70,6 +74,29 @@ public class MyFragmentActivity extends FragmentActivity implements
 	}
 
 	@Override
+	protected void onResume() {
+		if (Utilities.isNetworkAvailable(MyFragmentActivity.this)) {
+			if (!Utilities.readString(MyFragmentActivity.this, "jsondata", "")
+					.isEmpty()) {
+				try {
+					String jsonstring = Utilities.readString(
+							MyFragmentActivity.this, "jsondata", "");
+					System.out.println("jsonstring " + jsonstring);
+					JSONObject object = new JSONObject(jsonstring);
+					ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
+							MyFragmentActivity.this);
+					transmitter.execute(object);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+
+			}
+		}
+
+		super.onResume();
+	}
+
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return false;
@@ -92,7 +119,7 @@ public class MyFragmentActivity extends FragmentActivity implements
 			break;
 		case R.id.headerBtnResultats:
 			Utilities.selectFrag(this, Constants.RESULTATS_FRAGMENT);
-			break; 
+			break;
 		case R.id.headerBtnTelecharg:
 			Utilities.selectFrag(this, Constants.TELECHARG_FRAGMENT);
 			break;
@@ -105,11 +132,11 @@ public class MyFragmentActivity extends FragmentActivity implements
 
 	@Override
 	public void onBackPressed() {
-//		try {
-//			LogoutRequest.logOut(MyFragmentActivity.this);
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		// try {
+		// LogoutRequest.logOut(MyFragmentActivity.this);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
 		finish();
 	}
 }
