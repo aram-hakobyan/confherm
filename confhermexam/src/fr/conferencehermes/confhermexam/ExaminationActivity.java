@@ -68,7 +68,7 @@ import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
-public class CorrectionActivity extends Activity implements OnClickListener {
+public class ExaminationActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
 	private ListView listview;
 	private QuestionsAdapter adapter;
@@ -116,7 +116,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		setContentView(R.layout.activity_question_response);
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		aq = new AQuery(CorrectionActivity.this);
+		aq = new AQuery(ExaminationActivity.this);
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
 		validAnswers = new SparseBooleanArray();
@@ -144,6 +144,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		ennouncer.setOnClickListener(this);
 		valider.setOnClickListener(this);
 
+		CounterClass timer = new CounterClass(Utilities.readLong(
+				ExaminationActivity.this, "millisUntilFinished", 7200000), 1000);
+		timer.start();
+
 		startTime = SystemClock.uptimeMillis();
 		customHandler.postDelayed(updateTimerThread, 0);
 		mediaPlayer = new MediaPlayer();
@@ -164,7 +168,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		});
 
-		db = new DatabaseHelper(CorrectionActivity.this);
+		db = new DatabaseHelper(ExaminationActivity.this);
 
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
@@ -172,9 +176,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			ennouncer.setVisibility(View.GONE);
 		}
 
-		questions = db.getAllQuestionsByExerciseId(0);
-	//db.getAllQuestions();
-		adapter = new QuestionsAdapter(CorrectionActivity.this, questions);
+		questions = db.getAllQuestionsByExerciseId(exercise_id);
+		adapter = new QuestionsAdapter(ExaminationActivity.this, questions);
 
 		listview.setAdapter(adapter);
 		examName.setText(exercise.getName());
@@ -245,7 +248,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		// Single choice answer
 		if (q.getType().equalsIgnoreCase("2")) {
-			mRadioGroup = new RadioGroup(CorrectionActivity.this);
+			mRadioGroup = new RadioGroup(ExaminationActivity.this);
 			mRadioGroup.setOrientation(RadioGroup.VERTICAL);
 			for (int i = answersCount - 1; i >= 0; i--) {
 				RadioButton newRadioButton = new RadioButton(this);
@@ -272,11 +275,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			ArrayList<String> answers = null;
 
 			for (int i = 0; i < answersCount; i++) {
-				checkBoxLayout = new LinearLayout(CorrectionActivity.this);
+				checkBoxLayout = new LinearLayout(ExaminationActivity.this);
 				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
-				final CheckBox checkBox = new CheckBox(CorrectionActivity.this);
+				final CheckBox checkBox = new CheckBox(ExaminationActivity.this);
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
-				TextView text = new TextView(CorrectionActivity.this);
+				TextView text = new TextView(ExaminationActivity.this);
 				text.setText(currentQuestionAnswers.get(i).getAnswer());
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -332,7 +335,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			editTextsArray.clear();
 			int count = Integer.valueOf(q.getInputCount());
 			for (int i = 0; i < count; i++) {
-				EditText editText = new EditText(CorrectionActivity.this);
+				EditText editText = new EditText(ExaminationActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
 				editText.requestFocus();
@@ -400,16 +403,16 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		JSONArray answers = answersArray;
 		data.put("question_answers", answers);
-		object.put("auth_key", Utilities.readString(CorrectionActivity.this,
+		object.put("auth_key", Utilities.readString(ExaminationActivity.this,
 				Constants.AUTHKEY_SHAREDPREFS_KEY, ""));
 		object.put("data", data);
 
-		if (Utilities.isNetworkAvailable(CorrectionActivity.this)) {
+		if (Utilities.isNetworkAvailable(ExaminationActivity.this)) {
 			ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
-					CorrectionActivity.this);
+					ExaminationActivity.this);
 			transmitter.execute(object);
 		} else {
-			Utilities.writeString(CorrectionActivity.this, "jsondata",
+			Utilities.writeString(ExaminationActivity.this, "jsondata",
 					object.toString());
 		}
 
@@ -524,7 +527,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 								currentQuestionId);
 					}
 				} else
-					Toast.makeText(CorrectionActivity.this,
+					Toast.makeText(ExaminationActivity.this,
 							"Please select at least one answer.",
 							Toast.LENGTH_SHORT).show();
 			} catch (JSONException e) {
@@ -593,7 +596,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {
-		dialog = new Dialog(CorrectionActivity.this);
+		dialog = new Dialog(ExaminationActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
 
@@ -641,7 +644,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = new MediaController(CorrectionActivity.this);
+		final MediaController mc = new MediaController(ExaminationActivity.this);
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -856,7 +859,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 	private void showAlertDialog() {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				CorrectionActivity.this);
+				ExaminationActivity.this);
 
 		// set title
 		alertDialogBuilder.setTitle("You have been dropped out");
@@ -869,11 +872,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
 
-						Intent intentHome = new Intent(CorrectionActivity.this,
-								HomeActivity.class);
+						Intent intentHome = new Intent(
+								ExaminationActivity.this, HomeActivity.class);
 						startActivity(intentHome);
 
-						CorrectionActivity.this.finish();
+						ExaminationActivity.this.finish();
 						onPaused = false;
 					}
 				});
@@ -956,6 +959,34 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return false;
+	}
+
+	public class CounterClass extends CountDownTimer {
+		public CounterClass(long millisInFuture, long countDownInterval) {
+			super(millisInFuture, countDownInterval);
+		}
+
+		@Override
+		public void onFinish() {
+			temps1.setText("");
+		}
+
+		@Override
+		public void onTick(long millisUntilFinished) {
+			long millis = millisUntilFinished;
+			Utilities.writeLong(ExaminationActivity.this,
+					"millisUntilFinished", millisUntilFinished);
+			String hms = String.format(
+					"%02d:%02d:%02d",
+					TimeUnit.MILLISECONDS.toHours(millis),
+					TimeUnit.MILLISECONDS.toMinutes(millis)
+							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
+									.toHours(millis)),
+					TimeUnit.MILLISECONDS.toSeconds(millis)
+							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+									.toMinutes(millis)));
+			temps1.setText("Temps epreuve - " + hms);
+		}
 	}
 
 }

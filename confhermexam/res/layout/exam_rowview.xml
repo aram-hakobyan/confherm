@@ -41,7 +41,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_marginRight="10dp"
-        android:text="Status"
+        android:text=""
         android:textSize="12sp" />
 
     <Button

@@ -7,14 +7,18 @@ import java.util.Map;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView.FindListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 
@@ -22,6 +26,7 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
+import fr.conferencehermes.confhermexam.ExamExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
@@ -36,9 +41,11 @@ public class ExamineFragment extends Fragment {
 	ListView listview;
 	ExamsAdapter adapter;
 	ArrayList<Exam> exams;
+	ArrayList<Exam> dbExams;
 	ProgressBar progressBarExamin;
 	AQuery aq;
 	DatabaseHelper db;
+	ArrayList<Integer> downloadedExamIds;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -48,15 +55,25 @@ public class ExamineFragment extends Fragment {
 
 		aq = new AQuery(getActivity());
 		db = new DatabaseHelper(getActivity());
+		dbExams = db.getAllExams();
+		downloadedExamIds = new ArrayList<Integer>();
+		for (int i = 0; i < dbExams.size(); i++) {
+			downloadedExamIds.add(dbExams.get(i).getId());
+		}
+
 		progressBarExamin = (ProgressBar) fragment
 				.findViewById(R.id.progressBarExamin);
-
 		listview = (ListView) fragment.findViewById(R.id.listViewExamine);
 		listview.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-
+				if (exams != null)
+					showPasswordAlert(exams.get(position).getId(),
+							exams.get(position).getEventId());
+				else if (dbExams != null)
+					showPasswordAlert(dbExams.get(position).getId(), dbExams
+							.get(position).getEventId());
 			}
 
 		});
@@ -75,9 +92,11 @@ public class ExamineFragment extends Fragment {
 								if (json.has("data")
 										&& json.get("data") != null) {
 									exams = JSONParser.parseExams(json);
+
 									if (adapter == null) {
 										adapter = new ExamsAdapter(
-												getActivity(), exams);
+												getActivity(), exams,
+												downloadedExamIds);
 									} else {
 										adapter.notifyDataSetChanged();
 									}
@@ -94,9 +113,8 @@ public class ExamineFragment extends Fragment {
 					});
 		} else {
 
-			exams = db.getAllExams();
 			if (adapter == null) {
-				adapter = new ExamsAdapter(getActivity(), exams);
+				adapter = new ExamsAdapter(getActivity(), dbExams, null);
 			} else {
 				adapter.notifyDataSetChanged();
 			}
@@ -108,5 +126,37 @@ public class ExamineFragment extends Fragment {
 		db.closeDB();
 
 		return fragment;
+	}
+
+	private void showPasswordAlert(final int id, final int eventId) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+		builder.setTitle("Enter Password");
+
+		final EditText input = new EditText(getActivity());
+		input.setInputType(InputType.TYPE_CLASS_TEXT
+				| InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		builder.setView(input);
+
+		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int which) {
+				if (!input.getText().toString().trim().isEmpty()) {
+					Intent intent = new Intent(getActivity(),
+							ExamExercisesActivity.class);
+					intent.putExtra("exam_id", id);
+					intent.putExtra("event_id", eventId);
+					startActivity(intent);
+				}
+			}
+		});
+		builder.setNegativeButton("Cancel",
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.cancel();
+					}
+				});
+
+		builder.show();
 	}
 }

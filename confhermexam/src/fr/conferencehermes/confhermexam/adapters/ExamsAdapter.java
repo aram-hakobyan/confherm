@@ -2,11 +2,10 @@ package fr.conferencehermes.confhermexam.adapters;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,15 +14,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.parser.Exam;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExamsAdapter extends BaseAdapter {
 	private ArrayList<Exam> mListItems;
 	private LayoutInflater mLayoutInflater;
+	private ArrayList<Integer> mDownloadedExamIds;
 
-	public ExamsAdapter(Context context, ArrayList<Exam> arrayList) {
-		mListItems = arrayList;
-		mLayoutInflater = (LayoutInflater) context
+	public ExamsAdapter(Context context, ArrayList<Exam> arrayList,
+			ArrayList<Integer> downloadedExamIds) {
+		this.mListItems = arrayList;
+		this.mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.mDownloadedExamIds = downloadedExamIds;
 	}
 
 	@Override
@@ -62,22 +65,26 @@ public class ExamsAdapter extends BaseAdapter {
 			if (holder.name != null) {
 				holder.name.setText(exam.getTitle());
 
-				Calendar calendar = Calendar.getInstance(TimeZone
-						.getTimeZone("UTC"));
+				Calendar calendar = new GregorianCalendar(
+						TimeZone.getTimeZone("France"));
 				calendar.setTimeInMillis(exam.getStartDate() * 1000);
+				final String startTimeString = Utilities.timeConverter(calendar
+						.get(Calendar.HOUR_OF_DAY))
+						+ ":"
+						+ Utilities
+								.timeConverter(calendar.get(Calendar.MINUTE));
+				calendar.setTimeInMillis(exam.getEndDate() * 1000);
+				final String endTimeString = Utilities.timeConverter(calendar
+						.get(Calendar.HOUR_OF_DAY))
+						+ ":"
+						+ Utilities
+								.timeConverter(calendar.get(Calendar.MINUTE));
 				holder.desc.setText("Available from "
 						+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH))
 						+ "/"
 						+ String.valueOf(calendar.get(Calendar.MONTH) + 1)
-						+ "/"
-						+ String.valueOf(calendar.get(Calendar.YEAR))
-						+ " at "
-						+ DateFormat.format("hh:mm",
-								new Date(exam.getStartDate() * 1000))
-								.toString()
-						+ " to "
-						+ DateFormat.format("hh:mm",
-								new Date(exam.getEndDate() * 1000)).toString());
+						+ "/" + String.valueOf(calendar.get(Calendar.YEAR))
+						+ " at " + startTimeString + " to " + endTimeString);
 
 				int status = exam.getStatus();
 				if (status == 1) {
