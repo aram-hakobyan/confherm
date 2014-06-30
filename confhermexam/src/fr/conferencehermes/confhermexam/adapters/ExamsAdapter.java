@@ -19,11 +19,14 @@ import fr.conferencehermes.confhermexam.parser.Exam;
 public class ExamsAdapter extends BaseAdapter {
 	private ArrayList<Exam> mListItems;
 	private LayoutInflater mLayoutInflater;
+	private ArrayList<Integer> mDownloadedExamIds;
 
-	public ExamsAdapter(Context context, ArrayList<Exam> arrayList) {
-		mListItems = arrayList;
-		mLayoutInflater = (LayoutInflater) context
+	public ExamsAdapter(Context context, ArrayList<Exam> arrayList,
+			ArrayList<Integer> downloadedExamIds) {
+		this.mListItems = arrayList;
+		this.mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		this.mDownloadedExamIds = downloadedExamIds;
 	}
 
 	@Override

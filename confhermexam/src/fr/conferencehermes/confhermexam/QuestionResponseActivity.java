@@ -287,9 +287,9 @@ public class QuestionResponseActivity extends Activity implements
 					listview.getChildAt(i).setBackgroundColor(
 							getResources()
 									.getColor(R.color.app_main_color_dark));
-				//else
-				//	listview.getChildAt(i).setBackgroundColor(
-				//			getResources().getColor(R.color.app_main_color));
+				// else
+				// listview.getChildAt(i).setBackgroundColor(
+				// getResources().getColor(R.color.app_main_color));
 			}
 		}
 
@@ -399,7 +399,7 @@ public class QuestionResponseActivity extends Activity implements
 				EditText editText = new EditText(QuestionResponseActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				
+
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
@@ -1300,74 +1300,6 @@ public class QuestionResponseActivity extends Activity implements
 		// show it
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		alertDialog.show();
-	}
-
-	private void showAlertDialog() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				QuestionResponseActivity.this);
-
-		// set title
-		alertDialogBuilder.setTitle("You have been dropped out");
-
-		// set dialog message
-		alertDialogBuilder
-				.setMessage(
-						"You have been dropped out from examination, because you have left the exercise.")
-				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-
-						Intent intentHome = new Intent(
-								QuestionResponseActivity.this,
-								HomeActivity.class);
-						startActivity(intentHome);
-
-						QuestionResponseActivity.this.finish();
-						onPaused = false;
-					}
-				});
-
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
-
-		// show it
-		alertDialog.show();
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		// ONLY WHEN SCREEN TURNS ON
-		if (!ScreenReceiver.wasScreenOn) {
-			// THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
-
-		} else {
-			// THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT
-			// CHANGED
-			System.out.println("SCREEN TURNED ON");
-		}
-
-		if (onPaused == true) {
-			showAlertDialog();
-		}
-
-	}
-
-	@Override
-	protected void onPause() {
-
-		onPaused = true;
-
-		// WHEN THE SCREEN IS ABOUT TO TURN OFF
-		if (ScreenReceiver.wasScreenOn) {
-			// THIS IS THE CASE WHEN ONPAUSE() IS CALLED BY THE SYSTEM DUE TO A
-			// SCREEN STATE CHANGE
-			System.out.println("SCREEN TURNED OFF");
-		} else {
-			// THIS IS WHEN ONPAUSE() IS CALLED WHEN THE SCREEN STATE HAS NOT
-			// CHANGED
-		}
-		super.onPause();
 	}
 
 }
