@@ -130,8 +130,8 @@ public class DownloadsAdapter extends BaseAdapter {
 						holder.progressBar.setVisibility(View.VISIBLE);
 						holder.btnAction.setVisibility(View.INVISIBLE);
 
-						holder.downloadProgressNumber.setText(String
-								.valueOf(donwloadProcent));
+					//	holder.downloadProgressNumber.setText(String
+						//		.valueOf(donwloadProcent));
 						
 					}
 
