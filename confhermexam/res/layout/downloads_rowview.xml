@@ -64,7 +64,7 @@
             android:id="@+id/downloadProgressNumber"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" 
-            android:text="10 %"
+            android:text=""
             android:padding="2dp"/>
 
         <Button

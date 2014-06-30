@@ -182,11 +182,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		});
 
-	//	DatabaseHelper dbHelper = new DatabaseHelper(CorrectionActivity.this);
-	//	Log.i("QUESTIOS FROM DB",
-			//	dbHelper.getAllQuestionsByExerciseId(exercise_id) + "");
-	//	adapter = new QuestionsAdapter(CorrectionActivity.this,
-		//		dbHelper.getAllQuestionsByExerciseId(exercise_id));
+		DatabaseHelper dbHelper = new DatabaseHelper(CorrectionActivity.this);
+		Log.i("QUESTIOS FROM DB",
+				dbHelper.getAllQuestionsByExerciseId(exercise_id) + "");
+		adapter = new QuestionsAdapter(CorrectionActivity.this,
+				dbHelper.getAllQuestionsByExerciseId(exercise_id));
 
 	
 
