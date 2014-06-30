@@ -338,22 +338,22 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		case 1:
 			status.setText("Telechargement: Disponible");
 			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.exam_checked), null,
-					null, null);
+					getResources().getDrawable(R.drawable.white_exam_checked),
+					null, null, null);
 			download.setEnabled(true);
 			break;
 		case 2:
 			status.setText("Telechargement: Need update");
 			download.setEnabled(true);
 			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.exam_refresh), null,
+					getResources().getDrawable(R.drawable.white_refresh), null,
 					null, null);
 			break;
 		case 3:
 			status.setText("Telechargement: Not downloaded yet");
 			download.setEnabled(true);
 			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.download_icon_white),
+					getResources().getDrawable(R.drawable.white_download),
 					null, null, null);
 			break;
 		case 4:
