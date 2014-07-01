@@ -866,20 +866,22 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		// set dialog message
 		alertDialogBuilder
-				.setMessage(
-						"You have been dropped out from examination, because you have left the exercise.")
+				.setMessage(getResources().getString(R.string.alert_drop_out))
 				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
+				.setPositiveButton(
+						getResources().getString(R.string.alert_drop_out_ok),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
 
-						Intent intentHome = new Intent(
-								ExaminationActivity.this, HomeActivity.class);
-						startActivity(intentHome);
+								Intent intentHome = new Intent(
+										ExaminationActivity.this,
+										HomeActivity.class);
+								startActivity(intentHome);
 
-						ExaminationActivity.this.finish();
-						onPaused = false;
-					}
-				});
+								ExaminationActivity.this.finish();
+								onPaused = false;
+							}
+						});
 
 		// create alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();

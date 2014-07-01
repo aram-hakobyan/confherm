@@ -35,18 +35,46 @@
     <string name="time11am">11 A.M</string>
     <string name="time12am">12 A.M</string>
 
-    <!-- Result Page Text -->
+    <!-- Result -->
     <string name="target_button">Target me</string>
     <string name="global_button">GLOBAL TEST</string>
     <string name="notes_rank">RANG</string>
     <string name="notes_nom">NOM</string>
     <string name="notes_note">NOTE</string>
 
-    
-       <!-- Training & Exam Pages -->
+    <!-- Login -->
 
-    
-    
-    
-    
+    <string name="login_username_text">Votre Identifiant Hermes</string>
+    <string name="login_password_text">Votre Mot de passe Hermes</string>
+    <string name="login_button_text">CONNEXION</string>
+
+    <!-- Home -->
+
+    <string name="home_my_profile">MON PROFIL</string>
+    <string name="home_planning">PLANNING</string>
+    <string name="home_examen">EXAMEN</string>
+    <string name="home_entrainement">ENTRAINEMENT</string>
+    <string name="home_resultats">RÉSULTAT</string>
+    <string name="home_telechargement">TÉLÉCHARGEMENT</string>
+
+    <!-- My Profile -->
+
+    <string name="my_profile_name">Nom</string>
+    <string name="my_profile_lastname">Prénom</string>
+    <string name="my_profile_login">Login</string>
+    <string name="my_profile_groups">Mes groupes</string>
+    <string name="my_profile_logout">CHANGER DE COMPTE</string>
+    <string name="my_profile_email">Email</string>
+
+    <!-- Plannig -->
+
+    <string name="plannig_previous_week">SEMAINE PRÉCÉDENTE</string>
+    <string name="plannig_next_week">SEMAINE SUIVANTE</string>
+    <!-- Plannig Popup -->
+    <string name="plannig_popup_donwload">Télécharger Maintenant</string>
+
+    <!-- Alerts -->
+    <string name="alert_drop_out">L\'application était inactive durant plus de 5 sec. Vos réponses seront envoyées automatiquement pour traitement</string>
+    <string name="alert_drop_out_ok">OK</string>
+
 </resources>
