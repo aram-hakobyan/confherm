@@ -93,10 +93,14 @@ public class MyProfileFragment extends Fragment {
 		if (NetworkReachability.isReachable()) {
 
 			profileEditor = profilePreferences.edit();
-			profileEditor.putString("profileFirstName", pData.getFirstName());
-			profileEditor.putString("profileLastName", pData.getLastName());
-			profileEditor.putString("profileUsername", pData.getUserName());
-			profileEditor.putString("profileEmail", pData.getEmailAdress());
+
+			if (pData != null) {
+				profileEditor.putString("profileFirstName",
+						pData.getFirstName());
+				profileEditor.putString("profileLastName", pData.getLastName());
+				profileEditor.putString("profileUsername", pData.getUserName());
+				profileEditor.putString("profileEmail", pData.getEmailAdress());
+			}
 			if (pData.getGroups().size() == 0) {
 				pGroups.setText(groups + "no groups available");
 			} else {

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
@@ -25,6 +26,7 @@ import com.androidquery.callback.AjaxStatus;
 import fr.conferencehermes.confhermexam.ExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.TrainingsAdapter;
+import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Training;
 import fr.conferencehermes.confhermexam.util.Constants;
@@ -35,6 +37,7 @@ public class TrainingsFragment extends Fragment {
 	TrainingsAdapter adapter;
 	ArrayList<Training> trainings;
 	ProgressBar progressBarTrainings;
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -56,39 +59,48 @@ public class TrainingsFragment extends Fragment {
 			}
 
 		});
+		if (NetworkReachability.isReachable()) {
+			AQuery aq = new AQuery(getActivity());
 
-		AQuery aq = new AQuery(getActivity());
+			Map<String, Object> params = new HashMap<String, Object>();
+			params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		Map<String, Object> params = new HashMap<String, Object>();
-		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+			aq.ajax(Constants.TRAINING_LIST_URL, params, JSONObject.class,
+					new AjaxCallback<JSONObject>() {
+						@Override
+						public void callback(String url, JSONObject json,
+								AjaxStatus status) {
 
-		aq.ajax(Constants.TRAINING_LIST_URL, params, JSONObject.class,
-				new AjaxCallback<JSONObject>() {
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
-
-						try {
-							if (json.has("data") && json.get("data") != null) {
-								trainings = JSONParser.parseTrainings(json);
-								if (adapter == null) {
-									adapter = new TrainingsAdapter(
-											getActivity(), trainings);
-								} else {
-									adapter.notifyDataSetChanged();
+							try {
+								if (json.has("data")
+										&& json.get("data") != null) {
+									trainings = JSONParser.parseTrainings(json);
+									if (adapter == null) {
+										adapter = new TrainingsAdapter(
+												getActivity(), trainings);
+									} else {
+										adapter.notifyDataSetChanged();
+									}
+									listview.setAdapter(adapter);
+									progressBarTrainings
+											.setVisibility(View.GONE);
+									listview.setVisibility(View.VISIBLE);
 								}
-								listview.setAdapter(adapter);
-								progressBarTrainings.setVisibility(View.GONE);
-								listview.setVisibility(View.VISIBLE);
+
+							} catch (JSONException e) {
+								e.printStackTrace();
+
 							}
-
-						} catch (JSONException e) {
-							e.printStackTrace();
-
 						}
-					}
-				});
-
+					});
+		} else {
+			progressBarTrainings.setVisibility(View.INVISIBLE);
+			Toast.makeText(
+					getActivity().getApplicationContext(),
+					getActivity().getResources().getString(
+							R.string.no_internet_connection), Toast.LENGTH_LONG)
+					.show();
+		}
 		return fragment;
 	}
 
