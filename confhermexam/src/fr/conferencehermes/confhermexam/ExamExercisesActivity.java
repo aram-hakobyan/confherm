@@ -3,6 +3,8 @@ package fr.conferencehermes.confhermexam;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -129,6 +131,35 @@ public class ExamExercisesActivity extends FragmentActivity implements
 									.toMinutes(millis)));
 			timerText.setText("Temps epreuve - " + hms);
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		showAlertDialog("Attention",
+				getResources().getString(R.string.exercise_finish_text));
+	}
+
+	public void showAlertDialog(String title, String message) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				ExamExercisesActivity.this);
+
+		alertDialogBuilder.setTitle(title);
+		alertDialogBuilder
+				.setMessage(message)
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						finish();
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();
 	}
 
 }

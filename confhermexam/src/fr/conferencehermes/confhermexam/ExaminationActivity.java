@@ -540,7 +540,9 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				if (SEND_DATA)
 					sendAnswers();
 				else
-					finish();
+					showAlertDialogWhenFinishPressed("Attention",
+							getResources()
+									.getString(R.string.finish_alert_text));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -858,34 +860,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	private void showAlertDialog() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				ExaminationActivity.this);
-
-		// set title
-		alertDialogBuilder.setTitle("You have been dropped out");
-
-		// set dialog message
-		alertDialogBuilder
-				.setMessage(
-						"You have been dropped out from examination, because you have left the exercise.")
-				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-
-						Intent intentHome = new Intent(
-								ExaminationActivity.this, HomeActivity.class);
-						startActivity(intentHome);
-
-						ExaminationActivity.this.finish();
-						onPaused = false;
-					}
-				});
-
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
-
-		// show it
-		alertDialog.show();
+		Utilities.showAlertDialog(ExaminationActivity.this, "Attention",
+				getResources().getString(R.string.drop_out_text));
 	}
 
 	@Override
@@ -987,6 +963,29 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 									.toMinutes(millis)));
 			temps1.setText("Temps epreuve - " + hms);
 		}
+	}
+
+	public void showAlertDialogWhenFinishPressed(String title, String message) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				ExaminationActivity.this);
+
+		alertDialogBuilder.setTitle(title);
+		alertDialogBuilder
+				.setMessage(message)
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						finish();
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();
 	}
 
 }
