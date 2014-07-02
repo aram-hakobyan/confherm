@@ -1197,6 +1197,7 @@ public class QuestionResponseActivity extends Activity implements
 						text.setVisibility(View.INVISIBLE);
 					}
 				});
+		
 		dialog.findViewById(R.id.button2).setOnClickListener(
 				new OnClickListener() {
 					@Override
@@ -1218,6 +1219,7 @@ public class QuestionResponseActivity extends Activity implements
 
 					}
 				});
+		
 		dialog.findViewById(R.id.button3).setOnClickListener(
 				new OnClickListener() {
 					@Override

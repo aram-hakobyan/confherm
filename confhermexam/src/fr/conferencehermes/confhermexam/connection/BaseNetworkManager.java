@@ -63,7 +63,7 @@ public class BaseNetworkManager {
 
 					case 400:
 						Log.d("Please check your internet connection.", "400");
-						handleFailResponse("Please check your internet connection.");
+						handleFailResponse("Something went wrong. Please try again.");
 						break;
 
 					case 500:
