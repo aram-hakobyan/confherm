@@ -11,7 +11,7 @@
         android:background="@color/app_main_color_dark" >
 
         <ImageView
-            android:layout_width="wrap_content"
+            android:layout_width="300dp"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="20dp"
@@ -25,46 +25,46 @@
             android:layout_centerVertical="true"
             android:layout_marginRight="30dp" >
 
-            <Button
+            <ImageView
                 android:id="@+id/headerBtnProfil"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
-                android:background="@drawable/ic_top1" />
+                android:src="@drawable/ic_top1" />
 
-            <Button
+            <ImageView
                 android:id="@+id/headerBtnPlanning"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="20dp"
-                android:background="@drawable/ic_top2" />
+                android:src="@drawable/ic_top2" />
 
-            <Button
+            <ImageView
                 android:id="@+id/headerBtnExamen"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="20dp"
-                android:background="@drawable/ic_top3" />
+                android:src="@drawable/ic_top3" />
 
-            <Button
+            <ImageView
                 android:id="@+id/headerBtnEntrainment"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="20dp"
-                android:background="@drawable/ic_top4" />
+                android:src="@drawable/ic_top4" />
 
-            <Button
+            <ImageView
                 android:id="@+id/headerBtnResultats"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="20dp"
-                android:background="@drawable/ic_top5" />
+                android:src="@drawable/ic_top5" />
 
-            <Button
+            <ImageView
                 android:id="@+id/headerBtnTelecharg"
                 android:layout_width="60dp"
                 android:layout_height="60dp"
                 android:layout_marginLeft="20dp"
-                android:background="@drawable/ic_top6" />
+                android:src="@drawable/ic_top6" />
         </LinearLayout>
     </RelativeLayout>
 

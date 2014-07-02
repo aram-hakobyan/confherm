@@ -108,7 +108,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private ArrayList<QuestionAnswer> questionAnswers;
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
-
+	private int resumPlaying = 0;
 	DatabaseHelper db;
 
 	@Override
@@ -686,6 +686,15 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				.findViewById(R.id.videoView1);
 		final MediaController mc = new MediaController(ExaminationActivity.this);
 
+		final LinearLayout soundControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.sound_control_layout);
+		final ImageView soundPlay = (ImageView) dialog
+				.findViewById(R.id.sound_play);
+		final ImageView soundPause = (ImageView) dialog
+				.findViewById(R.id.sound_pause);
+		final ImageView soundReplay = (ImageView) dialog
+				.findViewById(R.id.sound_replay);
+
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
 				try {
@@ -724,10 +733,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		case 0:
 			text.setText(exercise.getText());
 			text.setVisibility(View.VISIBLE);
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
+
 			break;
 		case 1:
 			if (mediaPlayer != null) {
@@ -743,17 +754,19 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				video.stopPlayback();
 			}
 			img.setVisibility(View.VISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			video.setVisibility(View.GONE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 			break;
 		case 2:
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
 			mc.setVisibility(View.VISIBLE);
 			audioImage.setVisibility(View.VISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.VISIBLE);
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
@@ -763,6 +776,58 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
+			soundPause.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						if (mediaPlayer.isPlaying()) {
+							mediaPlayer.pause();
+							resumPlaying = mediaPlayer.getCurrentPosition();
+							soundPlay.setVisibility(View.VISIBLE);
+							soundPause.setVisibility(View.GONE);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+				}
+			});
+
+			soundReplay.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						mediaPlayer.seekTo(0);
+						mediaPlayer.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					if (mediaPlayer.isPlaying()) {
+						soundPlay.setVisibility(View.GONE);
+						soundPause.setVisibility(View.VISIBLE);
+					}
+				}
+			});
+
+			soundPlay.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						mediaPlayer.seekTo(resumPlaying);
+						mediaPlayer.start();
+						soundPlay.setVisibility(View.GONE);
+						soundPause.setVisibility(View.VISIBLE);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
 			break;
 		case 3:
 			try {
@@ -772,11 +837,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			img.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 
 			try {
 				video.start();
@@ -805,27 +871,31 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							video.stopPlayback();
 						}
 						img.setVisibility(View.VISIBLE);
-						video.setVisibility(View.INVISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						video.setVisibility(View.GONE);
+						mc.setVisibility(View.GONE);
+						audioImage.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 					}
 				});
 		dialog.findViewById(R.id.button2).setOnClickListener(
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						img.setVisibility(View.INVISIBLE);
-						video.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
+						video.setVisibility(View.GONE);
 						mc.setVisibility(View.VISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						text.setVisibility(View.GONE);
 						audioImage.setVisibility(View.VISIBLE);
+						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
 						}
 						try {
 							mediaPlayer.seekTo(0);
 							mediaPlayer.start();
+							soundPlay.setVisibility(View.GONE);
+							soundPause.setVisibility(View.VISIBLE);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -843,11 +913,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						img.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						mc.setVisibility(View.GONE);
+						audioImage.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 
 						try {
 							video.start();

@@ -101,7 +101,8 @@ public class MyProfileFragment extends Fragment {
 				profileEditor.putString("profileUsername", pData.getUserName());
 				profileEditor.putString("profileEmail", pData.getEmailAdress());
 			}
-			if (pData.getGroups().size() == 0) {
+
+			if (pData != null && pData.getGroups().size() == 0) {
 				pGroups.setText(groups + "no groups available");
 			} else {
 				HashMap<String, String> groupsHashmap = pData.getGroups();
