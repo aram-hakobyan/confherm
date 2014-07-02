@@ -923,7 +923,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		// create alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();
-
 		// show it
 		alertDialog.show();
 

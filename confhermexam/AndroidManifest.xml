@@ -72,17 +72,14 @@
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
-                <activity
+        <activity
             android:name="fr.conferencehermes.confhermexam.CorrectionExercisesActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
-        
-
 
         <service android:name="fr.conferencehermes.confhermexam.service.DownloadService" />
         <!-- <service android:name="fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver" /> -->
-
 
     </application>
 

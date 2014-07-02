@@ -13,6 +13,17 @@ public class Exam {
 	private int status;
 	private String description;
 	private String password;
+	private String event_name;
+	
+	
+	public String getEvent_name() {
+		return event_name;
+	}
+
+	public void setEvent_name(String event_name) {
+		this.event_name = event_name;
+	}
+
 	private ArrayList<Exercise> exercises;
 
 	public void Exam() {

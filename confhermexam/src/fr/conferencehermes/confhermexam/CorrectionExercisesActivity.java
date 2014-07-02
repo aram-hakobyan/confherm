@@ -53,7 +53,7 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_exersice);
 		exam_id = getIntent().getIntExtra("exam_id", 0);
-
+		findViewById(R.id.timerText).setVisibility(View.INVISIBLE);
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
 		gvMain.setOnItemClickListener(new OnItemClickListener() {

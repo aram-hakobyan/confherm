@@ -71,7 +71,8 @@ public class ExamsAdapter extends BaseAdapter {
 		Exam exam = (Exam) mListItems.get(position);
 		if (exam != null) {
 			if (holder.name != null) {
-				holder.name.setText(exam.getTitle());
+				holder.name.setText(exam.getEvent_name() + " / "
+						+ exam.getTitle());
 			}
 
 			Calendar calendar = new GregorianCalendar(
@@ -89,18 +90,20 @@ public class ExamsAdapter extends BaseAdapter {
 			holder.desc.setText("Actif le "
 					+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
 					+ String.valueOf(calendar.get(Calendar.MONTH) + 1) + "/"
-					+ String.valueOf(calendar.get(Calendar.YEAR)) + " à  "
+					+ String.valueOf(calendar.get(Calendar.YEAR)) + " a  "
 					+ startTimeString + " to " + endTimeString);
 
 			int status = exam.getStatus();
 			if (status == 1) {
-				holder.status.setText(c.getResources().getString(R.string.examen_avaible));
+				holder.status.setText(c.getResources().getString(
+						R.string.examen_avaible));
 				holder.button.setBackgroundResource(R.drawable.exam_checked);
 			} else if (status == 2) {
 				holder.status.setText("Need update");
 				holder.button.setBackgroundResource(R.drawable.exam_refresh);
 			} else if (status == 3) {
-				holder.status.setText(c.getResources().getString(R.string.examen_non_avaible));
+				holder.status.setText(c.getResources().getString(
+						R.string.examen_non_avaible));
 				holder.button.setBackgroundResource(R.drawable.exam_download);
 
 			} else if (status == 4) {

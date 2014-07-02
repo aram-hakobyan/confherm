@@ -125,8 +125,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		String restoredAuthKey = authKeyPrefs.getString(
 				Constants.AUTHKEY_SHAREDPREFS_KEY, null);
 
-		final String uname = "STUDENT";// username.getText().toString().trim();
-		final String pass = "123456";// password.getText().toString().trim();
+		final String uname =  username.getText().toString().trim();
+		final String pass =  password.getText().toString().trim();
 		RequestCreator creator = new RequestCreator();
 		if (restoredAuthKey != null) {
 			logonOrAuth = Constants.SERVER_URL_AUTH;

@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
@@ -54,41 +55,52 @@ public class DownloadsFragment extends Fragment {
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 		params.put("device_id", Utilities.getDeviceId(getActivity()));
 		params.put("device_time", System.currentTimeMillis() / 1000);
+		if (Utilities.isNetworkAvailable(getActivity())) {
+			aq.ajax(Constants.DOWNLOADS_LIST_URL, params, JSONObject.class,
+					new AjaxCallback<JSONObject>() {
+						@Override
+						public void callback(String url, JSONObject json,
+								AjaxStatus status) {
 
-		aq.ajax(Constants.DOWNLOADS_LIST_URL, params, JSONObject.class,
-				new AjaxCallback<JSONObject>() {
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
+							try {
+								if (json.has("data")
+										&& json.get("data") != null) {
+									downloads = JSONParser.parseDownloads(json);
+									if (adapter == null) {
+										adapter = new DownloadsAdapter(
+												getActivity(), downloads);
+									} else {
+										adapter.notifyDataSetChanged();
+									}
+									listview.setAdapter(adapter);
+									progressBarTelecharge
+											.setVisibility(View.GONE);
+									listview.setVisibility(View.VISIBLE);
 
-						try {
-							if (json.has("data") && json.get("data") != null) {
-								downloads = JSONParser.parseDownloads(json);
-								if (adapter == null) {
-									adapter = new DownloadsAdapter(
-											getActivity(), downloads);
-								} else {
-									adapter.notifyDataSetChanged();
+									int timeslotId = -1;
+									Bundle arguments = getArguments();
+									if (arguments != null)
+										timeslotId = arguments.getInt(
+												"timeslot_id", -1);
+									if (timeslotId != -1)
+										selectCurrentEventDownload(timeslotId);
 								}
-								listview.setAdapter(adapter);
-								progressBarTelecharge.setVisibility(View.GONE);
-								listview.setVisibility(View.VISIBLE);
 
-								int timeslotId = -1;
-								Bundle arguments = getArguments();
-								if (arguments != null)
-									timeslotId = arguments.getInt(
-											"timeslot_id", -1);
-								if (timeslotId != -1)
-									selectCurrentEventDownload(timeslotId);
+							} catch (JSONException e) {
+								e.printStackTrace();
+
 							}
-
-						} catch (JSONException e) {
-							e.printStackTrace();
-
 						}
-					}
-				});
+					});
+		} else {
+			progressBarTelecharge.setVisibility(View.INVISIBLE);
+			Toast.makeText(
+					getActivity().getApplicationContext(),
+					getActivity().getResources().getString(
+							R.string.no_internet_connection), Toast.LENGTH_LONG)
+					.show();
+
+		}
 
 		return fragment;
 	}
