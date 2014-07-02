@@ -41,6 +41,18 @@ public class MyProfileFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View pFragment = inflater.inflate(R.layout.activity_my_profile,
 				container, false);
+
+		String groups = getActivity().getResources().getString(
+				R.string.my_profile_groups);
+		String name = getActivity().getResources().getString(
+				R.string.my_profile_name);
+		String lastname = getActivity().getResources().getString(
+				R.string.my_profile_lastname);
+		String login = getActivity().getResources().getString(
+				R.string.my_profile_login);
+		String emails = getActivity().getResources().getString(
+				R.string.my_profile_email);
+
 		pFirsName = (TextView) pFragment.findViewById(R.id.pFirsName);
 		pLastName = (TextView) pFragment.findViewById(R.id.pLastName);
 		pUserName = (TextView) pFragment.findViewById(R.id.pUsername);
@@ -81,12 +93,16 @@ public class MyProfileFragment extends Fragment {
 		if (NetworkReachability.isReachable()) {
 
 			profileEditor = profilePreferences.edit();
-			profileEditor.putString("profileFirstName", pData.getFirstName());
-			profileEditor.putString("profileLastName", pData.getLastName());
-			profileEditor.putString("profileUsername", pData.getUserName());
-			profileEditor.putString("profileEmail", pData.getEmailAdress());
+
+			if (pData != null) {
+				profileEditor.putString("profileFirstName",
+						pData.getFirstName());
+				profileEditor.putString("profileLastName", pData.getLastName());
+				profileEditor.putString("profileUsername", pData.getUserName());
+				profileEditor.putString("profileEmail", pData.getEmailAdress());
+			}
 			if (pData.getGroups().size() == 0) {
-				pGroups.setText("Groups : " + "no groups available");
+				pGroups.setText(groups + "no groups available");
 			} else {
 				HashMap<String, String> groupsHashmap = pData.getGroups();
 
@@ -114,7 +130,7 @@ public class MyProfileFragment extends Fragment {
 		@SuppressWarnings("unchecked")
 		HashMap<String, String> groupsHashmap = (HashMap<String, String>) groupsShared
 				.getAll();
-		pGroups.setText("Groups : ");
+		pGroups.setText(groups + " : ");
 		for (String s : groupsHashmap.keySet()) {
 			final String group = groupsHashmap.get(s);
 
@@ -128,10 +144,10 @@ public class MyProfileFragment extends Fragment {
 
 		}
 
-		pFirsName.setText(firstName);
-		pLastName.setText(lastName);
-		pUserName.setText("Username : " + userName);
-		pEmailAdress.setText("Email : " + email);
+		pFirsName.setText(name + " : " + firstName);
+		pLastName.setText(lastname + " : " + lastName);
+		pUserName.setText(login + " : " + userName);
+		pEmailAdress.setText(emails + " : " + email);
 
 		return pFragment;
 	}

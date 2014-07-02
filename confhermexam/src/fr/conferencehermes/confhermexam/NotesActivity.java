@@ -31,6 +31,7 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
+import fr.conferencehermes.confhermexam.R.string;
 import fr.conferencehermes.confhermexam.adapters.ExerciseAdapter;
 import fr.conferencehermes.confhermexam.adapters.NotesAdapter;
 import fr.conferencehermes.confhermexam.connection.NetworkReachability;
@@ -241,7 +242,7 @@ public class NotesActivity extends Activity {
 											Toast.makeText(
 													NotesActivity.this
 															.getApplicationContext(),
-													"No Any Result",
+													"no any result",
 													Toast.LENGTH_SHORT).show();
 										}
 
@@ -252,7 +253,7 @@ public class NotesActivity extends Activity {
 														.getApplicationContext(),
 												json.getInt("status"),
 												Toast.LENGTH_SHORT).show();
-   
+
 									}
 
 								}
@@ -265,8 +266,8 @@ public class NotesActivity extends Activity {
 		} else {
 
 			Toast.makeText(getApplicationContext(),
-					"Check your internet connection", Toast.LENGTH_SHORT)
-					.show();
+					getResources().getString(R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
 
 		}
 
@@ -361,10 +362,19 @@ public class NotesActivity extends Activity {
 												listNt);
 										listviewNt.setAdapter(adapterNt);
 
-										medianScore.setText("Median :"
-												+ String.valueOf(NotesResult.median_score));
-										moyenneScore.setText("Moyenne :"
-												+ String.valueOf(NotesResult.moyenne_score));
+										medianScore
+												.setText(getResources()
+														.getString(
+																R.string.notes_stats_medianne)
+														+ " : "
+														+ String.valueOf(NotesResult.median_score));
+										moyenneScore
+												.setText(getResources()
+														.getString(
+																R.string.notes_stats_moyenne)
+														+ " : "
+														+ String.valueOf(NotesResult.moyenne_score)
+														+ " | ");
 										progressBarNotes
 												.setVisibility(View.GONE);
 										listviewNt.setVisibility(View.VISIBLE);
@@ -372,7 +382,7 @@ public class NotesActivity extends Activity {
 
 										Toast.makeText(
 												context.getApplicationContext(),
-												"No Any Result",
+												"no any result",
 												Toast.LENGTH_SHORT).show();
 									}
 

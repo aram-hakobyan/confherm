@@ -40,7 +40,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_margin="10dp"
-                android:text="dfgvbhnj"
                 android:textSize="20sp" />
 
             <TextView
@@ -49,7 +48,6 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
                 android:layout_margin="10dp"
-                android:text="TextView"
                 android:textSize="20sp" />
         </RelativeLayout>
 
@@ -103,7 +101,7 @@
         android:drawablePadding="10dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
-        android:text="Telechargez maintenant"
+        android:text="@string/plannig_popup_donwload"
         android:textColor="@android:color/white"
         android:textSize="20sp" />
 

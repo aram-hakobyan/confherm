@@ -23,9 +23,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/relativeLayout1"
         android:layout_centerInParent="true"
         android:layout_marginTop="10dp"
-        android:layout_below="@+id/relativeLayout1"
         android:orientation="vertical" >
 
         <LinearLayout
@@ -52,7 +52,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="MON PROFIL"
+                    android:text="@string/home_my_profile"
                     android:textColor="#0d5c7c"
                     android:textSize="25sp" />
             </LinearLayout>
@@ -75,7 +75,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="PLANNING"
+                    android:text="@string/home_planning"
                     android:textColor="#0d5c7c"
                     android:textSize="25sp" />
             </LinearLayout>
@@ -98,7 +98,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="EXAMIN"
+                    android:text="@string/home_examen"
                     android:textColor="#0d5c7c"
                     android:textSize="25sp" />
             </LinearLayout>
@@ -128,7 +128,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="ENTRAINEMENT"
+                    android:text="@string/home_entrainement"
                     android:textColor="#0d5c7c"
                     android:textSize="25sp" />
             </LinearLayout>
@@ -151,7 +151,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="RÉSULTATS"
+                    android:text="@string/home_resultats"
                     android:textColor="#0d5c7c"
                     android:textSize="25sp" />
             </LinearLayout>
@@ -174,7 +174,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:text="TÉLÉCHARGEMENTS"
+                    android:text="@string/home_telechargement"
                     android:textColor="#0d5c7c"
                     android:textSize="25sp" />
             </LinearLayout>

@@ -83,10 +83,12 @@ public class ResultatFragment extends Fragment {
 						}
 					});
 		} else {
-
-			Toast.makeText(getActivity().getApplicationContext(),
-					"No Internet..Please check your internet connection",
-					Toast.LENGTH_LONG).show();
+			progressBar.setVisibility(View.INVISIBLE);
+			Toast.makeText(
+					getActivity().getApplicationContext(),
+					getActivity().getResources().getString(
+							R.string.no_internet_connection), Toast.LENGTH_LONG)
+					.show();
 
 		}
 		return fragment;

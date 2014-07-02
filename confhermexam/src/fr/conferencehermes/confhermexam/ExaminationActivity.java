@@ -860,8 +860,41 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	private void showAlertDialog() {
+
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				ExaminationActivity.this);
+
+		// set title
+		// alertDialogBuilder.setTitle("");
+
+		// set dialog message
+		alertDialogBuilder
+				.setMessage(getResources().getString(R.string.drop_out_text))
+				.setCancelable(false)
+				.setPositiveButton(
+						getResources().getString(R.string.drop_out_text_ok),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+
+								Intent intentHome = new Intent(
+										ExaminationActivity.this,
+										HomeActivity.class);
+								startActivity(intentHome);
+
+								ExaminationActivity.this.finish();
+								onPaused = false;
+							}
+						});
+
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+
+		// show it
+		alertDialog.show();
+
 		Utilities.showAlertDialog(ExaminationActivity.this, "Attention",
 				getResources().getString(R.string.drop_out_text));
+
 	}
 
 	@Override
