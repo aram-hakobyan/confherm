@@ -47,15 +47,13 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 	ArrayList<CorrectionsExercise> corExercises;
 	int exam_id;
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_exersice);
 		exam_id = getIntent().getIntExtra("exam_id", 0);
-	
-
+		findViewById(R.id.timerText).setVisibility(View.INVISIBLE);
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
 		gvMain.setOnItemClickListener(new OnItemClickListener() {
@@ -63,9 +61,9 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
-				int e_id = corExercises.get(position).getExercise_id();
-
-				openExamCorrection(e_id);
+				int exersice_id = corExercises.get(position).getExercise_id();
+				int exam_id = corExercises.get(position).getExam_id();
+				openExamCorrection(exersice_id, exam_id);
 			}
 
 		});
@@ -116,11 +114,11 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 		gvMain.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
 	}
 
-	private void openExamCorrection(int id) {
+	private void openExamCorrection(int exersice_id, int exam_id) {
 		Intent intent = new Intent(CorrectionExercisesActivity.this,
 				CorrectionActivity.class);
-		intent.putExtra("exercise_id", id);
-		 intent.putExtra("exam_id", exam_id);
+		intent.putExtra("exercise_id", exersice_id);
+		intent.putExtra("exam_id", exam_id);
 		startActivity(intent);
 	}
 

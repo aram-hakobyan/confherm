@@ -118,24 +118,12 @@ public class DownloadsAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					int status = mListItems.get(position).getStatus();
 					if (status == 2 || status == 3) {
-
 						downloadFile(mListItems.get(position).getDownloadUrl(),
-								mListItems.get(position).getName());
-
+								mListItems.get(position).getName(), position);
 						holder.progressBar.setVisibility(View.VISIBLE);
 						holder.btnAction.setVisibility(View.INVISIBLE);
-
-
-					//	holder.downloadProgressNumber.setText(String
-						//		.valueOf(donwloadProcent));
-						
-
-						/*holder.downloadProgressNumber
+						holder.downloadProgressNumber
 								.setVisibility(View.VISIBLE);
-						holder.downloadProgressNumber.setText(String
-								.valueOf(donwloadPercent));*/
-
-
 					}
 
 				}
@@ -171,7 +159,7 @@ public class DownloadsAdapter extends BaseAdapter {
 		public TextView downloadProgressNumber;
 	}
 
-	private void downloadFile(String url, final String title) {
+	private void downloadFile(String url, final String title, final int position) {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 		params.put("device_id", Utilities.getDeviceId(c));
@@ -188,6 +176,7 @@ public class DownloadsAdapter extends BaseAdapter {
 						Intent intent = new Intent(c, DownloadService.class);
 						intent.putExtra("url", json.getString("data"));
 						intent.putExtra("title", title);
+						intent.putExtra("position", position);
 						intent.putExtra("receiver", new DownloadReceiver(
 								new Handler()));
 						c.startService(intent);
@@ -213,9 +202,11 @@ public class DownloadsAdapter extends BaseAdapter {
 			if (resultCode == DownloadService.UPDATE_PROGRESS) {
 				int progress = resultData.getInt("progress");
 				donwloadPercent = progress;
+				int pos = resultData.getInt("position");
+
 				Log.d("DOWNLOADED: ", String.valueOf(progress));
 				if (progress == 100) {
-
+					// DownloadsAdapter.this.get
 				}
 			}
 		}

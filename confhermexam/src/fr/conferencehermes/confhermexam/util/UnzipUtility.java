@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
+import android.util.Log;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Event;
@@ -66,6 +67,12 @@ public class UnzipUtility {
 			entry = zipIn.getNextEntry();
 		}
 		zipIn.close();
+
+		File file = new File(zipFilePath);
+		if (!file.delete()) {
+			new FileNotFoundException("Failed to delete file: " + file);
+			Log.e("Exception", "File not found. Cannot perform delete process.");
+		}
 
 		String fileUrl = getTextFileFromDirectory(destDirectory);
 		Event event = null;
@@ -129,6 +136,7 @@ public class UnzipUtility {
 			bos.write(bytesIn, 0, read);
 		}
 		bos.close();
+
 	}
 
 	private String getTextFileFromDirectory(String directoryUrl)

@@ -50,7 +50,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
-                    android:text="@string/target_button"
+                    android:text="@string/notes_stats_target"
                     android:textColor="@color/app_main_color"
                     android:textSize="20sp" />
 
@@ -119,7 +119,7 @@
                         android:layout_height="wrap_content"
                         android:gravity="center_vertical"
                         android:padding="5dp"
-                        android:text="@string/notes_rank"
+                        android:text="@string/notes_stats_rang"
                         android:textSize="15sp" />
 
                     <View
@@ -135,7 +135,7 @@
                         android:layout_marginLeft="20dp"
                         android:gravity="center_vertical"
                         android:padding="5dp"
-                        android:text="@string/notes_nom"
+                        android:text="@string/notes_stats_nom"
                         android:textSize="15sp" />
                 </LinearLayout>
 
@@ -158,7 +158,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="20dp"
-                        android:text="@string/notes_note"
+                        android:text="@string/notes_stats_note"
                         android:textSize="15sp" />
                 </LinearLayout>
             </RelativeLayout>
@@ -215,7 +215,7 @@
                 android:background="@color/app_main_color_dark"
                 android:gravity="center"
                 android:padding="5dp"
-                android:text="@string/global_button"
+                android:text="@string/notes_stats_test_global"
                 android:textColor="@android:color/white"
                 android:textSize="23sp" />
 

@@ -46,6 +46,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EXAM_ID = "examId";
 	private static final String KEY_EXAM_NAME = "examName";
 	private static final String KEY_EXAM_EVENT_ID = "eventId";
+	private static final String KEY_EXAM_EVENT_NAME = "examEventName";
 	private static final String KEY_EXAM_START_DATE = "startDate";
 	private static final String KEY_EXAM_END_DATE = "endDate";
 	private static final String KEY_EXAM_PASSWORD = "creationDate";
@@ -102,7 +103,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ TABLE_EXAMS + "(" + KEY_EXAM_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_EXAM_EVENT_ID + " INTEGER," + KEY_EXAM_START_DATE
 			+ " INTEGER," + KEY_EXAM_END_DATE + " INTEGER," + KEY_EXAM_PASSWORD
-			+ " TEXT," + KEY_EXAM_NAME + " TEXT" + ")";
+			+ " TEXT," + KEY_EXAM_NAME + " TEXT," + KEY_EXAM_EVENT_NAME
+			+ " TEXT" + ")";
 
 	// ExerciseFiles table create statement
 	private static final String CREATE_TABLE_EXERCISE_FILES = "CREATE TABLE "
@@ -311,6 +313,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_START_DATE, exam.getStartDate());
 		values.put(KEY_EXAM_END_DATE, (int) exam.getEndDate());
 		values.put(KEY_EXAM_NAME, exam.getTitle());
+		values.put(KEY_EXAM_EVENT_NAME, exam.getEvent_name());
 
 		// insert row
 		db.beginTransaction();
@@ -345,6 +348,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			exam.setEndDate(c.getInt(c.getColumnIndex(KEY_EXAM_END_DATE)));
 			exam.setPassword(c.getString(c.getColumnIndex(KEY_EXAM_PASSWORD)));
 			exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
+			exam.setEvent_name(c.getString(c.getColumnIndex(KEY_EXAM_EVENT_NAME)));
+			
 			c.close();
 		}
 
@@ -367,6 +372,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				Exam exam = new Exam();
 				exam.setId(c.getInt(c.getColumnIndex(KEY_EXAM_ID)));
 				exam.setEventId((c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID))));
+				exam.setEvent_name(c.getString(c
+						.getColumnIndex(KEY_EXAM_EVENT_NAME)));
 				exam.setStartDate(c.getInt(c
 						.getColumnIndex(KEY_EXAM_START_DATE)));
 				exam.setEndDate(c.getInt(c.getColumnIndex(KEY_EXAM_END_DATE)));
@@ -391,6 +398,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		ContentValues values = new ContentValues();
 		values.put(KEY_EXAM_ID, exam.getId());
 		values.put(KEY_EXAM_END_DATE, (int) exam.getEndDate());
+		values.put(KEY_EXAM_EVENT_NAME, exam.getEvent_name());
 		values.put(KEY_EXAM_EVENT_ID, exam.getEventId());
 		values.put(KEY_EXAM_PASSWORD, exam.getPassword());
 		values.put(KEY_EXAM_START_DATE, exam.getStartDate());
@@ -435,6 +443,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					exam.setPassword(c.getString(c
 							.getColumnIndex(KEY_EXAM_PASSWORD)));
 					exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
+					exam.setEvent_name(c.getString(c
+							.getColumnIndex(KEY_EXAM_EVENT_NAME)));
+
 					exams.add(exam);
 				}
 

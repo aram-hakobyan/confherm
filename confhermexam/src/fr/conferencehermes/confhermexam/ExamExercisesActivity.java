@@ -3,6 +3,8 @@ package fr.conferencehermes.confhermexam;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -31,6 +33,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 	ArrayList<Exercise> exercises;
 	TextView timerText;
 	DatabaseHelper db;
+	private int examId;
+	private int eventId;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +58,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 		});
 
-		int examId = getIntent().getIntExtra("exam_id", -1);
+		examId = getIntent().getIntExtra("exam_id", -1);
+		eventId = getIntent().getIntExtra("event_id", -1);
 		exercises = db.getAllExercisesByExamId(examId);
 		String[] data = new String[exercises.size()];
 		for (int i = 0; i < exercises.size(); i++) {
@@ -89,6 +94,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		Intent intent = new Intent(ExamExercisesActivity.this,
 				ExaminationActivity.class);
 		intent.putExtra("exercise_id", id);
+		intent.putExtra("exam_id", examId);
+		intent.putExtra("event_id", eventId);
 		startActivity(intent);
 	}
 
@@ -124,6 +131,35 @@ public class ExamExercisesActivity extends FragmentActivity implements
 									.toMinutes(millis)));
 			timerText.setText("Temps epreuve - " + hms);
 		}
+	}
+
+	@Override
+	public void onBackPressed() {
+		showAlertDialog("Attention",
+				getResources().getString(R.string.exercise_finish_text));
+	}
+
+	public void showAlertDialog(String title, String message) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				ExamExercisesActivity.this);
+
+		alertDialogBuilder.setTitle(title);
+		alertDialogBuilder
+				.setMessage(message)
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						finish();
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();
 	}
 
 }

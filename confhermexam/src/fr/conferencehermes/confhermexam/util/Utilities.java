@@ -1,8 +1,10 @@
 package fr.conferencehermes.confhermexam.util;
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -155,6 +157,23 @@ public class Utilities {
 			mDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 			mDialog.show();
 		}
+	}
+
+	public static void showAlertDialog(Context context, String title,
+			String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title);
+		builder.setMessage(message);
+		builder.setCancelable(true);
+		builder.setPositiveButton(android.R.string.ok,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		AlertDialog dialog = builder.create();
+		dialog.show();
 	}
 
 	public static void showInfoDialog(Context context) {

@@ -86,7 +86,7 @@
                 android:drawableLeft="@drawable/key1"
                 android:gravity="center"
                 android:padding="15dp"
-                android:text="CHANGER DE COMPTE"
+                android:text="@string/my_profile_logout"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>

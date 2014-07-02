@@ -1,26 +1,11 @@
 package fr.conferencehermes.confhermexam;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.zip.GZIPInputStream;
 
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -35,7 +20,6 @@ import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -79,8 +63,9 @@ import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Exercise;
-import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
+import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExaminationActivity extends Activity implements OnClickListener {
@@ -92,7 +77,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private LinearLayout answersLayout, correctionsLayout;
 	private Button btnImage, btnAudio, btnVideo, abandonner, ennouncer,
 			valider;
-	private int exercise_id, training_id;
+	private int exercise_id, exam_id, event_id;
 	private TextView temps1;
 	private TextView temps2;
 	private TextView teacher;
@@ -115,7 +100,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	ArrayList<EditText> editTextsArray;
 
 	private boolean onPaused = false;
-	private boolean DATA_SENT = false;
+	private boolean SEND_DATA = false;
 
 	private SparseBooleanArray validAnswers;
 	private ArrayList<QuestionAnswer> questionAnswers;
@@ -169,7 +154,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
 		exercise_id = getIntent().getIntExtra("exercise_id", 1);
-		training_id = getIntent().getIntExtra("training_id", 1);
+		exam_id = getIntent().getIntExtra("exam_id", 1);
+		event_id = getIntent().getIntExtra("event_id", 1);
 		answersLayout = (LinearLayout) findViewById(R.id.answersLayout);
 		correctionsLayout = (LinearLayout) findViewById(R.id.correctionsLayout);
 		listview = (ListView) findViewById(R.id.questionsListView);
@@ -186,7 +172,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
-		System.out.println("exerciseFiles***" + exerciseFiles);
 		if (exercise.getExerciseType() == 2) {
 			ennouncer.setVisibility(View.GONE);
 		}
@@ -246,7 +231,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		currentQuestionId = position;
 		currentQuestion = q;
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
-		System.out.println("currentQuestionFiles******" + currentQuestionFiles);
 
 		answersLayout.removeAllViews();
 		correctionsLayout.removeAllViews();
@@ -260,13 +244,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		currentQuestionAnswers = db.getAllAnswersByQuestionId(currentQuestion
 				.getId());
-
-		for (int i = 0; i < db.getAllAnswers().size(); i++) {
-			System.out.println("Question id "
-					+ db.getAllAnswers().get(i).getQuestionId());
-			System.out.println("id" + db.getAllAnswers().get(i).getId());
-		}
-
 		int answersCount = currentQuestionAnswers.size();
 
 		// Single choice answer
@@ -415,136 +392,31 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	@Override
-	public boolean dispatchTouchEvent(MotionEvent event) {
-
-		View v = getCurrentFocus();
-		boolean ret = super.dispatchTouchEvent(event);
-
-		if (v instanceof EditText) {
-			View w = getCurrentFocus();
-			int scrcoords[] = new int[2];
-			w.getLocationOnScreen(scrcoords);
-			float x = event.getRawX() + w.getLeft() - scrcoords[0];
-			float y = event.getRawY() + w.getTop() - scrcoords[1];
-
-			Log.d("Activity",
-					"Touch event " + event.getRawX() + "," + event.getRawY()
-							+ " " + x + "," + y + " rect " + w.getLeft() + ","
-							+ w.getTop() + "," + w.getRight() + ","
-							+ w.getBottom() + " coords " + scrcoords[0] + ","
-							+ scrcoords[1]);
-			if (event.getAction() == MotionEvent.ACTION_UP
-					&& (x < w.getLeft() || x >= w.getRight() || y < w.getTop() || y > w
-							.getBottom())) {
-
-				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-				imm.hideSoftInputFromWindow(getWindow().getCurrentFocus()
-						.getWindowToken(), 0);
-			}
-		}
-		return ret;
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-		return false;
-	}
-
 	public void sendAnswers() throws JSONException {
-		Map<String, String> params = new HashMap<String, String>();
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
 
-		data.put("exam_id", training_id);
+		data.put("event_id", event_id);
+		data.put("exam_id", exam_id);
 		data.put("exercise_id", exercise.getId());
 		data.put("type", exercise.getType());
 
 		JSONArray answers = answersArray;
 		data.put("question_answers", answers);
-		object.put("auth_key", JSONParser.AUTH_KEY);
+		object.put("auth_key", Utilities.readString(ExaminationActivity.this,
+				Constants.AUTHKEY_SHAREDPREFS_KEY, ""));
 		object.put("data", data);
-		params.put("data", object.toString());
 
-		JSONTransmitter transmitter = new JSONTransmitter();
-		// transmitter.execute(object);
-
-	}
-
-	public class JSONTransmitter extends
-			AsyncTask<JSONObject, JSONObject, JSONObject> {
-
-		String url = "http://ecni.conference-hermes.fr/api/examanswer";
-
-		@Override
-		protected JSONObject doInBackground(JSONObject... data) {
-			JSONObject json = data[0];
-			DefaultHttpClient httpclient = new DefaultHttpClient();
-			HttpPost httppostreq = new HttpPost(url);
-			StringEntity se;
-			try {
-				se = new StringEntity(json.toString());
-
-				se.setContentType("application/json;charset=UTF-8");
-				se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,
-						"application/json;charset=UTF-8"));
-				httppostreq.setEntity(se);
-				HttpResponse httpresponse = httpclient.execute(httppostreq);
-
-				HttpEntity resultentity = httpresponse.getEntity();
-				InputStream inputstream = resultentity.getContent();
-				Header contentencoding = httpresponse
-						.getFirstHeader("Content-Encoding");
-				if (contentencoding != null
-						&& contentencoding.getValue().equalsIgnoreCase("gzip")) {
-					inputstream = new GZIPInputStream(inputstream);
-				}
-				String resultstring = convertStreamToString(inputstream);
-				inputstream.close();
-				Log.d("RESPONSE******************", resultstring);
-
-				JSONObject ob = null;
-				try {
-					ob = new JSONObject(resultstring);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-				if (ob != null) {
-					final String score = JSONParser.parseCorrections(ob);
-					runOnUiThread(new Runnable() {
-						public void run() {
-							DATA_SENT = true;
-						}
-					});
-
-				}
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			} finally {
-				Utilities.showOrHideActivityIndicator(ExaminationActivity.this,
-						1, "Please wait...");
-			}
-			return null;
+		if (Utilities.isNetworkAvailable(ExaminationActivity.this)) {
+			ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
+					ExaminationActivity.this);
+			transmitter.execute(object);
+		} else {
+			Utilities.writeString(ExaminationActivity.this, "jsondata",
+					object.toString());
 		}
-	}
 
-	private String convertStreamToString(InputStream is) {
-		String line = "";
-		StringBuilder total = new StringBuilder();
-		BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-		try {
-			while ((line = rd.readLine()) != null) {
-				total.append(line);
-			}
-		} catch (Exception e) {
-			Toast.makeText(this, "Stream Exception", Toast.LENGTH_SHORT).show();
-		}
-		return total.toString();
+		finish();
 	}
 
 	private void saveQuestionAnswers() throws JSONException {
@@ -646,6 +518,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 					if (areAllAnswersValidated()) {
 						abandonner.setText("SUBMIT");
 						valider.setVisibility(View.GONE);
+						SEND_DATA = true;
 					}
 
 					if (currentQuestionId < questions.size() - 1) {
@@ -664,11 +537,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.abandonner:
 			try {
-				if (Utilities.isNetworkAvailable(ExaminationActivity.this))
+				if (SEND_DATA)
 					sendAnswers();
-
-				finish();
-
+				else
+					showAlertDialogWhenFinishPressed("Attention",
+							getResources()
+									.getString(R.string.finish_alert_text));
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -694,34 +568,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			break;
 		}
 
-	}
-
-	public class CounterClass extends CountDownTimer {
-		public CounterClass(long millisInFuture, long countDownInterval) {
-			super(millisInFuture, countDownInterval);
-		}
-
-		@Override
-		public void onFinish() {
-			temps1.setText("");
-		}
-
-		@Override
-		public void onTick(long millisUntilFinished) {
-			long millis = millisUntilFinished;
-			Utilities.writeLong(ExaminationActivity.this,
-					"millisUntilFinished", millisUntilFinished);
-			String hms = String.format(
-					"%02d:%02d:%02d",
-					TimeUnit.MILLISECONDS.toHours(millis),
-					TimeUnit.MILLISECONDS.toMinutes(millis)
-							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-									.toHours(millis)),
-					TimeUnit.MILLISECONDS.toSeconds(millis)
-							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-									.toMinutes(millis)));
-			temps1.setText("Temps epreuve - " + hms);
-		}
 	}
 
 	private Runnable updateTimerThread = new Runnable() {
@@ -1014,34 +860,41 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	private void showAlertDialog() {
+
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				ExaminationActivity.this);
 
 		// set title
-		alertDialogBuilder.setTitle("You have been dropped out");
+		// alertDialogBuilder.setTitle("");
 
 		// set dialog message
 		alertDialogBuilder
-				.setMessage(
-						"You have been dropped out from examination, because you have left the exercise.")
+				.setMessage(getResources().getString(R.string.drop_out_text))
 				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
+				.setPositiveButton(
+						getResources().getString(R.string.drop_out_text_ok),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
 
-						Intent intentHome = new Intent(
-								ExaminationActivity.this, HomeActivity.class);
-						startActivity(intentHome);
+								Intent intentHome = new Intent(
+										ExaminationActivity.this,
+										HomeActivity.class);
+								startActivity(intentHome);
 
-						ExaminationActivity.this.finish();
-						onPaused = false;
-					}
-				});
+								ExaminationActivity.this.finish();
+								onPaused = false;
+							}
+						});
 
 		// create alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();
 
 		// show it
 		alertDialog.show();
+
+//		Utilities.showAlertDialog(ExaminationActivity.this, "Attention",
+//				getResources().getString(R.string.drop_out_text));
+
 	}
 
 	@Override
@@ -1078,6 +931,94 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			// CHANGED
 		}
 		super.onPause();
+	}
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent event) {
+
+		View v = getCurrentFocus();
+		boolean ret = super.dispatchTouchEvent(event);
+
+		if (v instanceof EditText) {
+			View w = getCurrentFocus();
+			int scrcoords[] = new int[2];
+			w.getLocationOnScreen(scrcoords);
+			float x = event.getRawX() + w.getLeft() - scrcoords[0];
+			float y = event.getRawY() + w.getTop() - scrcoords[1];
+
+			Log.d("Activity",
+					"Touch event " + event.getRawX() + "," + event.getRawY()
+							+ " " + x + "," + y + " rect " + w.getLeft() + ","
+							+ w.getTop() + "," + w.getRight() + ","
+							+ w.getBottom() + " coords " + scrcoords[0] + ","
+							+ scrcoords[1]);
+			if (event.getAction() == MotionEvent.ACTION_UP
+					&& (x < w.getLeft() || x >= w.getRight() || y < w.getTop() || y > w
+							.getBottom())) {
+
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(getWindow().getCurrentFocus()
+						.getWindowToken(), 0);
+			}
+		}
+		return ret;
+	}
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return false;
+	}
+
+	public class CounterClass extends CountDownTimer {
+		public CounterClass(long millisInFuture, long countDownInterval) {
+			super(millisInFuture, countDownInterval);
+		}
+
+		@Override
+		public void onFinish() {
+			temps1.setText("");
+		}
+
+		@Override
+		public void onTick(long millisUntilFinished) {
+			long millis = millisUntilFinished;
+			Utilities.writeLong(ExaminationActivity.this,
+					"millisUntilFinished", millisUntilFinished);
+			String hms = String.format(
+					"%02d:%02d:%02d",
+					TimeUnit.MILLISECONDS.toHours(millis),
+					TimeUnit.MILLISECONDS.toMinutes(millis)
+							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
+									.toHours(millis)),
+					TimeUnit.MILLISECONDS.toSeconds(millis)
+							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+									.toMinutes(millis)));
+			temps1.setText("Temps epreuve - " + hms);
+		}
+	}
+
+	public void showAlertDialogWhenFinishPressed(String title, String message) {
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				ExaminationActivity.this);
+
+		alertDialogBuilder.setTitle(title);
+		alertDialogBuilder
+				.setMessage(message)
+				.setCancelable(false)
+				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						finish();
+					}
+				})
+				.setNegativeButton("Cancel",
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+							}
+						});
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();
 	}
 
 }

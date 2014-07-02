@@ -56,14 +56,10 @@ public class BaseNetworkManager {
 						handleFinishResponse();
 						break;
 
-					case 403:
-						Log.d("Access denied. Please login", "404");
+					case 401:
+						Log.d("Username does not exists or Invalid password",
+								"401");
 						handleFailResponse("Access denied. Please login");
-						break;
-
-					case 400:
-						Log.d("Please check your internet connection.", "400");
-						handleFailResponse("Please check your internet connection.");
 						break;
 
 					case 500:

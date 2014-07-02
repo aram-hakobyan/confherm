@@ -6,23 +6,31 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
+import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
 import fr.conferencehermes.confhermexam.parser.Exam;
+import fr.conferencehermes.confhermexam.parser.TimeSlot;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExamsAdapter extends BaseAdapter {
 	private ArrayList<Exam> mListItems;
 	private LayoutInflater mLayoutInflater;
 	private ArrayList<Integer> mDownloadedExamIds;
+	private Context c;
 
 	public ExamsAdapter(Context context, ArrayList<Exam> arrayList,
 			ArrayList<Integer> downloadedExamIds) {
+		this.c = context;
 		this.mListItems = arrayList;
 		this.mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -63,47 +71,44 @@ public class ExamsAdapter extends BaseAdapter {
 		Exam exam = (Exam) mListItems.get(position);
 		if (exam != null) {
 			if (holder.name != null) {
-				holder.name.setText(exam.getTitle());
+				holder.name.setText(exam.getEvent_name() + " / "
+						+ exam.getTitle());
+			}
 
-				Calendar calendar = new GregorianCalendar(
-						TimeZone.getTimeZone("France"));
-				calendar.setTimeInMillis(exam.getStartDate() * 1000);
-				final String startTimeString = Utilities.timeConverter(calendar
-						.get(Calendar.HOUR_OF_DAY))
-						+ ":"
-						+ Utilities
-								.timeConverter(calendar.get(Calendar.MINUTE));
-				calendar.setTimeInMillis(exam.getEndDate() * 1000);
-				final String endTimeString = Utilities.timeConverter(calendar
-						.get(Calendar.HOUR_OF_DAY))
-						+ ":"
-						+ Utilities
-								.timeConverter(calendar.get(Calendar.MINUTE));
-				holder.desc.setText("Available from "
-						+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH))
-						+ "/"
-						+ String.valueOf(calendar.get(Calendar.MONTH) + 1)
-						+ "/" + String.valueOf(calendar.get(Calendar.YEAR))
-						+ " at " + startTimeString + " to " + endTimeString);
+			Calendar calendar = new GregorianCalendar(
+					TimeZone.getTimeZone("France"));
+			calendar.setTimeInMillis(exam.getStartDate() * 1000);
+			final String startTimeString = Utilities.timeConverter(calendar
+					.get(Calendar.HOUR_OF_DAY))
+					+ ":"
+					+ Utilities.timeConverter(calendar.get(Calendar.MINUTE));
+			calendar.setTimeInMillis(exam.getEndDate() * 1000);
+			final String endTimeString = Utilities.timeConverter(calendar
+					.get(Calendar.HOUR_OF_DAY))
+					+ ":"
+					+ Utilities.timeConverter(calendar.get(Calendar.MINUTE));
+			holder.desc.setText("Actif le "
+					+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
+					+ String.valueOf(calendar.get(Calendar.MONTH) + 1) + "/"
+					+ String.valueOf(calendar.get(Calendar.YEAR)) + " a  "
+					+ startTimeString + " to " + endTimeString);
 
-				int status = exam.getStatus();
-				if (status == 1) {
-					holder.status.setText("Disponible");
-					holder.button
-							.setBackgroundResource(R.drawable.exam_checked);
-				} else if (status == 2) {
-					holder.status.setText("Need update");
-					holder.button
-							.setBackgroundResource(R.drawable.exam_refresh);
-				} else if (status == 3) {
-					holder.status.setText("Not downloaded yet");
-					holder.button
-							.setBackgroundResource(R.drawable.exam_download);
+			int status = exam.getStatus();
+			if (status == 1) {
+				holder.status.setText(c.getResources().getString(
+						R.string.examen_avaible));
+				holder.button.setBackgroundResource(R.drawable.exam_checked);
+			} else if (status == 2) {
+				holder.status.setText("Need update");
+				holder.button.setBackgroundResource(R.drawable.exam_refresh);
+			} else if (status == 3) {
+				holder.status.setText(c.getResources().getString(
+						R.string.examen_non_avaible));
+				holder.button.setBackgroundResource(R.drawable.exam_download);
 
-				} else if (status == 4) {
-					holder.status.setText("Non disponible");
-					holder.button.setBackgroundResource(R.drawable.exam_x);
-				}
+			} else if (status == 4) {
+				holder.status.setText("Non disponible");
+				holder.button.setBackgroundResource(R.drawable.exam_x);
 			}
 
 		}
@@ -119,4 +124,5 @@ public class ExamsAdapter extends BaseAdapter {
 		protected Button button;
 
 	}
+
 }

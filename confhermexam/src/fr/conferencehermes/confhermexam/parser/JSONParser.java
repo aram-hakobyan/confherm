@@ -69,6 +69,7 @@ public class JSONParser {
 					e.setId(obj.getInt("exam_id"));
 					e.setEventId(obj.getInt("event_id"));
 					e.setTitle(obj.getString("exam_name"));
+					e.setEvent_name(obj.getString("event_name"));
 					e.setCategoryType(obj.getString("category_type"));
 					e.setStartDate(obj.getLong("start_date"));
 					e.setEndDate(obj.getLong("end_date"));

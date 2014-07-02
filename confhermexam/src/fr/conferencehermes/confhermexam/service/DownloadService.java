@@ -24,6 +24,7 @@ public class DownloadService extends IntentService {
 	private String path;
 	private Intent mIntent;
 	Handler mMainThreadHandler = null;
+	private int position;
 
 	public DownloadService() {
 		super("DownloadService");
@@ -35,6 +36,7 @@ public class DownloadService extends IntentService {
 		mIntent = intent;
 		String urlToDownload = intent.getStringExtra("url");
 		String title = intent.getStringExtra("title");
+		position = intent.getIntExtra("position", 0);
 		DownloaderTask downloadTask = new DownloaderTask();
 		downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
 				urlToDownload, title);
@@ -65,13 +67,12 @@ public class DownloadService extends IntentService {
 				title = params[1];
 				URL url = new URL(urlToDownload);
 				URLConnection connection = url.openConnection();
-				connection.connect();  
+				connection.connect();
 
 				int fileLength = connection.getContentLength();
 				path = Environment.getExternalStorageDirectory()
 						.getAbsolutePath();
-				
-				
+
 				path += "/temp/android/data/";
 
 				File mFolder = new File(path);
@@ -90,6 +91,7 @@ public class DownloadService extends IntentService {
 					Bundle resultData = new Bundle();
 					resultData.putInt("progress",
 							(int) (total * 100 / fileLength));
+					resultData.putInt("position", position);
 					receiver.send(UPDATE_PROGRESS, resultData);
 					output.write(data, 0, count);
 				}
