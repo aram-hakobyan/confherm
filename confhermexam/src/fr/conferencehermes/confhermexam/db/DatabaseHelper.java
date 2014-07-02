@@ -13,6 +13,7 @@ import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
+import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.parser.Profile;
 import fr.conferencehermes.confhermexam.parser.Question;
 
@@ -33,6 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String TABLE_QUESTIONS = "Questions";
 	private static final String TABLE_USERS = "Users";
 	private static final String TABLE_ANSWERS = "Answers";
+	private static final String TABLE_EXERCISE_ANSWERS = "ExerciseAnswers";
 
 	// EVENT column names
 	private static final String KEY_EVENT_ID = "eventId";
@@ -88,6 +90,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_ANSWER_ID = "answerId";
 	private static final String KEY_ANSWER_NAME = "name";
 	private static final String KEY_ANSWER_QUESTION_ID = "questionId";
+
+	// EXERCISE ANSWERS column names
+	private static final String KEY_EXERCISE_ANSWER_EXERCISE_ID = "exerciseId";
+	private static final String KEY_EXERCISE_ANSWER_EXAM_ID = "examId";
+	private static final String KEY_EXERCISE_ANSWER_EVENT_ID = "eventId";
+	private static final String KEY_EXERCISE_ANSWER_JSONSTRING = "jsonString";
 
 	// Table Create Statements
 	// Event table create statement
@@ -145,6 +153,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ KEY_ANSWER_NAME + " TEXT," + KEY_ANSWER_QUESTION_ID + " INTEGER"
 			+ ")";
 
+	// Exercise Answers table create statement
+	private static final String CREATE_TABLE_EXERCISE_ANSWERS = "CREATE TABLE "
+			+ TABLE_EXERCISE_ANSWERS + "(" + KEY_EXERCISE_ANSWER_EXERCISE_ID
+			+ " INTEGER PRIMARY KEY," + KEY_EXERCISE_ANSWER_EXAM_ID
+			+ " INTEGER," + KEY_EXERCISE_ANSWER_EVENT_ID + " INTEGER,"
+			+ KEY_EXERCISE_ANSWER_JSONSTRING + " TEXT" + ")";
+
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -152,7 +167,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		// creating required tables
-		db.execSQL(CREATE_TABLE_ANSWERS);
 		db.execSQL(CREATE_TABLE_EVENT);
 		db.execSQL(CREATE_TABLE_EXAM);
 		db.execSQL(CREATE_TABLE_EXERCISE);
@@ -160,12 +174,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(CREATE_TABLE_QUESTION);
 		db.execSQL(CREATE_TABLE_QUESTION_FILES);
 		db.execSQL(CREATE_TABLE_USER);
+		db.execSQL(CREATE_TABLE_ANSWERS);
+		db.execSQL(CREATE_TABLE_EXERCISE_ANSWERS);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		// on upgrade drop older tables
-		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANSWERS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXAMS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE_FILES);
@@ -173,6 +188,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTION_FILES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTIONS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANSWERS);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE_ANSWERS);
 
 		// create new tables
 		onCreate(db);
@@ -1164,6 +1181,149 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				a.setAnswer(c.getString(c.getColumnIndex(KEY_ANSWER_NAME)));
 				a.setQuestionId(c.getInt(c
 						.getColumnIndex(KEY_ANSWER_QUESTION_ID)));
+				answers.add(a);
+
+			} while (c.moveToNext());
+			c.close();
+		}
+		return answers;
+	}
+
+	/*
+	 * Creating an exercise answer
+	 */
+	public long createExerciseAnswer(ExerciseAnswer a) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_EXERCISE_ANSWER_EXERCISE_ID, a.getExerciseId());
+		values.put(KEY_EXERCISE_ANSWER_EXAM_ID, a.getExamId());
+		values.put(KEY_EXERCISE_ANSWER_EVENT_ID, a.getEventId());
+		values.put(KEY_EXERCISE_ANSWER_JSONSTRING, a.getJsonString());
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_EXERCISE_ANSWERS, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single exercise answer
+	 */
+	public ExerciseAnswer getExerciseAnswer(long answer_id) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISE_ANSWERS
+				+ " WHERE " + KEY_EXERCISE_ANSWER_EXERCISE_ID + " = "
+				+ answer_id;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		ExerciseAnswer a = new ExerciseAnswer();
+		if (c != null && c.moveToFirst()) {
+			a.setExerciseId((c.getInt(c
+					.getColumnIndex(KEY_EXERCISE_ANSWER_EXERCISE_ID))));
+			a.setExamId(c.getInt(c.getColumnIndex(KEY_EXERCISE_ANSWER_EXAM_ID)));
+			a.setEventId(c.getInt(c
+					.getColumnIndex(KEY_EXERCISE_ANSWER_EVENT_ID)));
+			a.setJsonString(c.getString(c
+					.getColumnIndex(KEY_EXERCISE_ANSWER_JSONSTRING)));
+			c.close();
+		}
+
+		return a;
+	}
+
+	/*
+	 * getting all exercise answers
+	 */
+	public ArrayList<ExerciseAnswer> getAllExerciseAnswers() {
+		ArrayList<ExerciseAnswer> answers = new ArrayList<ExerciseAnswer>();
+		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISE_ANSWERS;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c != null && c.moveToFirst()) {
+			do {
+				ExerciseAnswer a = new ExerciseAnswer();
+				a.setExerciseId((c.getInt(c
+						.getColumnIndex(KEY_EXERCISE_ANSWER_EXERCISE_ID))));
+				a.setExamId(c.getInt(c
+						.getColumnIndex(KEY_EXERCISE_ANSWER_EXAM_ID)));
+				a.setEventId(c.getInt(c
+						.getColumnIndex(KEY_EXERCISE_ANSWER_EVENT_ID)));
+				a.setJsonString(c.getString(c
+						.getColumnIndex(KEY_EXERCISE_ANSWER_JSONSTRING)));
+
+				answers.add(a);
+			} while (c.moveToNext());
+			c.close();
+		}
+
+		return answers;
+	}
+
+	/*
+	 * Updating an exercise answer
+	 */
+	public int updateExerciseAnswer(ExerciseAnswer a) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_EXERCISE_ANSWER_EXERCISE_ID, a.getExerciseId());
+		values.put(KEY_EXERCISE_ANSWER_EXAM_ID, a.getExamId());
+		values.put(KEY_EXERCISE_ANSWER_EVENT_ID, a.getExamId());
+		values.put(KEY_EXERCISE_ANSWER_JSONSTRING, a.getJsonString());
+
+		// updating row
+		return db.update(TABLE_EXERCISE_ANSWERS, values,
+				KEY_EXERCISE_ANSWER_EXERCISE_ID + " = ?",
+				new String[] { String.valueOf(a.getExerciseId()) });
+	}
+
+	/*
+	 * Deleting an exercise answer
+	 */
+	public void deleteExerciseAnswer(long exercise_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_EXERCISE_ANSWERS, KEY_EXERCISE_ANSWER_EXERCISE_ID
+				+ " = ?", new String[] { String.valueOf(exercise_id) });
+	}
+
+	/*
+	 * getting all exercise answers by exam id
+	 */
+	public ArrayList<ExerciseAnswer> getAllExerciseAnswersByExamId(int examId) {
+		ArrayList<ExerciseAnswer> answers = new ArrayList<ExerciseAnswer>();
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_EXERCISE_ANSWERS
+				+ " WHERE " + KEY_EXERCISE_ANSWER_EXAM_ID + " = " + examId;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null && c.moveToFirst()) {
+			do {
+				ExerciseAnswer a = new ExerciseAnswer();
+				a.setExerciseId((c.getInt(c
+						.getColumnIndex(KEY_EXERCISE_ANSWER_EXERCISE_ID))));
+				a.setExamId(c.getInt(c
+						.getColumnIndex(KEY_EXERCISE_ANSWER_EXAM_ID)));
+				a.setExamId(c.getInt(c
+						.getColumnIndex(KEY_EXERCISE_ANSWER_EVENT_ID)));
+				a.setJsonString(c.getString(c
+						.getColumnIndex(KEY_EXERCISE_ANSWER_JSONSTRING)));
 				answers.add(a);
 
 			} while (c.moveToNext());

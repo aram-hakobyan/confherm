@@ -1,5 +1,7 @@
 package fr.conferencehermes.confhermexam;
 
+import java.util.ArrayList;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -12,18 +14,22 @@ import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
 import fr.conferencehermes.confhermexam.fragments.ExamineFragment;
 import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
 import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
 import fr.conferencehermes.confhermexam.fragments.TrainingsFragment;
+import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class MyFragmentActivity extends FragmentActivity implements
 		OnClickListener {
+
+	private DatabaseHelper db;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,23 +77,35 @@ public class MyFragmentActivity extends FragmentActivity implements
 			fragmentTransaction.commit();
 		}
 
+		db = new DatabaseHelper(MyFragmentActivity.this);
+
 	}
 
 	@Override
 	protected void onResume() {
 		if (Utilities.isNetworkAvailable(MyFragmentActivity.this)) {
-			if (!Utilities.readString(MyFragmentActivity.this, "jsondata", "")
-					.isEmpty()) {
+			ArrayList<ExerciseAnswer> exerciseAnswers = db
+					.getAllExerciseAnswers();
+			if (!exerciseAnswers.isEmpty()) {
 				try {
-					String jsonstring = Utilities.readString(
-							MyFragmentActivity.this, "jsondata", "");
-					System.out.println("jsonstring " + jsonstring);
-					JSONObject object = new JSONObject(jsonstring);
-					ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
-							MyFragmentActivity.this);
-					transmitter.execute(object);
+					
+					for (int i = 0; i < exerciseAnswers.size(); i++) {
+						String jsonstring = exerciseAnswers.get(i)
+								.getJsonString();
+						System.out.println("jsonstring " + jsonstring);
+						JSONObject object = new JSONObject(jsonstring);
+						ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
+								MyFragmentActivity.this);
+						transmitter.execute(object);
+
+						db.deleteExerciseAnswer(exerciseAnswers.get(i)
+								.getExerciseId());
+
+					}
 				} catch (JSONException e) {
 					e.printStackTrace();
+				} finally {
+					db.close();
 				}
 
 			}
@@ -132,11 +150,11 @@ public class MyFragmentActivity extends FragmentActivity implements
 
 	@Override
 	public void onBackPressed() {
-		// try {
-		// LogoutRequest.logOut(MyFragmentActivity.this);
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
 		finish();
+	}
+
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 	}
 }

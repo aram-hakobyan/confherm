@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -63,6 +64,7 @@ import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Exercise;
+import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
@@ -398,25 +400,61 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		data.put("event_id", event_id);
 		data.put("exam_id", exam_id);
-		data.put("exercise_id", exercise.getId());
+		data.put("exercise_id", exercise_id);
+		data.put("is_send", 0);
 		data.put("type", exercise.getType());
 
 		JSONArray answers = answersArray;
 		data.put("question_answers", answers);
-		object.put("auth_key", Utilities.readString(ExaminationActivity.this,
-				Constants.AUTHKEY_SHAREDPREFS_KEY, ""));
+		object.put("auth_key",
+				Utilities.readString(ExaminationActivity.this, "auth_key", ""));
+		object.put("device_id", Utilities.getDeviceId(ExaminationActivity.this));
+		object.put("device_time", System.currentTimeMillis() / 1000);
 		object.put("data", data);
+
+		Utilities.writeBoolean(ExaminationActivity.this,
+				String.valueOf("exercise" + exercise_id), false);
 
 		if (Utilities.isNetworkAvailable(ExaminationActivity.this)) {
 			ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
 					ExaminationActivity.this);
 			transmitter.execute(object);
+			finish();
 		} else {
-			Utilities.writeString(ExaminationActivity.this, "jsondata",
-					object.toString());
+			DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
+			ExerciseAnswer exerciseAnswer = new ExerciseAnswer();
+			exerciseAnswer.setExerciseId(exercise.getId());
+			exerciseAnswer.setExamId(exam_id);
+			exerciseAnswer.setEventId(event_id);
+			exerciseAnswer.setJsonString(data.toString());
+			db.createExerciseAnswer(exerciseAnswer);
+			db.closeDB();
+			showAlertDialog(ExaminationActivity.this, "Attention",
+					"No internet connection. Exam will be submitted after connection.");
 		}
 
-		finish();
+	}
+
+	public void showAlertDialog(Context context, String title, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title);
+		builder.setMessage(message);
+		builder.setCancelable(true);
+		builder.setPositiveButton(android.R.string.ok,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		AlertDialog dialog = builder.create();
+		dialog.setOnDismissListener(new OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				finish();
+			}
+		});
+		dialog.show();
 	}
 
 	private void saveQuestionAnswers() throws JSONException {
@@ -864,9 +902,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				ExaminationActivity.this);
 
-		// set title
-		// alertDialogBuilder.setTitle("");
-
 		// set dialog message
 		alertDialogBuilder
 				.setMessage(getResources().getString(R.string.drop_out_text))
@@ -891,9 +926,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		// show it
 		alertDialog.show();
-
-		Utilities.showAlertDialog(ExaminationActivity.this, "Attention",
-				getResources().getString(R.string.drop_out_text));
 
 	}
 
@@ -978,6 +1010,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		@Override
 		public void onFinish() {
 			temps1.setText("");
+			/*
+			 * try { sendAnswers(); } catch (JSONException e) { // TODO
+			 * Auto-generated catch block e.printStackTrace(); }
+			 */
 		}
 
 		@Override

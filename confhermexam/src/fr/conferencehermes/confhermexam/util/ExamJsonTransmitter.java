@@ -19,6 +19,7 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import fr.conferencehermes.confhermexam.ExaminationActivity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -48,12 +49,25 @@ public class ExamJsonTransmitter extends
 
 	@Override
 	protected JSONObject doInBackground(JSONObject... data) {
+		JSONObject object = new JSONObject();
 		JSONObject json = data[0];
+
+		try {
+			object.put("auth_key",
+					Utilities.readString(context, "auth_key", ""));
+			object.put("device_time", System.currentTimeMillis() / 1000);
+			object.put("device_id", Utilities.getDeviceId(context));
+			object.put("data", data);
+		} catch (JSONException e1) {
+			e1.printStackTrace();
+		}
+
+		Log.d("JSON WITH ANSWERS", object.toString());
 		DefaultHttpClient httpclient = new DefaultHttpClient();
 		HttpPost httppostreq = new HttpPost(url);
 		StringEntity se;
 		try {
-			se = new StringEntity(json.toString());
+			se = new StringEntity(object.toString());
 
 			se.setContentType("application/json;charset=UTF-8");
 			se.setContentEncoding(new BasicHeader(HTTP.CONTENT_TYPE,

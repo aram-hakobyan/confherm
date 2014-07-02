@@ -526,6 +526,9 @@ public class QuestionResponseActivity extends Activity implements
 	public void sendAnswers() throws JSONException {
 		Utilities.showOrHideActivityIndicator(QuestionResponseActivity.this, 0,
 				"Please wait...");
+		Utilities.writeBoolean(QuestionResponseActivity.this,
+				String.valueOf("trainingexercise" + exercise_id), false);
+
 		Map<String, String> params = new HashMap<String, String>();
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -1197,7 +1200,7 @@ public class QuestionResponseActivity extends Activity implements
 						text.setVisibility(View.INVISIBLE);
 					}
 				});
-		
+
 		dialog.findViewById(R.id.button2).setOnClickListener(
 				new OnClickListener() {
 					@Override
@@ -1219,7 +1222,7 @@ public class QuestionResponseActivity extends Activity implements
 
 					}
 				});
-		
+
 		dialog.findViewById(R.id.button3).setOnClickListener(
 				new OnClickListener() {
 					@Override

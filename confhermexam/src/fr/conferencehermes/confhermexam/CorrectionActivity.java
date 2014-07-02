@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +39,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -49,6 +52,8 @@ import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
@@ -56,7 +61,9 @@ import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
+import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
+import fr.conferencehermes.confhermexam.util.Constants;
 
 public class CorrectionActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
@@ -180,6 +187,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				questionAnswers.add(null);
 			}
 			selectQuestion(questions.get(0), 0);
+			getCorrections();
 
 		}
 
@@ -229,6 +237,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						RadioGroup.LayoutParams.WRAP_CONTENT,
 						RadioGroup.LayoutParams.WRAP_CONTENT);
 				mRadioGroup.addView(newRadioButton, 0, layoutParams);
+				newRadioButton.setEnabled(false);
 
 			}
 			answersLayout.addView(mRadioGroup);
@@ -249,6 +258,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
 				final CheckBox checkBox = new CheckBox(CorrectionActivity.this);
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
+				checkBox.setEnabled(false);
 				TextView text = new TextView(CorrectionActivity.this);
 				text.setText(currentQuestionAnswers.get(i).getAnswer());
 				text.setGravity(Gravity.CENTER_VERTICAL);
@@ -308,7 +318,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(CorrectionActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				editText.requestFocus();
+				editText.setEnabled(false);
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
@@ -360,6 +370,33 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			btnVideo.setClickable(true);
 			btnVideo.setAlpha(1f);
 		}
+	}
+
+	private void getCorrections() {
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put("exercise_id", exercise_id);
+		params.put("event_id", event_id);
+
+		aq.ajax(Constants.EXAM_EXERCISE_CORRECTIONS_URL, params,
+				JSONObject.class, new AjaxCallback<JSONObject>() {
+					@Override
+					public void callback(String url, JSONObject json,
+							AjaxStatus status) {
+
+						try {
+							if (json.has("data") && json.get("data") != null) {
+								ArrayList<Correction> corrections = JSONParser
+										.parseResultCorrections(json);
+								drawCorrections(corrections);
+							}
+						} catch (JSONException e) {
+							e.printStackTrace();
+
+						}
+					}
+				});
+
 	}
 
 	private void drawCorrections(ArrayList<Correction> corrections) {
@@ -495,38 +532,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		btnAudioCorrection.setOnClickListener(this);
 		btnVideoCorrection.setOnClickListener(this);
 
-		setCorrectionFileIcons(currentQuestion.getCorrectionFiles());
-
-	}
-
-	private void setCorrectionFileIcons(HashMap<String, String> files) {
-		if (files.get("image").isEmpty()) {
-			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera_gray);
-			btnImageCorrection.setClickable(false);
-			btnImageCorrection.setAlpha(0.5f);
-		} else {
-			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera);
-			btnImageCorrection.setClickable(true);
-			btnImageCorrection.setAlpha(1f);
-		}
-		if (files.get("sound").isEmpty()) {
-			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound_gray);
-			btnAudioCorrection.setClickable(false);
-			btnAudioCorrection.setAlpha(0.5f);
-		} else {
-			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound);
-			btnAudioCorrection.setClickable(true);
-			btnAudioCorrection.setAlpha(1f);
-		}
-		if (files.get("video").isEmpty()) {
-			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video_gray);
-			btnVideoCorrection.setClickable(false);
-			btnVideoCorrection.setAlpha(0.5f);
-		} else {
-			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video);
-			btnVideoCorrection.setClickable(true);
-			btnVideoCorrection.setAlpha(1f);
-		}
 	}
 
 	@Override

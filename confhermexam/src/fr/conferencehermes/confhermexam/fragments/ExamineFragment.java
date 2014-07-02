@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.crypto.spec.PSource;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -68,12 +70,46 @@ public class ExamineFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if (exams != null)
-					showPasswordAlert(exams.get(position).getId(),
-							exams.get(position).getEventId());
-				else if (dbExams != null)
-					showPasswordAlert(dbExams.get(position).getId(), dbExams
-							.get(position).getEventId());
+				if (dbExams != null
+						&& !Utilities.isNetworkAvailable(getActivity())) {
+					String key = "exam"
+							+ String.valueOf(downloadedExamIds.get(position));
+					if (Utilities.readBoolean(getActivity(), key, true)
+							|| position == 0) {
+						if (dbExams.get(position).getPassword().isEmpty()) {
+							Intent intent = new Intent(getActivity(),
+									ExamExercisesActivity.class);
+							intent.putExtra("exam_id", dbExams.get(position)
+									.getId());
+							intent.putExtra("event_id", dbExams.get(position)
+									.getEventId());
+							startActivity(intent);
+						} else {
+							try {
+								showPasswordAlert(
+										dbExams.get(position).getId(), dbExams
+												.get(position).getEventId());
+							} catch (NullPointerException e) {
+								e.printStackTrace();
+							} catch (IndexOutOfBoundsException e) {
+								e.printStackTrace();
+							}
+
+						}
+					} else {
+						Utilities
+								.showAlertDialog(
+										getActivity(),
+										"Attention",
+										"Cet examen est terminé ou vous l'avez déjà passé vous ne pouvez pas le refaire.");
+					}
+				} else {
+					Utilities
+							.showAlertDialog(
+									getActivity(),
+									"Attention",
+									"Vous devez télécharger l'epreuve avant de pouvoir y participer. il est conseiller de vous connecter en wi-fi.");
+				}
 			}
 
 		});
