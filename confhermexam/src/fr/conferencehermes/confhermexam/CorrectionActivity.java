@@ -179,7 +179,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		});
 
 		if (Utilities.isNetworkAvailable(CorrectionActivity.this))
-			sendAnswers();
+			//sendAnswers();
 		
 		db = new DatabaseHelper(CorrectionActivity.this);
 
@@ -457,7 +457,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 
 		data.put("exercise_id", exercise.getId());
-		data.put("event_id", db.getE());
+		//data.put("event_id", db.getE());
 
 		JSONArray answers = answersArray;
 		data.put("question_answers", answers);
