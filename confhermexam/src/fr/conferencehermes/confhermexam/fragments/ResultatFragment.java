@@ -21,10 +21,10 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.ResultsAdapter;
-import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Result;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ResultatFragment extends Fragment {
 	private LayoutInflater inflater;
@@ -51,7 +51,7 @@ public class ResultatFragment extends Fragment {
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		if (NetworkReachability.isReachable()) {
+		if (Utilities.isNetworkAvailable(getActivity())) {
 			aq.ajax(Constants.RESULT_LIST_URL, params, JSONObject.class,
 					new AjaxCallback<JSONObject>() {
 						@Override
@@ -73,13 +73,6 @@ public class ResultatFragment extends Fragment {
 											listview.setAdapter(adapter);
 											progressBar
 													.setVisibility(View.GONE);
-										} else {
-											Toast.makeText(
-													getActivity()
-															.getApplicationContext(),
-													"No Any Result",
-													Toast.LENGTH_SHORT).show();
-
 										}
 									}
 								}

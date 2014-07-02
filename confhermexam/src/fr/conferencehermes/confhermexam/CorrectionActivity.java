@@ -4,26 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.TimeUnit;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
-import android.content.Intent;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.SystemClock;
 import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
@@ -52,7 +46,6 @@ import android.widget.MediaController;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.androidquery.AQuery;
@@ -60,13 +53,10 @@ import com.androidquery.AQuery;
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
-import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
+import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.Question;
-import fr.conferencehermes.confhermexam.util.Constants;
-import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
-import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class CorrectionActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
@@ -76,33 +66,25 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private ArrayList<Question> questions;
 	private LinearLayout answersLayout, correctionsLayout;
 	private Button btnImage, btnAudio, btnVideo, abandonner, ennouncer;
+	private Button btnImageCorrection;
+	private Button btnAudioCorrection;
+	private Button btnVideoCorrection;
 	private int exercise_id, exam_id, event_id;
-
 	private TextView teacher;
 	private TextView examName;
-
 	Question currentQuestion;
 	ArrayList<Answer> currentQuestionAnswers;
 	int currentQuestionId = 0;
 	HashMap<String, String> currentQuestionFiles;
 	HashMap<String, String> exerciseFiles;
-
 	AQuery aq;
 	JSONArray answersArray;
 	private RadioGroup mRadioGroup;
 	private ArrayList<Integer> multipleAnswers;
-
-	int ANSWERED_QUESTIONS_COUNT = 0;
 	ArrayList<EditText> editTextsArray;
-
-	private boolean onPaused = false;
-	private boolean SEND_DATA = false;
-
-	private SparseBooleanArray validAnswers;
 	private ArrayList<QuestionAnswer> questionAnswers;
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
-
 	DatabaseHelper db;
 
 	@Override
@@ -115,7 +97,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		aq = new AQuery(CorrectionActivity.this);
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
-		validAnswers = new SparseBooleanArray();
 		questionAnswers = new ArrayList<QuestionAnswer>();
 
 		editTextsArray = new ArrayList<EditText>();
@@ -151,25 +132,23 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// selectQuestion(questions.get(position), position);
+				selectQuestion(questions.get(position), position);
 			}
 
 		});
 
 		db = new DatabaseHelper(CorrectionActivity.this);
 
-		db.getAllQuestions();
-
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
 		if (exercise.getExerciseType() == 2) {
 			ennouncer.setVisibility(View.GONE);
 		}
-
 		questions = db.getAllQuestionsByExerciseId(exercise_id);
-		// db.getAllQuestions();
-		adapter = new QuestionsAdapter(CorrectionActivity.this, questions);
+		System.out
+				.println("DB ALL QUESTIONS***********" + db.getAllQuestions());
 
+		adapter = new QuestionsAdapter(CorrectionActivity.this, questions);
 		listview.setAdapter(adapter);
 		examName.setText(exercise.getName());
 		teacher.setText("Teacher " + exercise.getTeacher());
@@ -216,7 +195,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 					getResources().getColor(R.color.app_main_color_dark));
 			for (int i = 0; i < listview.getChildCount(); i++) {
 
-			} 
+			}
 		}
 
 		currentQuestionId = position;
@@ -383,146 +362,178 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		}
 	}
 
-	public void sendAnswers() throws JSONException {
-		JSONObject object = new JSONObject();
-		JSONObject data = new JSONObject();
-
-		data.put("event_id", event_id);
-		data.put("exam_id", exam_id);
-		data.put("exercise_id", exercise.getId());
-		data.put("type", exercise.getType());
-
-		JSONArray answers = answersArray;
-		data.put("question_answers", answers);
-		object.put("auth_key", Utilities.readString(CorrectionActivity.this,
-				Constants.AUTHKEY_SHAREDPREFS_KEY, ""));
-		object.put("data", data);
-
-		if (Utilities.isNetworkAvailable(CorrectionActivity.this)) {
-			ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
-					CorrectionActivity.this);
-			transmitter.execute(object);
-		} else {
-			Utilities.writeString(CorrectionActivity.this, "jsondata",
-					object.toString());
+	private void drawCorrections(ArrayList<Correction> corrections) {
+		correctionsLayout.removeAllViews();
+		ArrayList<String> correctionAnswerIDs = new ArrayList<String>();
+		for (Correction c : corrections) {
+			if (currentQuestion.getId() == Integer.valueOf(c.getQuestionId())) {
+				correctionAnswerIDs = c.getAnswersArray();
+			}
 		}
 
-		finish();
-	}
+		ArrayList<String> allAnswerIDs = new ArrayList<String>();
+		ArrayList<Answer> allAnswers = currentQuestion.getAnswers();
+		for (int i = 0; i < allAnswers.size(); i++) {
+			allAnswerIDs.add(String.valueOf(allAnswers.get(i).getId()));
+		}
 
-	private void saveQuestionAnswers() throws JSONException {
-		JSONObject questionAnswer = new JSONObject();
-		questionAnswer.put("question_id", currentQuestion.getId());
-		questionAnswer.put("question_type", currentQuestion.getType());
+		int answerCount = 0;
+		if (currentQuestion.getType().equalsIgnoreCase("3")) {
+			answerCount = Integer.valueOf(currentQuestion.getInputCount());
+		} else {
+			answerCount = allAnswers.size();
+		}
 
-		JSONArray answers = new JSONArray();
+		for (int j = 0; j < answerCount; j++) {
+			ImageView img = new ImageView(CorrectionActivity.this);
 
-		try {
+			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+					30, 30);
+
 			if (currentQuestion.getType().equalsIgnoreCase("2")) {
+				for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
+					mRadioGroup.getChildAt(i).setEnabled(false);
+				}
 
-				int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
-				View radioButton = mRadioGroup.findViewById(radioButtonID);
-				int idx = mRadioGroup.indexOfChild(radioButton);
-				int answerId = currentQuestionAnswers.get(idx).getId();
-				answers.put(answerId);
+				imageParams.setMargins(0, 7, 0, 0);
+				int userAnswerIDs = questionAnswers.get(currentQuestionId)
+						.getSingleAnswerPosition();
+
+				if (userAnswerIDs == j) {
+					if (allAnswerIDs.get(userAnswerIDs).equalsIgnoreCase(
+							correctionAnswerIDs.get(0)))
+						img.setBackgroundResource(R.drawable.correction_true);
+					else
+						img.setBackgroundResource(R.drawable.correction_false);
+				} else {
+					if (allAnswerIDs.get(j).equalsIgnoreCase(
+							correctionAnswerIDs.get(0)))
+						img.setBackgroundResource(R.drawable.correction_true);
+				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-				for (int i = 0; i < multipleAnswers.size(); i++) {
-					answers.put(multipleAnswers.get(i));
-				}
-				multipleAnswers.clear();
-			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-				for (EditText editText : editTextsArray) {
-					if (editText.getText().length() != 0) {
-						answers.put(editText.getText());
-					} else {
-						answers.put("");
+				for (int i = 0; i < answersLayout.getChildCount(); i++) {
+					LinearLayout layout = (LinearLayout) answersLayout
+							.getChildAt(i);
+					for (int i1 = 0; i1 < layout.getChildCount(); i1++) {
+						layout.getChildAt(i1).setEnabled(false);
 					}
 				}
 
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		questionAnswer.put("answers", answers);
-		answersArray.put(questionAnswer);
-	}
+				imageParams.setMargins(0, 5, 0, 0);
 
-	private void saveValidation() {
-		QuestionAnswer qa = new QuestionAnswer();
-		if (currentQuestion.getType().equalsIgnoreCase("2")) {
-			qa.setType(2);
-			int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
-			View radioButton = mRadioGroup.findViewById(radioButtonID);
-			int idx = mRadioGroup.indexOfChild(radioButton);
-			qa.setSingleAnswerPosition(idx);
-		} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-			qa.setType(1);
-			ArrayList<Integer> mAnswers = new ArrayList<Integer>(
-					multipleAnswers);
-			qa.setMultiAnswerPositions(mAnswers);
-		} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-			qa.setType(3);
-			for (int e = 0; e < editTextsArray.size(); e++) {
-				qa.getTextAnswers().add(e,
-						editTextsArray.get(e).getText().toString());
-			}
-		}
+				ArrayList<Integer> userAnswerIDs = questionAnswers.get(
+						currentQuestionId).getMultiAnswerPositions();
+				for (int i = 0; i < userAnswerIDs.size(); i++) {
+					String currentAsnwerId = allAnswerIDs.get(j);
+					if (currentAsnwerId.equalsIgnoreCase(String
+							.valueOf(userAnswerIDs.get(i)))) { // User has
+																// checked
+																// this
+																// answer
 
-		questionAnswers.set(currentQuestionId, qa);
-	}
+						for (int k = 0; k < correctionAnswerIDs.size(); k++) {
+							if (correctionAnswerIDs.get(k).equalsIgnoreCase(
+									currentAsnwerId)) // The checked answer
+														// exists in correct
+														// answers
+								img.setBackgroundResource(R.drawable.correction_true);
+							else
+								img.setBackgroundResource(R.drawable.correction_false);
+						}
+					} else {
+						for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
+							if (currentAsnwerId
+									.equalsIgnoreCase(correctionAnswerIDs
+											.get(k1)))
+								img.setBackgroundResource(R.drawable.correction_true);
 
-	private boolean isValidAnswer() {
-		if (currentQuestion.getType().equalsIgnoreCase("2")) {
-			return mRadioGroup.getCheckedRadioButtonId() != -1;
-		} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-			return !multipleAnswers.isEmpty();
-		} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-			for (EditText editText : editTextsArray) {
-				if (editText.getText().length() != 0) {
-					return true;
+						}
+
+					}
 				}
+
+			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
+				imageParams.setMargins(0, 20, 0, 0);
+
+				try {
+					JSONObject corObj = new JSONObject(corrections
+							.get(currentQuestionId).getAnswersArray().get(j));
+					String answerText = corObj.getString("name");
+					editTextsArray.get(j).setText(answerText);
+					editTextsArray.get(j).setEnabled(false);
+
+					int IS_GOOD = corObj.getInt("is_good");
+					if (IS_GOOD == 1) {
+						img.setBackgroundResource(R.drawable.correction_true);
+					} else {
+						img.setBackgroundResource(R.drawable.correction_false);
+					}
+
+				} catch (JSONException e) {
+					e.printStackTrace();
+				} catch (IndexOutOfBoundsException e) {
+					e.printStackTrace();
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
+
 			}
+
+			correctionsLayout.addView(img, imageParams);
 		}
-		return false;
+
+		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
+		correctionText.setText(corrections.get(currentQuestionId).getText());
+		LinearLayout correctionButtons = (LinearLayout) findViewById(R.id.correctionButtons);
+		correctionButtons.setVisibility(View.VISIBLE);
+
+		btnImageCorrection = (Button) findViewById(R.id.btnImageCorrection);
+		btnAudioCorrection = (Button) findViewById(R.id.btnAudioCorrection);
+		btnVideoCorrection = (Button) findViewById(R.id.btnVideoCorrection);
+		btnImageCorrection.setOnClickListener(this);
+		btnAudioCorrection.setOnClickListener(this);
+		btnVideoCorrection.setOnClickListener(this);
+
+		setCorrectionFileIcons(currentQuestion.getCorrectionFiles());
+
 	}
 
-	private boolean areAllAnswersValidated() {
-		int count = 0;
-		for (int i = 0; i < questionAnswers.size(); i++) {
-			if (questionAnswers.get(i) != null)
-				count++;
+	private void setCorrectionFileIcons(HashMap<String, String> files) {
+		if (files.get("image").isEmpty()) {
+			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera_gray);
+			btnImageCorrection.setClickable(false);
+			btnImageCorrection.setAlpha(0.5f);
+		} else {
+			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera);
+			btnImageCorrection.setClickable(true);
+			btnImageCorrection.setAlpha(1f);
 		}
-
-		return count == questions.size();
+		if (files.get("sound").isEmpty()) {
+			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound_gray);
+			btnAudioCorrection.setClickable(false);
+			btnAudioCorrection.setAlpha(0.5f);
+		} else {
+			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound);
+			btnAudioCorrection.setClickable(true);
+			btnAudioCorrection.setAlpha(1f);
+		}
+		if (files.get("video").isEmpty()) {
+			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video_gray);
+			btnVideoCorrection.setClickable(false);
+			btnVideoCorrection.setAlpha(0.5f);
+		} else {
+			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video);
+			btnVideoCorrection.setClickable(true);
+			btnVideoCorrection.setAlpha(1f);
+		}
 	}
 
 	@Override
 	public void onClick(View v) {
 		switch (v.getId()) {
-		/*
-		 * case R.id.validerBtn: try { if (isValidAnswer()) { saveValidation();
-		 * saveQuestionAnswers(); ANSWERED_QUESTIONS_COUNT++; if
-		 * (areAllAnswersValidated()) { abandonner.setText("SUBMIT");
-		 * 
-		 * SEND_DATA = true; }
-		 * 
-		 * if (currentQuestionId < questions.size() - 1) { currentQuestionId++;
-		 * selectQuestion(questions.get(currentQuestionId), currentQuestionId);
-		 * } } else Toast.makeText(CorrectionActivity.this,
-		 * "Please select at least one answer.", Toast.LENGTH_SHORT).show(); }
-		 * catch (JSONException e) { e.printStackTrace(); }
-		 * validAnswers.put(currentQuestionId, true); break;
-		 */
 		case R.id.abandonner:
-			try {
-				if (SEND_DATA)
-					sendAnswers();
-				else
-					finish();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			finish();
 			break;
 		case R.id.ennouncer:
 			if (exerciseFiles != null)
@@ -809,73 +820,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		mediaPlayer.stop();
 		mediaPlayer.release();
 		super.onDestroy();
-	}
-
-	private void showAlertDialog() {
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				CorrectionActivity.this);
-
-		// set title
-		alertDialogBuilder.setTitle("You have been dropped out");
-
-		// set dialog message
-		alertDialogBuilder
-				.setMessage(
-						"You have been dropped out from examination, because you have left the exercise.")
-				.setCancelable(false)
-				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-
-						Intent intentHome = new Intent(CorrectionActivity.this,
-								HomeActivity.class);
-						startActivity(intentHome);
-
-						CorrectionActivity.this.finish();
-						onPaused = false;
-					}
-				});
-
-		// create alert dialog
-		AlertDialog alertDialog = alertDialogBuilder.create();
-
-		// show it
-		alertDialog.show();
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		// ONLY WHEN SCREEN TURNS ON
-		if (!ScreenReceiver.wasScreenOn) {
-			// THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
-
-		} else {
-			// THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT
-			// CHANGED
-			System.out.println("SCREEN TURNED ON");
-		}
-
-		if (onPaused == true) {
-			showAlertDialog();
-		}
-
-	}
-
-	@Override
-	protected void onPause() {
-
-		onPaused = true;
-
-		// WHEN THE SCREEN IS ABOUT TO TURN OFF
-		if (ScreenReceiver.wasScreenOn) {
-			// THIS IS THE CASE WHEN ONPAUSE() IS CALLED BY THE SYSTEM DUE TO A
-			// SCREEN STATE CHANGE
-			System.out.println("SCREEN TURNED OFF");
-		} else {
-			// THIS IS WHEN ONPAUSE() IS CALLED WHEN THE SCREEN STATE HAS NOT
-			// CHANGED
-		}
-		super.onPause();
 	}
 
 	@Override

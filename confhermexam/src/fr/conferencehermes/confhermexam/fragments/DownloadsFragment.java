@@ -53,6 +53,7 @@ public class DownloadsFragment extends Fragment {
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 		params.put("device_id", Utilities.getDeviceId(getActivity()));
+		params.put("device_time", System.currentTimeMillis() / 1000);
 
 		aq.ajax(Constants.DOWNLOADS_LIST_URL, params, JSONObject.class,
 				new AjaxCallback<JSONObject>() {
