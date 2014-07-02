@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 public class Exercise {
 	private int id;
+	private int examId;
 	private String name;
 	private String type;
 	private int exerciseType;
@@ -153,6 +154,14 @@ public class Exercise {
 
 	public void setExerciseType(int exerciseType) {
 		this.exerciseType = exerciseType;
+	}
+
+	public int getExamId() {
+		return examId;
+	}
+
+	public void setExamId(int examId) {
+		this.examId = examId;
 	}
 
 }

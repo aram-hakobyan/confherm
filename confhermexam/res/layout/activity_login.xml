@@ -17,14 +17,6 @@
             android:layout_marginLeft="20dp"
             android:src="@drawable/logo_with_text" >
         </ImageView>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="30dp" >
-        </LinearLayout>
     </RelativeLayout>
 
     <LinearLayout
@@ -44,7 +36,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Votre Identifiant Hermes"
+            android:text="@string/login_username_text"
             android:textColor="#0d5c7c"
             android:textSize="25sp" />
 
@@ -60,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Votre Mot de Passe Hermes"
+            android:text="@string/login_password_text"
             android:textColor="#0d5c7c"
             android:textSize="25sp" />
 
@@ -85,7 +77,7 @@
             android:paddingLeft="20dp"
             android:paddingRight="20dp"
             android:paddingTop="15dp"
-            android:text="CONNEXION"
+            android:text="@string/login_button_text"
             android:textColor="@android:color/white" />
     </LinearLayout>
 

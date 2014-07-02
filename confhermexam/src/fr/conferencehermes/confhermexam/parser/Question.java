@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 public class Question {
 	private int id;
+	private int exerciseId;
 	private String name;
 	private String questionText;
 	private String type;
@@ -99,6 +100,14 @@ public class Question {
 
 	public void setCorrectionFiles(HashMap<String, String> correctionFiles) {
 		this.correctionFiles = correctionFiles;
+	}
+
+	public int getExerciseId() {
+		return exerciseId;
+	}
+
+	public void setExerciseId(int exerciseId) {
+		this.exerciseId = exerciseId;
 	}
 
 }

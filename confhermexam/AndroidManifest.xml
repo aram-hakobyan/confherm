@@ -12,8 +12,9 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
-    <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <application
         android:allowBackup="true"
@@ -47,12 +48,17 @@
             android:screenOrientation="landscape" >
         </activity>
         <activity
+            android:name="fr.conferencehermes.confhermexam.ExamExercisesActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
+        <activity
             android:name="fr.conferencehermes.confhermexam.QuestionResponseActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
         <activity
-            android:name="fr.conferencehermes.confhermexam.QuestionResponseQCMActivity"
+            android:name="fr.conferencehermes.confhermexam.ExaminationActivity"
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
@@ -61,8 +67,23 @@
             android:label="@string/app_name"
             android:screenOrientation="landscape" >
         </activity>
+        <activity
+            android:name="fr.conferencehermes.confhermexam.CorrectionActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
+                <activity
+            android:name="fr.conferencehermes.confhermexam.CorrectionExercisesActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="landscape" >
+        </activity>
+        
 
-        <service android:name="fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver" />
+
+        <service android:name="fr.conferencehermes.confhermexam.service.DownloadService" />
+        <!-- <service android:name="fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver" /> -->
+
+
     </application>
 
 </manifest>

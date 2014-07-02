@@ -35,7 +35,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:layout_toRightOf="@+id/buttonPrevious"
-                android:text="SEMAINE PRECEDENTE"
+                android:text="@string/plannig_previous_week"
                 android:textColor="@color/app_main_color" />
 
             <TextView
@@ -45,7 +45,7 @@
                 android:layout_centerVertical="true"
                 android:layout_marginRight="10dp"
                 android:layout_toLeftOf="@+id/buttonNext"
-                android:text="SEMAINE SUIVANTE"
+                android:text="@string/plannig_next_week"
                 android:textColor="@color/app_main_color" />
 
             <Button

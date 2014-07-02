@@ -1,6 +1,8 @@
 package fr.conferencehermes.confhermexam.fragments;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import android.content.Context;
 import android.content.Intent;
@@ -15,8 +17,10 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 import fr.conferencehermes.confhermexam.LoginActivity;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.Profile;
 import fr.conferencehermes.confhermexam.util.Constants;
 
@@ -27,18 +31,43 @@ public class MyProfileFragment extends Fragment {
 	private Button logout;
 	private SharedPreferences.Editor logoutEditor;
 	private SharedPreferences logoutPrefs;
+	private SharedPreferences.Editor profileEditor;
+	private SharedPreferences profilePreferences;
+	private SharedPreferences groupsShared;
+	private SharedPreferences.Editor groupsEditor;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View pFragment = inflater.inflate(R.layout.activity_my_profile,
 				container, false);
+
+		String groups = getActivity().getResources().getString(
+				R.string.my_profile_groups);
+		String name = getActivity().getResources().getString(
+				R.string.my_profile_name);
+		String lastname = getActivity().getResources().getString(
+				R.string.my_profile_lastname);
+		String login = getActivity().getResources().getString(
+				R.string.my_profile_login);
+		String emails = getActivity().getResources().getString(
+				R.string.my_profile_email);
+
 		pFirsName = (TextView) pFragment.findViewById(R.id.pFirsName);
 		pLastName = (TextView) pFragment.findViewById(R.id.pLastName);
 		pUserName = (TextView) pFragment.findViewById(R.id.pUsername);
 		pEmailAdress = (TextView) pFragment.findViewById(R.id.pEmail);
 		pGroups = (TextView) pFragment.findViewById(R.id.pGroups);
+		profilePreferences = getActivity().getSharedPreferences(
+				"fr.conferencehermes.confhermexam.fragments.MYPROFILE",
+				Context.MODE_PRIVATE);
+
+		groupsShared = getActivity().getSharedPreferences(
+				"fr.conferencehermes.confhermexam.fragments.MYPROFILE_GROUPS",
+				Context.MODE_PRIVATE);
+
 		logout = (Button) pFragment.findViewById(R.id.logout);
+
 		logout.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -61,31 +90,64 @@ public class MyProfileFragment extends Fragment {
 				getActivity().finish();
 			}
 		});
+		if (NetworkReachability.isReachable()) {
 
-		pFirsName.setText(pData.getFirstName());
-		pLastName.setText(pData.getLastName());
-		pUserName.setText("Username : " + pData.getUserName());
-		pEmailAdress.setText("Email : " + pData.getEmailAdress());
+			profileEditor = profilePreferences.edit();
 
-		if (pData.getGroups().size() == 0) {
-			pGroups.setText("Groups : " + "no groups available");
-		} else {
-			Handler h = new Handler(getActivity().getMainLooper());
-
-			pGroups.setText("Groups : ");
-			for (Map.Entry<String, String> entry : pData.getGroups().entrySet()) {
-				String gKey = entry.getKey();
-				final String gValue = entry.getValue();
-
-				h.post(new Runnable() {
-					@Override
-					public void run() {
-						pGroups.append("\n" + gValue.toString());
-					}
-				});
-
+			if (pData != null) {
+				profileEditor.putString("profileFirstName",
+						pData.getFirstName());
+				profileEditor.putString("profileLastName", pData.getLastName());
+				profileEditor.putString("profileUsername", pData.getUserName());
+				profileEditor.putString("profileEmail", pData.getEmailAdress());
 			}
+			if (pData.getGroups().size() == 0) {
+				pGroups.setText(groups + "no groups available");
+			} else {
+				HashMap<String, String> groupsHashmap = pData.getGroups();
+
+				groupsEditor = groupsShared.edit();
+				for (String s : groupsHashmap.keySet()) {
+					groupsEditor.putString(s, groupsHashmap.get(s));
+				}
+				groupsEditor.commit();
+			}
+			profileEditor.commit();
+
+		} else {
+
+			/*
+			 * Toast.makeText(getActivity().getApplicationContext(),
+			 * "Check your internet connection", Toast.LENGTH_SHORT) .show();
+			 */
+
 		}
+		String firstName = profilePreferences.getString("profileFirstName", "");
+		String lastName = profilePreferences.getString("profileLastName", "");
+		String userName = profilePreferences.getString("profileUsername", "");
+		String email = profilePreferences.getString("profileEmail", "");
+		Handler h = new Handler(getActivity().getMainLooper());
+		@SuppressWarnings("unchecked")
+		HashMap<String, String> groupsHashmap = (HashMap<String, String>) groupsShared
+				.getAll();
+		pGroups.setText(groups + " : ");
+		for (String s : groupsHashmap.keySet()) {
+			final String group = groupsHashmap.get(s);
+
+			h.post(new Runnable() {
+
+				@Override
+				public void run() {
+					pGroups.append("\n" + group.toString());
+				}
+			});
+
+		}
+
+		pFirsName.setText(name + " : " + firstName);
+		pLastName.setText(lastname + " : " + lastName);
+		pUserName.setText(login + " : " + userName);
+		pEmailAdress.setText(emails + " : " + email);
 
 		return pFragment;
 	}

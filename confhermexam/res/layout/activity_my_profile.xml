@@ -80,14 +80,13 @@
                 android:id="@+id/logout"
                 android:layout_width="250dp"
                 android:layout_height="wrap_content"
-    
                 android:layout_marginRight="170dp"
                 android:layout_marginTop="120dp"
-                android:background="@drawable/blue_bg"
+                android:background="@color/app_main_color_dark"
                 android:drawableLeft="@drawable/key1"
                 android:gravity="center"
                 android:padding="15dp"
-                android:text="CHANGER DE COMPTE"
+                android:text="@string/my_profile_logout"
                 android:textColor="@android:color/white" />
         </LinearLayout>
     </LinearLayout>
@@ -96,7 +95,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-       
         android:layout_margin="20dp"
         android:text="@string/lorem_ipsum"
         android:textColor="#0d5c7c"

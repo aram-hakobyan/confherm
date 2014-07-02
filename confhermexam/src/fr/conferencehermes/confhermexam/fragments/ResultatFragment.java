@@ -24,6 +24,7 @@ import fr.conferencehermes.confhermexam.adapters.ResultsAdapter;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Result;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ResultatFragment extends Fragment {
 	private LayoutInflater inflater;
@@ -50,43 +51,46 @@ public class ResultatFragment extends Fragment {
 		HashMap<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 
-		aq.ajax(Constants.RESULT_LIST_URL, params, JSONObject.class,
-				new AjaxCallback<JSONObject>() {
-					@Override
-					public void callback(String url, JSONObject json,
-							AjaxStatus status) {
-						System.out.println(json.toString());
-						try {
-							if (json.has(Constants.KEY_STATUS)
-									&& json.get(Constants.KEY_STATUS) != null) {
-								if (json.getInt("status") == 200) {
-									// pData =
-									// JSONParser.parseProfileData(json);
-									// Profile uProf = new Profile();
-									rList = JSONParser.parseResults(json);
+		if (Utilities.isNetworkAvailable(getActivity())) {
+			aq.ajax(Constants.RESULT_LIST_URL, params, JSONObject.class,
+					new AjaxCallback<JSONObject>() {
+						@Override
+						public void callback(String url, JSONObject json,
+								AjaxStatus status) {
+							System.out.println(json.toString());
+							try {
+								if (json.has(Constants.KEY_STATUS)
+										&& json.get(Constants.KEY_STATUS) != null) {
+									if (json.getInt("status") == 200) {
+										// pData =
+										// JSONParser.parseProfileData(json);
+										// Profile uProf = new Profile();
+										rList = JSONParser.parseResults(json);
 
-									if (rList.size() != 0) {
-										adapter = new ResultsAdapter(
-												getActivity(), rList);
-										listview.setAdapter(adapter);
-										progressBar.setVisibility(View.GONE);
-									} else {
-										Toast.makeText(
-												getActivity()
-														.getApplicationContext(),
-												"No Any Result",
-												Toast.LENGTH_SHORT).show();
-
+										if (rList.size() != 0) {
+											adapter = new ResultsAdapter(
+													getActivity(), rList);
+											listview.setAdapter(adapter);
+											progressBar
+													.setVisibility(View.GONE);
+										}
 									}
 								}
+							} catch (JSONException e) {
+								e.printStackTrace();
+
 							}
-						} catch (JSONException e) {
-							e.printStackTrace();
-
 						}
-					}
-				});
+					});
+		} else {
+			progressBar.setVisibility(View.INVISIBLE);
+			Toast.makeText(
+					getActivity().getApplicationContext(),
+					getActivity().getResources().getString(
+							R.string.no_internet_connection), Toast.LENGTH_LONG)
+					.show();
 
+		}
 		return fragment;
 	}
 

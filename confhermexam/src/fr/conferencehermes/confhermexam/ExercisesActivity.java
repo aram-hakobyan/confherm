@@ -40,12 +40,12 @@ import fr.conferencehermes.confhermexam.util.Utilities;
 public class ExercisesActivity extends FragmentActivity implements
 		OnClickListener {
 
-	LayoutInflater inflater;
-	GridView gvMain;
-	ArrayAdapter<String> adapter;
-	ArrayList<TrainingExercise> exercises;
-	int training_id;
-	TextView timerText;
+	private LayoutInflater inflater;
+	private GridView gvMain;
+	private ArrayAdapter<String> adapter;
+	private ArrayList<TrainingExercise> exercises;
+	private int training_id;
+	private TextView timerText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
