@@ -62,6 +62,11 @@ public class BaseNetworkManager {
 						handleFailResponse("Access denied. Please login");
 						break;
 
+					case 400:
+						Log.d("Please check your internet connection.", "400");
+						handleFailResponse("Something went wrong. Please try again.");
+						break;
+
 					case 500:
 						Log.d("Something went wrong. Please try again later",
 								"500");

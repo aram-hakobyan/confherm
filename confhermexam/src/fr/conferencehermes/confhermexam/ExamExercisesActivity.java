@@ -53,7 +53,18 @@ public class ExamExercisesActivity extends FragmentActivity implements
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 				int e_id = exercises.get(position).getId();
-				openExercise(e_id);
+				String key = "exercise" + String.valueOf(e_id);
+				if (Utilities
+						.readBoolean(ExamExercisesActivity.this, key, true)
+						|| position == 0) {
+					openExercise(e_id);
+				} else {
+					Utilities
+							.showAlertDialog(
+									ExamExercisesActivity.this,
+									"Attention",
+									"Cet examen est terminé ou vous l'avez déjà passé vous ne pouvez pas le refaire.");
+				}
 			}
 
 		});
@@ -131,6 +142,13 @@ public class ExamExercisesActivity extends FragmentActivity implements
 									.toMinutes(millis)));
 			timerText.setText("Temps epreuve - " + hms);
 		}
+	}
+
+	@Override
+	protected void onDestroy() {
+		Utilities.writeBoolean(ExamExercisesActivity.this,
+				String.valueOf("exam" + examId), false);
+		super.onDestroy();
 	}
 
 	@Override

@@ -485,6 +485,70 @@ public class JSONParser {
 		return score;
 	}
 
+	public static ArrayList<Correction> parseResultCorrections(JSONObject json) {
+		ArrayList<Correction> correctionsList = new ArrayList<Correction>();
+
+		try {
+			if (json.has(Constants.KEY_DATA)
+					&& json.get(Constants.KEY_DATA) != null) {
+
+				JSONObject data = json.getJSONObject("data");
+
+				JSONArray corrections = data
+						.getJSONArray("question_corrections");
+
+				for (int i = 0; i < corrections.length(); i++) {
+					Correction c = new Correction();
+					JSONObject obj = corrections.getJSONObject(i);
+					c.setQuestionId(obj.getString("question_id"));
+					c.setText(obj.getString("correction_text"));
+					ArrayList<String> answersArray = new ArrayList<String>();
+					JSONArray answers = obj.getJSONArray("answers");
+					for (int j = 0; j < answers.length(); j++) {
+						answersArray.add(String.valueOf(answers.get(j)));
+					}
+					c.setAnswersArray(answersArray);
+					correctionsList.add(c);
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return correctionsList;
+	}
+
+	public static ArrayList<Correction> parseResultAsnwers(JSONObject json) {
+		ArrayList<Correction> correctionsList = new ArrayList<Correction>();
+
+		try {
+			if (json.has(Constants.KEY_DATA)
+					&& json.get(Constants.KEY_DATA) != null) {
+
+				JSONObject data = json.getJSONObject("data");
+
+				JSONArray corrections = data
+						.getJSONArray("question_answers");
+
+				for (int i = 0; i < corrections.length(); i++) {
+					Correction c = new Correction();
+					JSONObject obj = corrections.getJSONObject(i);
+					c.setQuestionId(obj.getString("question_id"));
+					c.setText(obj.getString("correction_text"));
+					ArrayList<String> answersArray = new ArrayList<String>();
+					JSONArray answers = obj.getJSONArray("answers");
+					for (int j = 0; j < answers.length(); j++) {
+						answersArray.add(String.valueOf(answers.get(j)));
+					}
+					c.setAnswersArray(answersArray);
+					correctionsList.add(c);
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return correctionsList;
+	}
+	
 	public static ArrayList<TimeSlot> parsePlannig(JSONObject planJson) {
 		ArrayList<TimeSlot> planningResult = new ArrayList<TimeSlot>();
 		try {
@@ -545,7 +609,6 @@ public class JSONParser {
 		return corExercises;
 	}
 
-	
 	public static ArrayList<CorrectionsExercise> parseCorrectionsQuestionAnswers(
 			JSONObject json) {
 		ArrayList<CorrectionsExercise> corExercises = new ArrayList<CorrectionsExercise>();
@@ -574,8 +637,5 @@ public class JSONParser {
 
 		return corExercises;
 	}
-	
-	
-	
-	
+
 }

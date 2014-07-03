@@ -28,12 +28,14 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.TimeSlot;
 import fr.conferencehermes.confhermexam.util.Constants;
@@ -101,9 +103,19 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		fragment.findViewById(R.id.buttonNext).setOnClickListener(this);
 		fragment.findViewById(R.id.textPrevious).setOnClickListener(this);
 		fragment.findViewById(R.id.textNext).setOnClickListener(this);
-		aq = new AQuery(getActivity());
-		getCalendarData();
 
+		if (NetworkReachability.isReachable()) {
+			aq = new AQuery(getActivity());
+
+			getCalendarData();
+		} else {
+			calendarContainer.setVisibility(View.GONE);
+			Toast.makeText(
+					getActivity().getApplicationContext(),
+					getActivity().getResources().getString(
+							R.string.no_internet_connection), Toast.LENGTH_LONG)
+					.show();
+		}
 		return fragment;
 	}
 

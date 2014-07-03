@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -63,6 +64,7 @@ import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Exercise;
+import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
@@ -106,7 +108,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private ArrayList<QuestionAnswer> questionAnswers;
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
-
+	private int resumPlaying = 0;
 	DatabaseHelper db;
 
 	@Override
@@ -398,25 +400,61 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		data.put("event_id", event_id);
 		data.put("exam_id", exam_id);
-		data.put("exercise_id", exercise.getId());
+		data.put("exercise_id", exercise_id);
+		data.put("is_send", 0);
 		data.put("type", exercise.getType());
 
 		JSONArray answers = answersArray;
 		data.put("question_answers", answers);
-		object.put("auth_key", Utilities.readString(ExaminationActivity.this,
-				Constants.AUTHKEY_SHAREDPREFS_KEY, ""));
+		object.put("auth_key",
+				Utilities.readString(ExaminationActivity.this, "auth_key", ""));
+		object.put("device_id", Utilities.getDeviceId(ExaminationActivity.this));
+		object.put("device_time", System.currentTimeMillis() / 1000);
 		object.put("data", data);
+
+		Utilities.writeBoolean(ExaminationActivity.this,
+				String.valueOf("exercise" + exercise_id), false);
 
 		if (Utilities.isNetworkAvailable(ExaminationActivity.this)) {
 			ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
 					ExaminationActivity.this);
 			transmitter.execute(object);
+			finish();
 		} else {
-			Utilities.writeString(ExaminationActivity.this, "jsondata",
-					object.toString());
+			DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
+			ExerciseAnswer exerciseAnswer = new ExerciseAnswer();
+			exerciseAnswer.setExerciseId(exercise.getId());
+			exerciseAnswer.setExamId(exam_id);
+			exerciseAnswer.setEventId(event_id);
+			exerciseAnswer.setJsonString(data.toString());
+			db.createExerciseAnswer(exerciseAnswer);
+			db.closeDB();
+			showAlertDialog(ExaminationActivity.this, "Attention",
+					"No internet connection. Exam will be submitted after connection.");
 		}
 
-		finish();
+	}
+
+	public void showAlertDialog(Context context, String title, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title);
+		builder.setMessage(message);
+		builder.setCancelable(true);
+		builder.setPositiveButton(android.R.string.ok,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		AlertDialog dialog = builder.create();
+		dialog.setOnDismissListener(new OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				finish();
+			}
+		});
+		dialog.show();
 	}
 
 	private void saveQuestionAnswers() throws JSONException {
@@ -648,6 +686,15 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				.findViewById(R.id.videoView1);
 		final MediaController mc = new MediaController(ExaminationActivity.this);
 
+		final LinearLayout soundControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.sound_control_layout);
+		final ImageView soundPlay = (ImageView) dialog
+				.findViewById(R.id.sound_play);
+		final ImageView soundPause = (ImageView) dialog
+				.findViewById(R.id.sound_pause);
+		final ImageView soundReplay = (ImageView) dialog
+				.findViewById(R.id.sound_replay);
+
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
 				try {
@@ -686,10 +733,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		case 0:
 			text.setText(exercise.getText());
 			text.setVisibility(View.VISIBLE);
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
+
 			break;
 		case 1:
 			if (mediaPlayer != null) {
@@ -705,17 +754,19 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				video.stopPlayback();
 			}
 			img.setVisibility(View.VISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			video.setVisibility(View.GONE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 			break;
 		case 2:
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
 			mc.setVisibility(View.VISIBLE);
 			audioImage.setVisibility(View.VISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.VISIBLE);
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
@@ -725,6 +776,58 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
+			soundPause.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						if (mediaPlayer.isPlaying()) {
+							mediaPlayer.pause();
+							resumPlaying = mediaPlayer.getCurrentPosition();
+							soundPlay.setVisibility(View.VISIBLE);
+							soundPause.setVisibility(View.GONE);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+				}
+			});
+
+			soundReplay.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						mediaPlayer.seekTo(0);
+						mediaPlayer.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					if (mediaPlayer.isPlaying()) {
+						soundPlay.setVisibility(View.GONE);
+						soundPause.setVisibility(View.VISIBLE);
+					}
+				}
+			});
+
+			soundPlay.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						mediaPlayer.seekTo(resumPlaying);
+						mediaPlayer.start();
+						soundPlay.setVisibility(View.GONE);
+						soundPause.setVisibility(View.VISIBLE);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
 			break;
 		case 3:
 			try {
@@ -734,11 +837,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			img.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 
 			try {
 				video.start();
@@ -767,27 +871,31 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							video.stopPlayback();
 						}
 						img.setVisibility(View.VISIBLE);
-						video.setVisibility(View.INVISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						video.setVisibility(View.GONE);
+						mc.setVisibility(View.GONE);
+						audioImage.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 					}
 				});
 		dialog.findViewById(R.id.button2).setOnClickListener(
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						img.setVisibility(View.INVISIBLE);
-						video.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
+						video.setVisibility(View.GONE);
 						mc.setVisibility(View.VISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						text.setVisibility(View.GONE);
 						audioImage.setVisibility(View.VISIBLE);
+						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
 						}
 						try {
 							mediaPlayer.seekTo(0);
 							mediaPlayer.start();
+							soundPlay.setVisibility(View.GONE);
+							soundPause.setVisibility(View.VISIBLE);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -805,11 +913,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						img.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						mc.setVisibility(View.GONE);
+						audioImage.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 
 						try {
 							video.start();
@@ -864,9 +973,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				ExaminationActivity.this);
 
-		// set title
-		// alertDialogBuilder.setTitle("");
-
 		// set dialog message
 		alertDialogBuilder
 				.setMessage(getResources().getString(R.string.drop_out_text))
@@ -888,12 +994,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		// create alert dialog
 		AlertDialog alertDialog = alertDialogBuilder.create();
-
 		// show it
 		alertDialog.show();
-
-//		Utilities.showAlertDialog(ExaminationActivity.this, "Attention",
-//				getResources().getString(R.string.drop_out_text));
 
 	}
 
@@ -978,6 +1080,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		@Override
 		public void onFinish() {
 			temps1.setText("");
+			/*
+			 * try { sendAnswers(); } catch (JSONException e) { // TODO
+			 * Auto-generated catch block e.printStackTrace(); }
+			 */
 		}
 
 		@Override

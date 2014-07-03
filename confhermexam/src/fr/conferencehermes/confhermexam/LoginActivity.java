@@ -39,10 +39,11 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	private ProgressBar progressBarLogin;
 	private LinearLayout loginContentLayout;
 	public static String authToken;
-	private SharedPreferences.Editor authKeyEditor;
+	private static SharedPreferences.Editor authKeyEditor;
 	private SharedPreferences authKeyPrefs;
 	private SharedPreferences.Editor logoutEditor;
 	private SharedPreferences logoutPrefs;
+	public static Context context;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +53,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 		ViewTracker.getInstance().setCurrentContext(this);
 		ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
+		context = LoginActivity.this;
 
 		username = (EditText) findViewById(R.id.loginRow);
 		password = (EditText) findViewById(R.id.passwordRow);
@@ -62,11 +64,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 			authKeyEditor = getPreferences(MODE_PRIVATE).edit();
 
-			if (lData != null) {
-				authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
-						lData.getAuthKey());
-			}
-			authKeyEditor.commit();
+	
 
 			logoutPrefs = getSharedPreferences("logoutPrefs", MODE_PRIVATE);
 			boolean logout = logoutPrefs.getBoolean(
@@ -76,7 +74,6 @@ public class LoginActivity extends Activity implements ActionDelegate {
 				loginAction();
 
 			} else {
-
 				loginContentLayout.setVisibility(View.VISIBLE);
 				progressBarLogin.setVisibility(View.GONE);
 			}
@@ -214,6 +211,14 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 	public static void setLoginData(Profile loginData) {
 		lData = loginData;
+		Utilities.writeString(context, "auth_key", lData.getAuthKey());
+		if (lData != null) {
+			authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
+					lData.getAuthKey()); 
+		}
+		authKeyEditor.commit();
+		
+		
 	}
 
 	@Override

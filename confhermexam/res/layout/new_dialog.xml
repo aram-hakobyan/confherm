@@ -12,8 +12,8 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
-        android:padding="15dp"
-        android:background="@drawable/exam_x" />
+        android:background="@drawable/exam_x"
+        android:padding="15dp" />
 
     <TextView
         android:id="@+id/ennouncerText"
@@ -21,7 +21,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:layout_margin="80dp"
-        android:visibility="invisible" />
+        android:visibility="gone" />
 
     <ImageView
         android:id="@+id/imageView1"
@@ -36,9 +36,41 @@
         android:layout_width="160dp"
         android:layout_height="160dp"
         android:layout_centerInParent="true"
-        android:layout_margin="80dp"
+        android:layout_margin="5dp"
         android:src="@drawable/audio_icon"
-        android:visibility="invisible" />
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/sound_control_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/sound_icon"
+        android:layout_centerHorizontal="true"
+        android:orientation="horizontal"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/sound_play"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/sound_play"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/sound_pause"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/sound_pause" />
+
+        <ImageView
+            android:id="@+id/sound_replay"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_margin="10dp"
+            android:src="@drawable/sound_replay" />
+    </LinearLayout>
 
     <VideoView
         android:id="@+id/videoView1"
@@ -46,7 +78,13 @@
         android:layout_height="match_parent"
         android:layout_centerInParent="true"
         android:layout_margin="80dp"
-        android:visibility="invisible" />
+        android:visibility="gone" />
+
+    <View
+        android:id="@+id/videoMedioControls"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentTop="true" />
 
     <LinearLayout
         android:id="@+id/linearLayout1"

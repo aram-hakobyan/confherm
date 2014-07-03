@@ -114,6 +114,7 @@ public class QuestionResponseActivity extends Activity implements
 			startTime;
 	Question currentQuestion;
 	int currentQuestionId = 0;
+	MediaController mc;
 	AQuery aq;
 	JSONArray answersArray;
 	private RadioGroup mRadioGroup;
@@ -133,6 +134,7 @@ public class QuestionResponseActivity extends Activity implements
 	private Button btnImageCorrection;
 	private Button btnAudioCorrection;
 	private Button btnVideoCorrection;
+	private int resumPlaying = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -526,6 +528,9 @@ public class QuestionResponseActivity extends Activity implements
 	public void sendAnswers() throws JSONException {
 		Utilities.showOrHideActivityIndicator(QuestionResponseActivity.this, 0,
 				"Please wait...");
+		Utilities.writeBoolean(QuestionResponseActivity.this,
+				String.valueOf("trainingexercise" + exercise_id), false);
+
 		Map<String, String> params = new HashMap<String, String>();
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
@@ -1039,8 +1044,17 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = new MediaController(
-				QuestionResponseActivity.this);
+		 mc = new
+		 MediaController(QuestionResponseActivity.this);
+
+		final LinearLayout soundControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.sound_control_layout);
+		final ImageView soundPlay = (ImageView) dialog
+				.findViewById(R.id.sound_play);
+		final ImageView soundPause = (ImageView) dialog
+				.findViewById(R.id.sound_pause);
+		final ImageView soundReplay = (ImageView) dialog
+				.findViewById(R.id.sound_replay);
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -1063,11 +1077,16 @@ public class QuestionResponseActivity extends Activity implements
 			}
 		if (VIDEO_URL != null)
 			if (!VIDEO_URL.isEmpty()) {
-				mc.setAnchorView(video);
 				Uri videoURI = Uri.parse(VIDEO_URL);
+
+				View v = (View) dialog.findViewById(R.id.videoMedioControls);
+				mc = new MediaController(this);
+				mc.setAnchorView(v);
+
 				video.setMediaController(mc);
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
+				v.bringToFront();
 			}
 
 		if (IMAGE_URL != null)
@@ -1110,10 +1129,12 @@ public class QuestionResponseActivity extends Activity implements
 		case 0:
 			text.setText(exercise.getText());
 			text.setVisibility(View.VISIBLE);
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
+
 			break;
 		case 1:
 			if (mediaPlayer != null) {
@@ -1129,26 +1150,83 @@ public class QuestionResponseActivity extends Activity implements
 				video.stopPlayback();
 			}
 			img.setVisibility(View.VISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			video.setVisibility(View.GONE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 			break;
 		case 2:
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
 			mc.setVisibility(View.VISIBLE);
 			audioImage.setVisibility(View.VISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.VISIBLE);
+
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
 			try {
 				mediaPlayer.seekTo(0);
 				mediaPlayer.start();
+				soundPlay.setVisibility(View.GONE);
+				soundPause.setVisibility(View.VISIBLE);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
+			soundPause.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						if (mediaPlayer.isPlaying()) {
+							mediaPlayer.pause();
+							resumPlaying = mediaPlayer.getCurrentPosition();
+							soundPlay.setVisibility(View.VISIBLE);
+							soundPause.setVisibility(View.GONE);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+				}
+			});
+
+			soundReplay.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						mediaPlayer.seekTo(0);
+						mediaPlayer.start();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+
+					if (mediaPlayer.isPlaying()) {
+						soundPlay.setVisibility(View.GONE);
+						soundPause.setVisibility(View.VISIBLE);
+					}
+				}
+			});
+
+			soundPlay.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					try {
+						mediaPlayer.seekTo(resumPlaying);
+						mediaPlayer.start();
+						soundPlay.setVisibility(View.GONE);
+						soundPause.setVisibility(View.VISIBLE);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
 			break;
 		case 3:
 			try {
@@ -1158,13 +1236,15 @@ public class QuestionResponseActivity extends Activity implements
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			img.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			mc.setVisibility(View.GONE);
+			audioImage.setVisibility(View.GONE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 
 			try {
+
 				video.start();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1191,33 +1271,39 @@ public class QuestionResponseActivity extends Activity implements
 							video.stopPlayback();
 						}
 						img.setVisibility(View.VISIBLE);
-						video.setVisibility(View.INVISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						video.setVisibility(View.GONE);
+						// mc.setVisibility(View.GONE);
+						audioImage.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 					}
 				});
+
 		dialog.findViewById(R.id.button2).setOnClickListener(
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						img.setVisibility(View.INVISIBLE);
-						video.setVisibility(View.INVISIBLE);
-						mc.setVisibility(View.VISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
+						video.setVisibility(View.GONE);
+						// mc.setVisibility(View.VISIBLE);
+						text.setVisibility(View.GONE);
 						audioImage.setVisibility(View.VISIBLE);
+						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
 						}
 						try {
 							mediaPlayer.seekTo(0);
 							mediaPlayer.start();
+							soundPlay.setVisibility(View.GONE);
+							soundPause.setVisibility(View.VISIBLE);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 
 					}
 				});
+
 		dialog.findViewById(R.id.button3).setOnClickListener(
 				new OnClickListener() {
 					@Override
@@ -1229,11 +1315,12 @@ public class QuestionResponseActivity extends Activity implements
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						img.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						// mc.setVisibility(View.GONE);
+						audioImage.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 
 						try {
 							video.start();
