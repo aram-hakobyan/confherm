@@ -114,7 +114,7 @@ public class QuestionResponseActivity extends Activity implements
 			startTime;
 	Question currentQuestion;
 	int currentQuestionId = 0;
-	MediaController mc;
+
 	AQuery aq;
 	JSONArray answersArray;
 	private RadioGroup mRadioGroup;
@@ -134,7 +134,8 @@ public class QuestionResponseActivity extends Activity implements
 	private Button btnImageCorrection;
 	private Button btnAudioCorrection;
 	private Button btnVideoCorrection;
-	private int resumPlaying = 0;
+	private int resumPlayingSound = 0;
+	private int resumPlayingVideo = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -1041,7 +1042,6 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		mc = new MediaController(QuestionResponseActivity.this);
 
 		final LinearLayout soundControlLayout = (LinearLayout) dialog
 				.findViewById(R.id.sound_control_layout);
@@ -1051,6 +1051,119 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.sound_pause);
 		final ImageView soundReplay = (ImageView) dialog
 				.findViewById(R.id.sound_replay);
+
+		final LinearLayout videoControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.video_control_layout);
+		final ImageView videoPlay = (ImageView) dialog
+				.findViewById(R.id.video_play);
+		final ImageView videoPause = (ImageView) dialog
+				.findViewById(R.id.video_pause);
+		final ImageView videoReplay = (ImageView) dialog
+				.findViewById(R.id.video_replay);
+
+		soundPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.pause();
+						resumPlayingSound = mediaPlayer.getCurrentPosition();
+						soundPlay.setVisibility(View.VISIBLE);
+						soundPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		soundReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(0);
+					mediaPlayer.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (mediaPlayer.isPlaying()) {
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		soundPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(resumPlayingSound);
+					mediaPlayer.start();
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		videoPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+
+					if (video.isPlaying()) {
+						video.pause();
+
+						resumPlayingVideo = video.getCurrentPosition();
+						videoPlay.setVisibility(View.VISIBLE);
+						videoPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		videoReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(0);
+					video.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (video.isPlaying()) {
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		videoPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(resumPlayingVideo);
+					video.start();
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -1075,14 +1188,9 @@ public class QuestionResponseActivity extends Activity implements
 			if (!VIDEO_URL.isEmpty()) {
 				Uri videoURI = Uri.parse(VIDEO_URL);
 
-				View v = (View) dialog.findViewById(R.id.videoMedioControls);
-				mc = new MediaController(this);
-				mc.setAnchorView(v);
-
-				video.setMediaController(mc);
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
-				v.bringToFront();
+
 			}
 
 		if (IMAGE_URL != null)
@@ -1127,7 +1235,8 @@ public class QuestionResponseActivity extends Activity implements
 			text.setVisibility(View.VISIBLE);
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			audioImage.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 
@@ -1147,7 +1256,8 @@ public class QuestionResponseActivity extends Activity implements
 			}
 			img.setVisibility(View.VISIBLE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			audioImage.setVisibility(View.GONE);
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
@@ -1155,7 +1265,8 @@ public class QuestionResponseActivity extends Activity implements
 		case 2:
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.VISIBLE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			audioImage.setVisibility(View.VISIBLE);
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.VISIBLE);
@@ -1172,57 +1283,6 @@ public class QuestionResponseActivity extends Activity implements
 				e.printStackTrace();
 			}
 
-			soundPause.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						if (mediaPlayer.isPlaying()) {
-							mediaPlayer.pause();
-							resumPlaying = mediaPlayer.getCurrentPosition();
-							soundPlay.setVisibility(View.VISIBLE);
-							soundPause.setVisibility(View.GONE);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-				}
-			});
-
-			soundReplay.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						mediaPlayer.seekTo(0);
-						mediaPlayer.start();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					if (mediaPlayer.isPlaying()) {
-						soundPlay.setVisibility(View.GONE);
-						soundPause.setVisibility(View.VISIBLE);
-					}
-				}
-			});
-
-			soundPlay.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						mediaPlayer.seekTo(resumPlaying);
-						mediaPlayer.start();
-						soundPlay.setVisibility(View.GONE);
-						soundPause.setVisibility(View.VISIBLE);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-
 			break;
 		case 3:
 			try {
@@ -1234,7 +1294,7 @@ public class QuestionResponseActivity extends Activity implements
 			}
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
-			mc.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.VISIBLE);
 			audioImage.setVisibility(View.GONE);
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
@@ -1245,6 +1305,7 @@ public class QuestionResponseActivity extends Activity implements
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			break;
 		default:
 			break;
@@ -1268,7 +1329,8 @@ public class QuestionResponseActivity extends Activity implements
 						}
 						img.setVisibility(View.VISIBLE);
 						video.setVisibility(View.GONE);
-						// mc.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.GONE);
+
 						audioImage.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
@@ -1281,7 +1343,7 @@ public class QuestionResponseActivity extends Activity implements
 					public void onClick(View v) {
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.GONE);
-						// mc.setVisibility(View.VISIBLE);
+						videoControlLayout.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
 						audioImage.setVisibility(View.VISIBLE);
 						soundControlLayout.setVisibility(View.VISIBLE);
@@ -1313,7 +1375,7 @@ public class QuestionResponseActivity extends Activity implements
 						}
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
-						// mc.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.VISIBLE);
 						audioImage.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
@@ -1323,6 +1385,7 @@ public class QuestionResponseActivity extends Activity implements
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+
 					}
 				});
 
