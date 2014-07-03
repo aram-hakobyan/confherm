@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -67,6 +68,12 @@ public class ExamsAdapter extends BaseAdapter {
 		} else {
 			holder = (ViewHolder) view.getTag();
 		}
+
+		if (position == 0)
+			view.setBackgroundColor(c.getResources().getColor(
+					R.color.app_main_color));
+		else
+			view.setBackgroundColor(Color.parseColor("#eeeeee"));
 
 		Exam exam = (Exam) mListItems.get(position);
 		if (exam != null) {

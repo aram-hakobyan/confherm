@@ -868,7 +868,7 @@ public class QuestionResponseActivity extends Activity implements
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
 					if (areAllAnswersValidated()) {
-						abandonner.setText("SUBMIT");
+						abandonner.setText("ENVOYER");
 						valider.setVisibility(View.GONE);
 					}
 

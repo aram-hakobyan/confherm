@@ -272,7 +272,7 @@
                     android:gravity="center"
                     android:padding="5dp"
                     android:layout_weight="0.5"
-                    android:text="ENNOUNCER"
+                    android:text="ENONCÉ"
                     android:textColor="@android:color/white"
                     android:textSize="23sp" />
 

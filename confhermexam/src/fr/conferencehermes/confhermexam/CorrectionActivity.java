@@ -22,7 +22,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,9 +38,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -221,7 +218,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
 		if (currentQuestionFiles != null)
-			setFileIcons(currentQuestionFiles);
+			if (!currentQuestionFiles.isEmpty())
+				setFileIcons(currentQuestionFiles);
 
 		currentQuestionAnswers = db.getAllAnswersByQuestionId(currentQuestion
 				.getId());
@@ -307,6 +305,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			}
 		}
 
+		if (corrections != null & !corrections.isEmpty() && answers != null
+				&& !answers.isEmpty())
+			drawCorrections();
+
 	}
 
 	private void setFileIcons(HashMap<String, String> files) {
@@ -359,7 +361,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 								answers = JSONParser
 										.parseCorrectionAnswers(json);
 								selectQuestion(questions.get(0), 0);
-								drawCorrections(corrections, answers);
 							}
 						} catch (JSONException e) {
 							e.printStackTrace();
@@ -369,15 +370,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 	}
 
-	private void drawCorrections(ArrayList<Correction> corrections,
-			ArrayList<CorrectionAnswer> answers) {
+	private void drawCorrections() {
 		correctionsLayout.removeAllViews();
-		ArrayList<String> correctionAnswerIDs = new ArrayList<String>();
-		for (Correction c : corrections) {
-			if (currentQuestion.getId() == Integer.valueOf(c.getQuestionId())) {
-				correctionAnswerIDs = c.getAnswersArray();
-			}
-		}
 
 		ArrayList<String> allAnswerIDs = new ArrayList<String>();
 		ArrayList<Answer> allAnswers = db
@@ -394,8 +388,9 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		}
 
 		for (int j = 0; j < answerCount; j++) {
+			// Current answer's id
+			String currentAnswerId = String.valueOf(allAnswers.get(j).getId());
 			ImageView img = new ImageView(CorrectionActivity.this);
-
 			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
 					30, 30);
 
@@ -405,6 +400,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				}
 
 				imageParams.setMargins(0, 7, 0, 0);
+
 				String userAnswerId = "";
 				for (int i = 0; i < answers.size(); i++) {
 					if (answers.get(i).getQuestionId() == currentQuestionId)
@@ -420,9 +416,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						correctAnswerId = corrections.get(i).getAnswersArray()
 								.get(0);
 				}
-
-				String currentAnswerId = String.valueOf(allAnswers.get(j)
-						.getId());
 
 				boolean USER_IS_RIGHT = userAnswerId
 						.equalsIgnoreCase(correctAnswerId);
@@ -448,51 +441,81 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 				imageParams.setMargins(0, 5, 0, 0);
 
-				ArrayList<Integer> userAnswerIDs = questionAnswers.get(
-						currentQuestionId).getMultiAnswerPositions();
-				String currentAsnwerId = allAnswerIDs.get(j);
-				for (int i = 0; i < userAnswerIDs.size(); i++) {
-					if (currentAsnwerId.equalsIgnoreCase(String
-							.valueOf(userAnswerIDs.get(i)))) { // User has
-																// checked
-																// this
-																// answer
-						for (int k = 0; k < correctionAnswerIDs.size(); k++) {
-							if (correctionAnswerIDs.get(k).equalsIgnoreCase(
-									currentAsnwerId)) // The checked answer
-														// exists in correct
-														// answers
-								img.setBackgroundResource(R.drawable.correction_true);
-							else
-								img.setBackgroundResource(R.drawable.correction_false);
+				// User's answers
+				ArrayList<String> userAnswerIds = new ArrayList<String>();
+				for (int i = 0; i < answers.size(); i++) {
+					if (answers.get(i).getQuestionId() == currentQuestionId) {
+						for (int k = 0; k < answers.get(i).getAnswers().size(); k++) {
+							userAnswerIds.add(answers.get(i).getAnswers()
+									.get(k));
+						}
+
+					}
+				}
+
+				// Correct answers
+				ArrayList<String> correctAnswerIds = new ArrayList<String>();
+				for (int i = 0; i < corrections.size(); i++) {
+					if (corrections
+							.get(i)
+							.getQuestionId()
+							.equalsIgnoreCase(String.valueOf(currentQuestionId)))
+						for (int k = 0; k < corrections.get(i)
+								.getAnswersArray().size(); k++) {
+							correctAnswerIds.add(corrections.get(i)
+									.getAnswersArray().get(k));
+						}
+				}
+
+				boolean CURRENT_IS_RIGHT = false;
+				for (int i = 0; i < correctAnswerIds.size(); i++) {
+					if (correctAnswerIds.get(i).equalsIgnoreCase(
+							currentAnswerId)) {
+						{
+							CURRENT_IS_RIGHT = true;
+							break;
 						}
 					}
 				}
 
-				for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
-					if (currentAsnwerId.equalsIgnoreCase(correctionAnswerIDs
-							.get(k1)))
-						img.setBackgroundResource(R.drawable.correction_true);
+				boolean CURRENT_IS_USER = false;
+				for (int i = 0; i < userAnswerIds.size(); i++) {
+					if (userAnswerIds.get(i).equalsIgnoreCase(currentAnswerId)) {
+						{
+							CURRENT_IS_USER = true;
+							break;
+						}
+					}
+				}
 
+				if (CURRENT_IS_RIGHT) {
+					img.setBackgroundResource(R.drawable.correction_true);
+				} else if (CURRENT_IS_USER) {
+					img.setBackgroundResource(R.drawable.correction_false);
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
 				imageParams.setMargins(0, 20, 0, 0);
 
 				try {
-					JSONObject corObj = new JSONObject(corrections
-							.get(currentQuestionId).getAnswersArray().get(j));
-					String answerText = corObj.getString("name");
-					editTextsArray.get(j).setText(answerText);
-					editTextsArray.get(j).setEnabled(false);
+					for (int i = 0; i < answers.size(); i++) {
+						if (answers.get(i).getQuestionId() == currentQuestionId) {
+							JSONObject corObj = new JSONObject(answers.get(i)
+									.getAnswers().get(j));
+							String answerText = corObj.getString("name");
+							editTextsArray.get(j).setText(answerText);
+							editTextsArray.get(j).setEnabled(false);
 
-					int IS_GOOD = corObj.getInt("is_good");
-					if (IS_GOOD == 1) {
-						img.setBackgroundResource(R.drawable.correction_true);
-					} else {
-						img.setBackgroundResource(R.drawable.correction_false);
+							int IS_GOOD = corObj.getInt("is_good");
+							if (IS_GOOD == 1) {
+								img.setBackgroundResource(R.drawable.correction_true);
+							} else {
+								img.setBackgroundResource(R.drawable.correction_false);
+							}
+
+							break;
+						}
 					}
-
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (IndexOutOfBoundsException e) {
@@ -506,18 +529,17 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			correctionsLayout.addView(img, imageParams);
 		}
 
+		String corrText = "";
+		for (int i = 0; i < corrections.size(); i++) {
+			if (corrections.get(i).getQuestionId()
+					.equalsIgnoreCase(String.valueOf(currentQuestionId))) {
+				corrText = corrections.get(i).getText();
+				break;
+			}
+		}
+
 		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
-		correctionText.setText(corrections.get(currentQuestionId).getText());
-		LinearLayout correctionButtons = (LinearLayout) findViewById(R.id.correctionButtons);
-		correctionButtons.setVisibility(View.VISIBLE);
-
-		btnImageCorrection = (Button) findViewById(R.id.btnImageCorrection);
-		btnAudioCorrection = (Button) findViewById(R.id.btnAudioCorrection);
-		btnVideoCorrection = (Button) findViewById(R.id.btnVideoCorrection);
-		btnImageCorrection.setOnClickListener(this);
-		btnAudioCorrection.setOnClickListener(this);
-		btnVideoCorrection.setOnClickListener(this);
-
+		correctionText.setText(corrText);
 	}
 
 	@Override

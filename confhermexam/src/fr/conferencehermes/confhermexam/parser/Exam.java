@@ -26,7 +26,7 @@ public class Exam {
 
 	private ArrayList<Exercise> exercises;
 
-	public void Exam() {
+	public Exam() {
 		setExercises(new ArrayList<Exercise>());
 	}
 

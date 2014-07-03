@@ -215,8 +215,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 				+ ":"
 				+ Utilities.timeConverter(calendar.get(Calendar.MINUTE));
 		int STARTING_HOUR = calendar.get(Calendar.HOUR_OF_DAY);
-		if (STARTING_HOUR < 6 || STARTING_HOUR > 22)
-			return;
+		/*if (STARTING_HOUR < 6 || STARTING_HOUR > 22)
+			return;*/
 		calendar.setTimeInMillis(timeSlot.getEnd_date() * 1000);
 		final String endTimeString = Utilities.timeConverter(calendar
 				.get(Calendar.HOUR_OF_DAY))
