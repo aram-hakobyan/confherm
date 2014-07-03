@@ -44,6 +44,7 @@ public class ExamineFragment extends Fragment {
 	ExamsAdapter adapter;
 	ArrayList<Exam> exams;
 	ArrayList<Exam> dbExams;
+	ArrayList<Exam> validExams;
 	ProgressBar progressBarExamin;
 	AQuery aq;
 	DatabaseHelper db;
@@ -57,8 +58,10 @@ public class ExamineFragment extends Fragment {
 
 		aq = new AQuery(getActivity());
 		db = new DatabaseHelper(getActivity());
+		validExams = new ArrayList<Exam>();
 		dbExams = db.getAllExams();
 		downloadedExamIds = new ArrayList<Integer>();
+
 		for (int i = 0; i < dbExams.size(); i++) {
 			downloadedExamIds.add(dbExams.get(i).getId());
 		}
@@ -129,9 +132,18 @@ public class ExamineFragment extends Fragment {
 										&& json.get("data") != null) {
 									exams = JSONParser.parseExams(json);
 
+									for (int i = 0; i < exams.size(); i++) {
+										downloadedExamIds.add(exams.get(i)
+												.getId());
+										if (exams.get(i).getStartDate() >= System
+												.currentTimeMillis() / 1000) {
+											validExams.add(exams.get(i));
+										}
+									}
+
 									if (adapter == null) {
 										adapter = new ExamsAdapter(
-												getActivity(), exams,
+												getActivity(), validExams,
 												downloadedExamIds);
 									} else {
 										adapter.notifyDataSetChanged();
@@ -148,9 +160,14 @@ public class ExamineFragment extends Fragment {
 						}
 					});
 		} else {
+			for (int i = 0; i < dbExams.size(); i++) {
+				if (dbExams.get(i).getStartDate() >= System.currentTimeMillis() / 1000) {
+					validExams.add(dbExams.get(i));
+				}
+			}
 
 			if (adapter == null) {
-				adapter = new ExamsAdapter(getActivity(), dbExams, null);
+				adapter = new ExamsAdapter(getActivity(), validExams, null);
 			} else {
 				adapter.notifyDataSetChanged();
 			}

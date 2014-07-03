@@ -63,19 +63,8 @@ public class ExercisesActivity extends FragmentActivity implements
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 				int e_id = exercises.get(position).getExercise_id();
-				String key = "trainingexercise" + String.valueOf(e_id);
-				if (Utilities.readBoolean(ExercisesActivity.this, key, true)
-						|| position == 0) {
-					openExam(e_id);
-				} else {
-					Utilities
-							.showAlertDialog(
-									ExercisesActivity.this,
-									"Attention",
-									"Cet examen est terminé ou vous l'avez déjà passé vous ne pouvez pas le refaire.");
-				}
+				openExam(e_id);
 			}
-
 		});
 
 		AQuery aq = new AQuery(ExercisesActivity.this);

@@ -23,9 +23,11 @@
         android:id="@+id/gvMain"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-       
-        android:layout_margin="100dp" >
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="100dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginTop="200dp" >
     </GridView>
 
     <TextView
@@ -34,9 +36,9 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/gvMain"
-        android:textSize="20sp"
         android:layout_marginTop="110dp"
         android:text="Temps epreuve - "
-        android:textColor="@color/app_main_color" />
+        android:textColor="@color/app_main_color"
+        android:textSize="20sp" />
 
 </RelativeLayout>

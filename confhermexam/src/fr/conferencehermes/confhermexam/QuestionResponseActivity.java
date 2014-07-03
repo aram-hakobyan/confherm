@@ -324,7 +324,9 @@ public class QuestionResponseActivity extends Activity implements
 			}
 			answersLayout.addView(mRadioGroup);
 
-			if (questionAnswers.get(currentQuestionId) != null) {
+			if (questionAnswers.get(currentQuestionId) != null
+					&& questionAnswers.get(currentQuestionId)
+							.getSingleAnswerPosition() != -1) {
 				int pos = questionAnswers.get(currentQuestionId)
 						.getSingleAnswerPosition();
 				View v = mRadioGroup.getChildAt(pos);
@@ -528,8 +530,6 @@ public class QuestionResponseActivity extends Activity implements
 	public void sendAnswers() throws JSONException {
 		Utilities.showOrHideActivityIndicator(QuestionResponseActivity.this, 0,
 				"Please wait...");
-		Utilities.writeBoolean(QuestionResponseActivity.this,
-				String.valueOf("trainingexercise" + exercise_id), false);
 
 		Map<String, String> params = new HashMap<String, String>();
 		JSONObject object = new JSONObject();
@@ -700,14 +700,13 @@ public class QuestionResponseActivity extends Activity implements
 
 				ArrayList<Integer> userAnswerIDs = questionAnswers.get(
 						currentQuestionId).getMultiAnswerPositions();
+				String currentAsnwerId = allAnswerIDs.get(j);
 				for (int i = 0; i < userAnswerIDs.size(); i++) {
-					String currentAsnwerId = allAnswerIDs.get(j);
 					if (currentAsnwerId.equalsIgnoreCase(String
 							.valueOf(userAnswerIDs.get(i)))) { // User has
 																// checked
 																// this
 																// answer
-
 						for (int k = 0; k < correctionAnswerIDs.size(); k++) {
 							if (correctionAnswerIDs.get(k).equalsIgnoreCase(
 									currentAsnwerId)) // The checked answer
@@ -717,16 +716,12 @@ public class QuestionResponseActivity extends Activity implements
 							else
 								img.setBackgroundResource(R.drawable.correction_false);
 						}
-					} else {
-						for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
-							if (currentAsnwerId
-									.equalsIgnoreCase(correctionAnswerIDs
-											.get(k1)))
-								img.setBackgroundResource(R.drawable.correction_true);
-
-						}
-
 					}
+				}
+				for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
+					if (currentAsnwerId.equalsIgnoreCase(correctionAnswerIDs
+							.get(k1)))
+						img.setBackgroundResource(R.drawable.correction_true);
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
@@ -867,7 +862,8 @@ public class QuestionResponseActivity extends Activity implements
 		switch (v.getId()) {
 		case R.id.validerBtn:
 			try {
-				if (isValidAnswer()) {
+				// if (isValidAnswer())
+				{
 					saveValidation();
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
@@ -881,10 +877,11 @@ public class QuestionResponseActivity extends Activity implements
 						selectQuestion(questions.get(currentQuestionId),
 								currentQuestionId);
 					}
-				} else
-					Toast.makeText(QuestionResponseActivity.this,
-							"Please select at least one answer.",
-							Toast.LENGTH_SHORT).show();
+				} /*
+				 * else Toast.makeText(QuestionResponseActivity.this,
+				 * "Please select at least one answer.",
+				 * Toast.LENGTH_SHORT).show();
+				 */
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -1044,8 +1041,7 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		 mc = new
-		 MediaController(QuestionResponseActivity.this);
+		mc = new MediaController(QuestionResponseActivity.this);
 
 		final LinearLayout soundControlLayout = (LinearLayout) dialog
 				.findViewById(R.id.sound_control_layout);

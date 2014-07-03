@@ -526,8 +526,7 @@ public class JSONParser {
 
 				JSONObject data = json.getJSONObject("data");
 
-				JSONArray corrections = data
-						.getJSONArray("question_answers");
+				JSONArray corrections = data.getJSONArray("question_answers");
 
 				for (int i = 0; i < corrections.length(); i++) {
 					Correction c = new Correction();
@@ -548,7 +547,7 @@ public class JSONParser {
 		}
 		return correctionsList;
 	}
-	
+
 	public static ArrayList<TimeSlot> parsePlannig(JSONObject planJson) {
 		ArrayList<TimeSlot> planningResult = new ArrayList<TimeSlot>();
 		try {
@@ -609,33 +608,37 @@ public class JSONParser {
 		return corExercises;
 	}
 
-	public static ArrayList<CorrectionsExercise> parseCorrectionsQuestionAnswers(
+	public static ArrayList<CorrectionAnswer> parseCorrectionAnswers(
 			JSONObject json) {
-		ArrayList<CorrectionsExercise> corExercises = new ArrayList<CorrectionsExercise>();
+		ArrayList<CorrectionAnswer> correctionsList = new ArrayList<CorrectionAnswer>();
 
 		try {
 			if (json.has(Constants.KEY_DATA)
 					&& json.get(Constants.KEY_DATA) != null) {
 
-				JSONArray exObj = json.getJSONArray("data");
-				for (int i = 0; i < exObj.length(); i++) {
-					CorrectionsExercise t = new CorrectionsExercise();
-					JSONObject obj = exObj.getJSONObject(i);
+				JSONObject data = json.getJSONObject("data");
 
-					t.setExam_id(obj.getInt("exam_id"));
-					t.setExercise_id(obj.getInt("exercise_id"));
-					t.setName(obj.getString("name"));
+				JSONArray corrections = data.getJSONArray("question_answers");
 
-					corExercises.add(t);
-
+				for (int i = 0; i < corrections.length(); i++) {
+					CorrectionAnswer c = new CorrectionAnswer();
+					JSONObject obj = corrections.getJSONObject(i);
+					c.setQuestionId(obj.getInt("question_id"));
+					c.setQuestionType(obj.getInt("question_type"));
+					ArrayList<String> answersArray = new ArrayList<String>();
+					JSONArray answers = obj.getJSONArray("answers");
+					for (int j = 0; j < answers.length(); j++) {
+						answersArray.add(String.valueOf(answers.get(j)));
+					}
+					c.setAnswers(answersArray);
+					correctionsList.add(c);
 				}
-
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-		return corExercises;
+		return correctionsList;
 	}
 
 }

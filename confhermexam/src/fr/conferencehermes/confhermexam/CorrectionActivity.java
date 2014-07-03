@@ -60,6 +60,7 @@ import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
+import fr.conferencehermes.confhermexam.parser.CorrectionAnswer;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
@@ -93,6 +94,9 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
 	DatabaseHelper db;
+
+	private ArrayList<Correction> corrections;
+	private ArrayList<CorrectionAnswer> answers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -186,9 +190,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			for (int i = 0; i < questions.size(); i++) {
 				questionAnswers.add(null);
 			}
-			selectQuestion(questions.get(0), 0);
-			getCorrections();
 
+			getCorrections();
 		}
 
 	}
@@ -206,7 +209,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			}
 		}
 
-		currentQuestionId = position;
+		currentQuestionId = q.getId();
 		currentQuestion = q;
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
 
@@ -241,13 +244,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 			}
 			answersLayout.addView(mRadioGroup);
-
-			if (questionAnswers.get(currentQuestionId) != null) {
-				int pos = questionAnswers.get(currentQuestionId)
-						.getSingleAnswerPosition();
-				View v = mRadioGroup.getChildAt(pos);
-				mRadioGroup.check(v.getId());
-			}
 
 		} else // Multichoice answer
 		if (q.getType().equalsIgnoreCase("1")) {
@@ -290,27 +286,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				});
 			}
 
-			if (questionAnswers.get(currentQuestionId) != null) {
-				ArrayList<Integer> answerIds = new ArrayList<Integer>();
-				answerIds.addAll(questionAnswers.get(currentQuestionId)
-						.getMultiAnswerPositions());
-				for (int j = 0; j < answersLayout.getChildCount(); j++) {
-					try {
-						LinearLayout layout = (LinearLayout) answersLayout
-								.getChildAt(j);
-						CheckBox box = (CheckBox) layout.getChildAt(0);
-						int currentId = currentQuestionAnswers.get(j).getId();
-						for (int k = 0; k < answerIds.size(); k++) {
-							if (answerIds.get(k) == currentId)
-								box.setChecked(true);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-				}
-			}
-
 		} else if (q.getType().equalsIgnoreCase("3")) {
 			editTextsArray.clear();
 			int count = Integer.valueOf(q.getInputCount());
@@ -329,14 +304,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 					layoutParams.setMargins(0, 10, 0, 0);
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
-
-			}
-			if (questionAnswers.get(currentQuestionId) != null) {
-				ArrayList<String> answers = questionAnswers.get(
-						currentQuestionId).getTextAnswers();
-				for (int c = 0; c < editTextsArray.size(); c++) {
-					editTextsArray.get(c).setText(answers.get(c));
-				}
 			}
 		}
 
@@ -380,26 +347,30 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		aq.ajax(Constants.EXAM_EXERCISE_CORRECTIONS_URL, params,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
+
 					@Override
 					public void callback(String url, JSONObject json,
 							AjaxStatus status) {
 
 						try {
 							if (json.has("data") && json.get("data") != null) {
-								ArrayList<Correction> corrections = JSONParser
+								corrections = JSONParser
 										.parseResultCorrections(json);
-								drawCorrections(corrections);
+								answers = JSONParser
+										.parseCorrectionAnswers(json);
+								selectQuestion(questions.get(0), 0);
+								drawCorrections(corrections, answers);
 							}
 						} catch (JSONException e) {
 							e.printStackTrace();
-
 						}
 					}
 				});
 
 	}
 
-	private void drawCorrections(ArrayList<Correction> corrections) {
+	private void drawCorrections(ArrayList<Correction> corrections,
+			ArrayList<CorrectionAnswer> answers) {
 		correctionsLayout.removeAllViews();
 		ArrayList<String> correctionAnswerIDs = new ArrayList<String>();
 		for (Correction c : corrections) {
@@ -409,7 +380,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		}
 
 		ArrayList<String> allAnswerIDs = new ArrayList<String>();
-		ArrayList<Answer> allAnswers = currentQuestion.getAnswers();
+		ArrayList<Answer> allAnswers = db
+				.getAllAnswersByQuestionId(currentQuestionId);
 		for (int i = 0; i < allAnswers.size(); i++) {
 			allAnswerIDs.add(String.valueOf(allAnswers.get(i).getId()));
 		}
@@ -433,19 +405,36 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				}
 
 				imageParams.setMargins(0, 7, 0, 0);
-				int userAnswerIDs = questionAnswers.get(currentQuestionId)
-						.getSingleAnswerPosition();
+				String userAnswerId = "";
+				for (int i = 0; i < answers.size(); i++) {
+					if (answers.get(i).getQuestionId() == currentQuestionId)
+						userAnswerId = answers.get(i).getAnswers().get(0);
+				}
 
-				if (userAnswerIDs == j) {
-					if (allAnswerIDs.get(userAnswerIDs).equalsIgnoreCase(
-							correctionAnswerIDs.get(0)))
-						img.setBackgroundResource(R.drawable.correction_true);
-					else
-						img.setBackgroundResource(R.drawable.correction_false);
-				} else {
-					if (allAnswerIDs.get(j).equalsIgnoreCase(
-							correctionAnswerIDs.get(0)))
-						img.setBackgroundResource(R.drawable.correction_true);
+				String correctAnswerId = "";
+				for (int i = 0; i < corrections.size(); i++) {
+					if (corrections
+							.get(i)
+							.getQuestionId()
+							.equalsIgnoreCase(String.valueOf(currentQuestionId)))
+						correctAnswerId = corrections.get(i).getAnswersArray()
+								.get(0);
+				}
+
+				String currentAnswerId = String.valueOf(allAnswers.get(j)
+						.getId());
+
+				boolean USER_IS_RIGHT = userAnswerId
+						.equalsIgnoreCase(correctAnswerId);
+				boolean CURRENT_IS_RIGHT = currentAnswerId
+						.equalsIgnoreCase(correctAnswerId);
+				boolean CURRENT_IS_USER = currentAnswerId
+						.equalsIgnoreCase(userAnswerId);
+
+				if (CURRENT_IS_RIGHT) {
+					img.setBackgroundResource(R.drawable.correction_true);
+				} else if (CURRENT_IS_USER) {
+					img.setBackgroundResource(R.drawable.correction_false);
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
@@ -461,14 +450,13 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 				ArrayList<Integer> userAnswerIDs = questionAnswers.get(
 						currentQuestionId).getMultiAnswerPositions();
+				String currentAsnwerId = allAnswerIDs.get(j);
 				for (int i = 0; i < userAnswerIDs.size(); i++) {
-					String currentAsnwerId = allAnswerIDs.get(j);
 					if (currentAsnwerId.equalsIgnoreCase(String
 							.valueOf(userAnswerIDs.get(i)))) { // User has
 																// checked
 																// this
 																// answer
-
 						for (int k = 0; k < correctionAnswerIDs.size(); k++) {
 							if (correctionAnswerIDs.get(k).equalsIgnoreCase(
 									currentAsnwerId)) // The checked answer
@@ -478,16 +466,14 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 							else
 								img.setBackgroundResource(R.drawable.correction_false);
 						}
-					} else {
-						for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
-							if (currentAsnwerId
-									.equalsIgnoreCase(correctionAnswerIDs
-											.get(k1)))
-								img.setBackgroundResource(R.drawable.correction_true);
-
-						}
-
 					}
+				}
+
+				for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
+					if (currentAsnwerId.equalsIgnoreCase(correctionAnswerIDs
+							.get(k1)))
+						img.setBackgroundResource(R.drawable.correction_true);
+
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {

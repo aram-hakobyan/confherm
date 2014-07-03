@@ -34,6 +34,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
@@ -116,6 +117,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_question_response);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		aq = new AQuery(ExaminationActivity.this);
@@ -549,7 +551,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.validerBtn:
 			try {
-				if (isValidAnswer()) {
+				//if (isValidAnswer()) 
+				{
 					saveValidation();
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
@@ -564,10 +567,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						selectQuestion(questions.get(currentQuestionId),
 								currentQuestionId);
 					}
-				} else
+				} /*else
 					Toast.makeText(ExaminationActivity.this,
 							"Please select at least one answer.",
-							Toast.LENGTH_SHORT).show();
+							Toast.LENGTH_SHORT).show();*/
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
