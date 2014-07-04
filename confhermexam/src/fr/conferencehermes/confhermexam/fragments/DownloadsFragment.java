@@ -77,13 +77,13 @@ public class DownloadsFragment extends Fragment {
 											.setVisibility(View.GONE);
 									listview.setVisibility(View.VISIBLE);
 
-									int timeslotId = -1;
+									int event_id = -1;
 									Bundle arguments = getArguments();
 									if (arguments != null)
-										timeslotId = arguments.getInt(
-												"timeslot_id", -1);
-									if (timeslotId != -1)
-										selectCurrentEventDownload(timeslotId);
+										event_id = arguments.getInt("event_id",
+												-1);
+									if (event_id != -1)
+										selectCurrentEventDownload(event_id);
 								}
 
 							} catch (JSONException e) {

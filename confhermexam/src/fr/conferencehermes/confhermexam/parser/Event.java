@@ -9,6 +9,7 @@ public class Event {
 	private String access_notes;
 	private int testId;
 	private long creationDate;
+	private long lastEditTime;
 	private String author;
 	private ArrayList<Exam> exams;
 
@@ -78,6 +79,14 @@ public class Event {
 
 	public void setExams(ArrayList<Exam> exams) {
 		this.exams = exams;
+	}
+
+	public long getLastEditTime() {
+		return lastEditTime;
+	}
+
+	public void setLastEditTime(long lastEditTime) {
+		this.lastEditTime = lastEditTime;
 	}
 
 }

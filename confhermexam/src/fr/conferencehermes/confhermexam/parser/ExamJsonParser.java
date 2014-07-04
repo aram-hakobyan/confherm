@@ -34,7 +34,7 @@ public class ExamJsonParser {
 		event.setName(obj.getString("event_name"));
 		event.setTestId(obj.getInt("test_id"));
 		event.setValidation(obj.getInt("validation"));
-		event.setCreationDate(obj.getLong("last_edit_time"));
+		event.setLastEditTime(obj.getLong("last_edit_time"));
 		return event;
 	}
 

@@ -36,6 +36,8 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.connection.NetworkReachability;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.TimeSlot;
 import fr.conferencehermes.confhermexam.util.Constants;
@@ -50,6 +52,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 	private TextView MON, TUE, WED, THU, FRI, SAT, SUN;
 	private AQuery aq;
 	private RelativeLayout calendarContainer;
+	private int eventStatus = 0;;
 	private static final long WEEK = 7 * 24 * 3600;
 	private static final long DAY_MILLS = 24 * 3600 * 1000;
 
@@ -215,8 +218,9 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 				+ ":"
 				+ Utilities.timeConverter(calendar.get(Calendar.MINUTE));
 		int STARTING_HOUR = calendar.get(Calendar.HOUR_OF_DAY);
-		/*if (STARTING_HOUR < 6 || STARTING_HOUR > 22)
-			return;*/
+		/*
+		 * if (STARTING_HOUR < 6 || STARTING_HOUR > 22) return;
+		 */
 		calendar.setTimeInMillis(timeSlot.getEnd_date() * 1000);
 		final String endTimeString = Utilities.timeConverter(calendar
 				.get(Calendar.HOUR_OF_DAY))
@@ -347,42 +351,62 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		hour.setText("De " + startTime + " a " + endTime);
 
 		switch (ts.getStatus()) {
-		case 1:
-			status.setText("Telechargement: Disponible");
-			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.white_exam_checked),
-					null, null, null);
-			download.setEnabled(true);
-			break;
-		case 2:
-			status.setText("Telechargement: Need update");
-			download.setEnabled(true);
-			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.white_refresh), null,
-					null, null);
-			break;
+
 		case 3:
-			status.setText("Telechargement: Not downloaded yet");
-			download.setEnabled(true);
-			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.white_download),
-					null, null, null);
+			DatabaseHelper db = new DatabaseHelper(getActivity());
+			Event event = null;
+			ArrayList<Event> events = db.getAllEvents();
+			for (int i = 0; i < events.size(); i++) {
+				if (event.getId() == events.get(i).getId())
+					event = events.get(i);
+			}
+
+			if (event != null) { // event is downloaded
+				if (event.getLastEditTime() >= ts.getLast_edit_time()) {
+					status.setText("Telechargement: OK");
+					download.setEnabled(false);
+					status.setCompoundDrawables(
+							getResources().getDrawable(R.drawable.exam_checked),
+							null, null, null);
+					eventStatus = 1;
+				} else {
+					status.setText("Telechargement: Need update");
+					download.setEnabled(true);
+					status.setCompoundDrawables(
+							getResources().getDrawable(R.drawable.exam_refresh),
+							null, null, null);
+					eventStatus = 2;
+				}
+			} else {
+				status.setText("Telechargement: Not downloaded yet");
+				download.setEnabled(true);
+				status.setCompoundDrawables(
+						getResources().getDrawable(R.drawable.white_download),
+						null, null, null);
+				eventStatus = 3;
+			}
+
 			break;
 		case 4:
-			status.setText("Telechargement: Non disponible");
+			status.setText("Telechargement: "
+					+ getResources().getString(R.string.examen_not_avaible));
 			download.setEnabled(false);
 			status.setCompoundDrawables(
 					getResources().getDrawable(R.drawable.exam_x), null, null,
 					null);
+			eventStatus = 4;
 			break;
 
+		default:
+			break;
 		}
 
 		download.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dialog.dismiss();
-				openExams(ts);
+				if (eventStatus == 2 || eventStatus == 3)
+					openDownloads(ts, eventStatus);
 			}
 		});
 
@@ -404,9 +428,9 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 
 	}
 
-	private void openExams(TimeSlot ts) {
+	private void openDownloads(TimeSlot ts, int eventStatus) {
 		Bundle bundle = new Bundle();
-		bundle.putInt("timeslot_id", ts.getTimeslot_id());
+		bundle.putInt("event_id", ts.getEvent_id());
 		DownloadsFragment fragobj = new DownloadsFragment();
 		fragobj.setArguments(bundle);
 		FragmentManager fm = getActivity().getSupportFragmentManager();

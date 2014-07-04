@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EVENT_TEST_ID = "testId";
 	private static final String KEY_EVENT_CREATION_DATE = "creationDate";
 	private static final String KEY_EVENT_AUTHOR = "author";
+	private static final String KEY_EVENT_LAST_EDIT_TIME = "lastEditTime";
 
 	// EXAM column names
 	private static final String KEY_EXAM_ID = "examId";
@@ -107,7 +108,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ TABLE_EVENTS + "(" + KEY_EVENT_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_EVENT_NAME + " TEXT," + KEY_EVENT_VALIDATION + " INTEGER,"
 			+ KEY_EVENT_TEST_ID + " INTEGER," + KEY_EVENT_AUTHOR + " INTEGER,"
-			+ KEY_EVENT_CREATION_DATE + " INTEGER" + ")";
+			+ KEY_EVENT_CREATION_DATE + " INTEGER," + KEY_EVENT_LAST_EDIT_TIME
+			+ " INTEGER" + ")";
 
 	// Exam table create statement
 	private static final String CREATE_TABLE_EXAM = "CREATE TABLE "
@@ -221,6 +223,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EVENT_NAME, event.getName());
 		values.put(KEY_EVENT_TEST_ID, event.getTestId());
 		values.put(KEY_EVENT_VALIDATION, event.getValidation());
+		values.put(KEY_EVENT_LAST_EDIT_TIME, event.getLastEditTime());
 
 		// insert row
 		db.beginTransaction();
@@ -251,11 +254,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if (c != null && c.moveToFirst()) {
 			event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
 			event.setAuthor((c.getString(c.getColumnIndex(KEY_EVENT_AUTHOR))));
-			event.setCreationDate(c.getInt(c
+			event.setCreationDate(c.getLong(c
 					.getColumnIndex(KEY_EVENT_CREATION_DATE)));
 			event.setName(c.getString(c.getColumnIndex(KEY_EVENT_NAME)));
 			event.setTestId(c.getInt(c.getColumnIndex(KEY_EVENT_TEST_ID)));
 			event.setValidation(c.getInt(c.getColumnIndex(KEY_EVENT_VALIDATION)));
+			event.setLastEditTime(c.getLong(c
+					.getColumnIndex(KEY_EVENT_LAST_EDIT_TIME)));
 			c.close();
 		}
 
@@ -265,8 +270,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	/*
 	 * getting all events
 	 */
-	public List<Event> getAllEvents() {
-		List<Event> events = new ArrayList<Event>();
+	public ArrayList<Event> getAllEvents() {
+		ArrayList<Event> events = new ArrayList<Event>();
 		String selectQuery = "SELECT  * FROM " + TABLE_EVENTS;
 
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -284,6 +289,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				event.setTestId(c.getInt(c.getColumnIndex(KEY_EVENT_TEST_ID)));
 				event.setValidation(c.getInt(c
 						.getColumnIndex(KEY_EVENT_VALIDATION)));
+				event.setLastEditTime(c.getLong(c
+						.getColumnIndex(KEY_EVENT_LAST_EDIT_TIME)));
 
 				events.add(event);
 			} while (c.moveToNext());
@@ -306,6 +313,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EVENT_NAME, event.getName());
 		values.put(KEY_EVENT_TEST_ID, event.getTestId());
 		values.put(KEY_EVENT_VALIDATION, event.getValidation());
+		values.put(KEY_EVENT_LAST_EDIT_TIME, event.getLastEditTime());
 
 		// updating row
 		return db.update(TABLE_EVENTS, values, KEY_EVENT_ID + " = ?",
