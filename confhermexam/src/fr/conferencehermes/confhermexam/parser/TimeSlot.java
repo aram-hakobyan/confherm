@@ -3,9 +3,11 @@ package fr.conferencehermes.confhermexam.parser;
 public class TimeSlot {
 	private int timeslot_id;
 	private int test_id;
+	private int event_id;
 	private String test_name;
 	private long start_date;
 	private long end_date;
+	private long last_edit_time;
 	private String academy;
 	private String place;
 	private String room;
@@ -85,6 +87,22 @@ public class TimeSlot {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	public long getLast_edit_time() {
+		return last_edit_time;
+	}
+
+	public void setLast_edit_time(long last_edit_time) {
+		this.last_edit_time = last_edit_time;
+	}
+
+	public int getEvent_id() {
+		return event_id;
+	}
+
+	public void setEvent_id(int event_id) {
+		this.event_id = event_id;
 	}
 
 }

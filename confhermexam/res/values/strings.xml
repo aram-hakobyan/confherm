@@ -82,7 +82,7 @@
 
     <!-- Exam -->
     <string name="examen_avaible">Disponible</string>
-    <string name="examen_non_avaible">non disponible</string>
+    <string name="examen_not_avaible">non disponible</string>
 
     <!-- Note & Stats -->
     <string name="notes_stats_target">Ma note</string>

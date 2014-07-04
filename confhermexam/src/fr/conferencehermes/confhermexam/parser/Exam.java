@@ -10,12 +10,12 @@ public class Exam {
 	private String categoryType;
 	private long startDate;
 	private long endDate;
+	private long lastEditTime;
 	private int status;
 	private String description;
 	private String password;
 	private String event_name;
-	
-	
+
 	public String getEvent_name() {
 		return event_name;
 	}
@@ -116,5 +116,13 @@ public class Exam {
 
 	public void setExercises(ArrayList<Exercise> exercises) {
 		this.exercises = exercises;
+	}
+
+	public long getLastEditTime() {
+		return lastEditTime;
+	}
+
+	public void setLastEditTime(long lastEditTime) {
+		this.lastEditTime = lastEditTime;
 	}
 }

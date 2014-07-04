@@ -52,6 +52,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EXAM_START_DATE = "startDate";
 	private static final String KEY_EXAM_END_DATE = "endDate";
 	private static final String KEY_EXAM_PASSWORD = "creationDate";
+	private static final String KEY_EXAM_TYPE = "categoryType";
+	private static final String KEY_EXAM_LAST_EDIT_TIME = "lastEditTime";
+	private static final String KEY_EXAM_STATUS = "status";
 
 	// EXERCISE_FILES column names
 	private static final String KEY_EXERCISE_FILES_ID = "exerciseId";
@@ -111,8 +114,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ TABLE_EXAMS + "(" + KEY_EXAM_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_EXAM_EVENT_ID + " INTEGER," + KEY_EXAM_START_DATE
 			+ " INTEGER," + KEY_EXAM_END_DATE + " INTEGER," + KEY_EXAM_PASSWORD
-			+ " TEXT," + KEY_EXAM_NAME + " TEXT," + KEY_EXAM_EVENT_NAME
-			+ " TEXT" + ")";
+			+ " TEXT," + KEY_EXAM_NAME + " TEXT," + KEY_EXAM_TYPE + " TEXT,"
+			+ KEY_EXAM_LAST_EDIT_TIME + " INTEGER," + KEY_EXAM_STATUS
+			+ " INTEGER," + KEY_EXAM_EVENT_NAME + " TEXT" + ")";
 
 	// ExerciseFiles table create statement
 	private static final String CREATE_TABLE_EXERCISE_FILES = "CREATE TABLE "
@@ -331,6 +335,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_END_DATE, (int) exam.getEndDate());
 		values.put(KEY_EXAM_NAME, exam.getTitle());
 		values.put(KEY_EXAM_EVENT_NAME, exam.getEvent_name());
+		values.put(KEY_EXAM_LAST_EDIT_TIME, exam.getLastEditTime());
+		values.put(KEY_EXAM_STATUS, exam.getStatus());
+		values.put(KEY_EXAM_TYPE, exam.getCategoryType());
 
 		// insert row
 		db.beginTransaction();
@@ -361,12 +368,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if (c != null && c.moveToFirst()) {
 			exam.setId(c.getInt(c.getColumnIndex(KEY_EXAM_ID)));
 			exam.setEventId((c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID))));
-			exam.setStartDate(c.getInt(c.getColumnIndex(KEY_EXAM_START_DATE)));
-			exam.setEndDate(c.getInt(c.getColumnIndex(KEY_EXAM_END_DATE)));
+			exam.setStartDate(c.getLong(c.getColumnIndex(KEY_EXAM_START_DATE)));
+			exam.setEndDate(c.getLong(c.getColumnIndex(KEY_EXAM_END_DATE)));
 			exam.setPassword(c.getString(c.getColumnIndex(KEY_EXAM_PASSWORD)));
 			exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
-			exam.setEvent_name(c.getString(c.getColumnIndex(KEY_EXAM_EVENT_NAME)));
-			
+			exam.setEvent_name(c.getString(c
+					.getColumnIndex(KEY_EXAM_EVENT_NAME)));
+			exam.setCategoryType(c.getString(c.getColumnIndex(KEY_EXAM_TYPE)));
+			exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
+			exam.setLastEditTime(c.getLong(c
+					.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
+
 			c.close();
 		}
 
@@ -397,6 +409,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				exam.setPassword(c.getString(c
 						.getColumnIndex(KEY_EXAM_PASSWORD)));
 				exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
+				exam.setCategoryType(c.getString(c
+						.getColumnIndex(KEY_EXAM_TYPE)));
+				exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
+				exam.setLastEditTime(c.getLong(c
+						.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
 
 				exams.add(exam);
 			} while (c.moveToNext());
@@ -420,6 +437,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_PASSWORD, exam.getPassword());
 		values.put(KEY_EXAM_START_DATE, exam.getStartDate());
 		values.put(KEY_EXAM_NAME, exam.getTitle());
+		values.put(KEY_EXAM_LAST_EDIT_TIME, exam.getLastEditTime());
+		values.put(KEY_EXAM_STATUS, exam.getStatus());
+		values.put(KEY_EXAM_TYPE, exam.getCategoryType());
 
 		// updating row
 		return db.update(TABLE_EVENTS, values, KEY_EVENT_ID + " = ?",
@@ -462,6 +482,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
 					exam.setEvent_name(c.getString(c
 							.getColumnIndex(KEY_EXAM_EVENT_NAME)));
+					exam.setCategoryType(c.getString(c
+							.getColumnIndex(KEY_EXAM_TYPE)));
+					exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
+					exam.setLastEditTime(c.getLong(c
+							.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
 
 					exams.add(exam);
 				}

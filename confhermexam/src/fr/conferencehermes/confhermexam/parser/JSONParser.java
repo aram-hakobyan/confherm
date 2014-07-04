@@ -74,6 +74,7 @@ public class JSONParser {
 					e.setStartDate(obj.getLong("start_date"));
 					e.setEndDate(obj.getLong("end_date"));
 					e.setStatus(obj.getInt("status"));
+					e.setLastEditTime(obj.getLong("last_edit_time"));
 					exams.add(e);
 				}
 			}
@@ -552,8 +553,7 @@ public class JSONParser {
 		ArrayList<TimeSlot> planningResult = new ArrayList<TimeSlot>();
 		try {
 			if (planJson.has(Constants.KEY_DATA)
-					&& planJson.get(Constants.KEY_DATA) != null) {
-				// JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
+					&& planJson.get(Constants.KEY_DATA) != null) {				
 				JSONArray data = planJson.getJSONArray(Constants.KEY_DATA);
 				if (data.length() != 0) {
 					for (int i = 0; i < data.length(); i++) {
@@ -561,6 +561,7 @@ public class JSONParser {
 						TimeSlot r = new TimeSlot();
 						r.setTimeslot_id(gObj.getInt("timeslot_id"));
 						r.setTest_id(gObj.getInt("test_id"));
+						r.setEvent_id(gObj.getInt("event_id"));
 						r.setTest_name(gObj.getString("test_name"));
 						r.setAcademy(gObj.getString("academy"));
 						r.setStart_date(gObj.getLong("start_date"));
@@ -568,6 +569,7 @@ public class JSONParser {
 						r.setPlace(gObj.getString("place"));
 						r.setRoom(gObj.getString("room"));
 						r.setStatus(gObj.getInt("status"));
+						r.setLast_edit_time(gObj.getLong("last_edit_time"));
 						planningResult.add(r);
 					}
 				}

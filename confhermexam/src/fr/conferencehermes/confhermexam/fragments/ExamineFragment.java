@@ -66,26 +66,40 @@ public class ExamineFragment extends Fragment {
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
 				String password = validExams.get(position).getPassword();
-				if (password != null) {
-					if (password.isEmpty()) {
-						Intent intent = new Intent(getActivity(),
-								ExamExercisesActivity.class);
-						intent.putExtra("exam_id", validExams.get(position)
-								.getId());
-						intent.putExtra("event_id", validExams.get(position)
-								.getEventId());
-						startActivity(intent);
-					} else {
-						showPasswordAlert(validExams.get(position).getId(),
-								validExams.get(position).getEventId());
+				if (password != null) { // exam is downloaded
+					if (validExams.get(position).getStatus() == 1) {
+						if (canStartExam(validExams.get(position))) {
+							if (password.isEmpty()) {
+								Intent intent = new Intent(getActivity(),
+										ExamExercisesActivity.class);
+								intent.putExtra("exam_id",
+										validExams.get(position).getId());
+								intent.putExtra("event_id",
+										validExams.get(position).getEventId());
+								startActivity(intent);
+							} else {
+								showPasswordAlert(validExams.get(position)
+										.getId(), validExams.get(position)
+										.getEventId());
+							}
+						} else {
+							Utilities.showAlertDialog(getActivity(),
+									"Attention", "You can't start exam now.");
+						}
+					} else if (validExams.get(position).getStatus() == 2) {
+						Utilities.showAlertDialog(getActivity(), "Attention",
+								"Need update");
 					}
 
 				} else {
-					Utilities.showAlertDialog(
-							getActivity(),
-							"Attention",
-							getResources().getString(
-									R.string.exam_not_downloaded_alert));
+					if (validExams.get(position).getStatus() == 3)
+						Utilities.showAlertDialog(
+								getActivity(),
+								"Attention",
+								getResources().getString(
+										R.string.exam_not_downloaded_alert));
+					else if (validExams.get(position).getStatus() == 4)
+						return;
 				}
 			}
 
@@ -118,15 +132,7 @@ public class ExamineFragment extends Fragment {
 											validExams.add(exams.get(j));
 									}
 
-									if (adapter == null) {
-										adapter = new ExamsAdapter(
-												getActivity(), validExams, null);
-									} else {
-										adapter.notifyDataSetChanged();
-									}
-									listview.setAdapter(adapter);
-									progressBarExamin.setVisibility(View.GONE);
-									listview.setVisibility(View.VISIBLE);
+									setupAdapterData();
 								}
 
 							} catch (JSONException e) {
@@ -142,19 +148,66 @@ public class ExamineFragment extends Fragment {
 					validExams.add(dbExams.get(i));
 			}
 
-			if (adapter == null) {
-				adapter = new ExamsAdapter(getActivity(), validExams, null);
-			} else {
-				adapter.notifyDataSetChanged();
-			}
-			listview.setAdapter(adapter);
-			progressBarExamin.setVisibility(View.GONE);
-			listview.setVisibility(View.VISIBLE);
+			setupAdapterData();
 		}
 
-		db.closeDB();
-
 		return fragment;
+	}
+
+	public boolean canStartExam(Exam e) {
+		long currentTime = System.currentTimeMillis() / 1000;
+		return e.getStartDate() < currentTime && e.getEndDate() > currentTime;
+
+	}
+
+	public void setupAdapterData() {
+		for (int i = 0; i < validExams.size(); i++) {
+			Exam exam = validExams.get(i);
+			switch (exam.getStatus()) {
+			case 3:
+				if (examIsDownloaded(exam.getId())) {
+					Exam downloadedExam = db.getExam(exam.getId());
+					if (downloadedExam.getLastEditTime() < exam
+							.getLastEditTime()) {
+						validExams.get(i).setStatus(2); // need update
+					} else {
+						validExams.get(i).setStatus(1); // status OK
+					}
+
+				} else {
+					// status is 3 (not downloaded yet)
+				}
+
+				break;
+			case 4:
+				validExams.get(i).setStatus(4); // not available
+				break;
+
+			default:
+				break;
+			}
+
+		}
+
+		if (adapter == null) {
+			adapter = new ExamsAdapter(getActivity(), validExams, null);
+		} else {
+			adapter.notifyDataSetChanged();
+		}
+		listview.setAdapter(adapter);
+		progressBarExamin.setVisibility(View.GONE);
+		listview.setVisibility(View.VISIBLE);
+
+		db.closeDB();
+	}
+
+	public boolean examIsDownloaded(int examId) {
+		for (int i = 0; i < dbExams.size(); i++) {
+			if (dbExams.get(i).getId() == examId)
+				return true;
+		}
+
+		return false;
 	}
 
 	private void showPasswordAlert(final int id, final int eventId) {
