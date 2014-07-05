@@ -639,13 +639,17 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(updatedTime)));
 
-			// temps2.setText("" + mins + ":" + String.format("%02d", secs));
+			 //temps1.setText("" + mins + ":" + String.format("%02d", secs));
 			temps2.setText("Temps exam - " + hms);
 			customHandler.postDelayed(this, 0);
 
 		}
 
 	};
+
+	
+	
+	
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {

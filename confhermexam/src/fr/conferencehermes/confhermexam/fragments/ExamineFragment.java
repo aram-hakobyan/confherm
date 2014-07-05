@@ -68,7 +68,7 @@ public class ExamineFragment extends Fragment {
 				String password = validExams.get(position).getPassword();
 				if (password != null) { // exam is downloaded
 					if (validExams.get(position).getStatus() == 1) {
-						if (canStartExam(validExams.get(position))) {
+						//if (canStartExam(validExams.get(position))) {
 							if (password.isEmpty()) {
 								Intent intent = new Intent(getActivity(),
 										ExamExercisesActivity.class);
@@ -82,10 +82,10 @@ public class ExamineFragment extends Fragment {
 										.getId(), validExams.get(position)
 										.getEventId());
 							}
-						} else {
-							Utilities.showAlertDialog(getActivity(),
-									"Attention", "You can't start exam now.");
-						}
+						//} else {
+						//	Utilities.showAlertDialog(getActivity(),
+						//			"Attention", "You can't start exam now.");
+						//}
 					} else if (validExams.get(position).getStatus() == 2) {
 						Utilities.showAlertDialog(getActivity(), "Attention",
 								"Need update");

@@ -2,6 +2,11 @@ package fr.conferencehermes.confhermexam;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +20,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -91,7 +98,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
 	DatabaseHelper db;
-
+	private int resumPlayingSound = 0;
+	private int resumPlayingVideo = 0;
 	private ArrayList<Correction> corrections;
 	private ArrayList<CorrectionAnswer> answers;
 
@@ -585,7 +593,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		final TextView text = (TextView) dialog
 				.findViewById(R.id.ennouncerText);
 
-		if (files.get("image") == null) {
+		if (files.get("image").isEmpty()) {
 			button1.setBackgroundResource(R.drawable.ic_camera_gray);
 			button1.setEnabled(false);
 			button1.setAlpha(0.5f);
@@ -594,7 +602,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			button1.setEnabled(true);
 			button1.setAlpha(1.0f);
 		}
-		if (files.get("sound") == null) {
+		if (files.get("sound").isEmpty()) {
 			button2.setBackgroundResource(R.drawable.ic_sound_gray);
 			button2.setEnabled(false);
 			button2.setAlpha(0.5f);
@@ -603,7 +611,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			button2.setEnabled(true);
 			button2.setAlpha(1f);
 		}
-		if (files.get("video") == null) {
+		if (files.get("video").isEmpty()) {
 			button3.setBackgroundResource(R.drawable.ic_video_gray);
 			button3.setEnabled(false);
 			button3.setAlpha(0.5f);
@@ -616,13 +624,134 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		final String IMAGE_URL = files.get("image");
 		final String AUDIO_URL = files.get("sound");
 		final String VIDEO_URL = files.get("video");
-
+		VIDEO_URL.replaceAll(" ", "%20");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
 		final ImageView audioImage = (ImageView) dialog
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = new MediaController(CorrectionActivity.this);
+
+		final LinearLayout soundControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.sound_control_layout);
+		final ImageView soundPlay = (ImageView) dialog
+				.findViewById(R.id.sound_play);
+		final ImageView soundPause = (ImageView) dialog
+				.findViewById(R.id.sound_pause);
+		final ImageView soundReplay = (ImageView) dialog
+				.findViewById(R.id.sound_replay);
+
+		final LinearLayout videoControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.video_control_layout);
+		final ImageView videoPlay = (ImageView) dialog
+				.findViewById(R.id.video_play);
+		final ImageView videoPause = (ImageView) dialog
+				.findViewById(R.id.video_pause);
+		final ImageView videoReplay = (ImageView) dialog
+				.findViewById(R.id.video_replay);
+
+		soundPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.pause();
+						resumPlayingSound = mediaPlayer.getCurrentPosition();
+						soundPlay.setVisibility(View.VISIBLE);
+						soundPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		soundReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(0);
+					mediaPlayer.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (mediaPlayer.isPlaying()) {
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		soundPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(resumPlayingSound);
+					mediaPlayer.start();
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		videoPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+
+					if (video.isPlaying()) {
+						video.pause();
+
+						resumPlayingVideo = video.getCurrentPosition();
+						videoPlay.setVisibility(View.VISIBLE);
+						videoPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		videoReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(0);
+					video.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (video.isPlaying()) {
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		videoPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(resumPlayingVideo);
+					video.start();
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -645,27 +774,60 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			}
 		if (VIDEO_URL != null)
 			if (!VIDEO_URL.isEmpty()) {
-				// VIDEO_URL.replaceAll(" ", "%20");
-				mc.setAnchorView(video);
 				Uri videoURI = Uri.parse(VIDEO_URL);
-				video.setMediaController(mc);
+
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
+
 			}
 
 		if (IMAGE_URL != null)
 			if (!IMAGE_URL.isEmpty()) {
-				img.setImageURI(Uri.parse(new File(IMAGE_URL).toString()));
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							URL url = new URL(IMAGE_URL);
+							URLConnection conn = url.openConnection();
+							HttpURLConnection httpConn = (HttpURLConnection) conn;
+							httpConn.setRequestMethod("GET");
+							httpConn.connect();
+							if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+								InputStream inputStream = httpConn
+										.getInputStream();
+								final Bitmap bitmap = BitmapFactory
+										.decodeStream(inputStream);
+								inputStream.close();
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										img.setImageBitmap(bitmap);
+										img.refreshDrawableState();
+										img.invalidate();
+									}
+								});
+
+							}
+						} catch (MalformedURLException e1) {
+							e1.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
 			}
 
 		switch (from) {
 		case 0:
 			text.setText(exercise.getText());
 			text.setVisibility(View.VISIBLE);
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
+			audioImage.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
+
 			break;
 		case 1:
 			if (mediaPlayer != null) {
@@ -681,26 +843,34 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				video.stopPlayback();
 			}
 			img.setVisibility(View.VISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			video.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
+			audioImage.setVisibility(View.GONE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 			break;
 		case 2:
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.VISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			audioImage.setVisibility(View.VISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.VISIBLE);
+
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
 			try {
 				mediaPlayer.seekTo(0);
 				mediaPlayer.start();
+				soundPlay.setVisibility(View.GONE);
+				soundPause.setVisibility(View.VISIBLE);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			break;
 		case 3:
 			try {
@@ -710,17 +880,20 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			img.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			videoControlLayout.setVisibility(View.VISIBLE);
+			audioImage.setVisibility(View.GONE);
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 
 			try {
+
 				video.start();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			break;
 		default:
 			break;
@@ -743,33 +916,40 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 							video.stopPlayback();
 						}
 						img.setVisibility(View.VISIBLE);
-						video.setVisibility(View.INVISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						video.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.GONE);
+
+						audioImage.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 					}
 				});
+
 		dialog.findViewById(R.id.button2).setOnClickListener(
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						img.setVisibility(View.INVISIBLE);
-						video.setVisibility(View.INVISIBLE);
-						mc.setVisibility(View.VISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
+						video.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
 						audioImage.setVisibility(View.VISIBLE);
+						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
 						}
 						try {
 							mediaPlayer.seekTo(0);
 							mediaPlayer.start();
+							soundPlay.setVisibility(View.GONE);
+							soundPause.setVisibility(View.VISIBLE);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 
 					}
 				});
+
 		dialog.findViewById(R.id.button3).setOnClickListener(
 				new OnClickListener() {
 					@Override
@@ -781,17 +961,19 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						img.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						videoControlLayout.setVisibility(View.VISIBLE);
+						audioImage.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 
 						try {
 							video.start();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+
 					}
 				});
 
