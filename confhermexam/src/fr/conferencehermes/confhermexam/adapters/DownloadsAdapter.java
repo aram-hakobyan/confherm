@@ -103,8 +103,7 @@ public class DownloadsAdapter extends BaseAdapter {
 			} else if (status == 2) {
 				holder.desc.setText("Mettre a jour");
 				holder.btnAction.setBackgroundResource(R.drawable.exam_refresh);
-				holder.btnRemove
-						.setBackgroundResource(R.drawable.exam_delete_disabled);
+				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
 			} else if (status == 3) {
 				holder.desc.setText("Telecharger");
 				holder.btnAction
@@ -133,7 +132,7 @@ public class DownloadsAdapter extends BaseAdapter {
 				@Override
 				public void onClick(View v) {
 					int status = mListItems.get(position).getStatus();
-					if (status == 1) {
+					if (status == 1 || status == 2) {
 						showDialog(position);
 					}
 

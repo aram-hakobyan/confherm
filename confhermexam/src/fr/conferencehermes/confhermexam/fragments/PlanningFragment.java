@@ -357,7 +357,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			Event event = null;
 			ArrayList<Event> events = db.getAllEvents();
 			for (int i = 0; i < events.size(); i++) {
-				if (event.getId() == events.get(i).getId())
+				if (ts.getEvent_id() == events.get(i).getId())
 					event = events.get(i);
 			}
 

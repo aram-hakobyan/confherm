@@ -23,7 +23,9 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.DownloadsAdapter;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
+import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
@@ -38,6 +40,8 @@ public class DownloadsFragment extends Fragment {
 
 	ProgressBar progressBarTelecharge;
 	protected int id = 0;
+	private DatabaseHelper db;
+	private ArrayList<Event> dbEvents;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -45,6 +49,8 @@ public class DownloadsFragment extends Fragment {
 		View fragment = inflater.inflate(R.layout.activity_telechargement,
 				container, false);
 		aq = new AQuery(getActivity());
+		db = new DatabaseHelper(getActivity());
+		dbEvents = db.getAllEvents();
 
 		progressBarTelecharge = (ProgressBar) fragment
 				.findViewById(R.id.progressBarTelecharge);
@@ -66,24 +72,7 @@ public class DownloadsFragment extends Fragment {
 								if (json.has("data")
 										&& json.get("data") != null) {
 									downloads = JSONParser.parseDownloads(json);
-									if (adapter == null) {
-										adapter = new DownloadsAdapter(
-												getActivity(), downloads);
-									} else {
-										adapter.notifyDataSetChanged();
-									}
-									listview.setAdapter(adapter);
-									progressBarTelecharge
-											.setVisibility(View.GONE);
-									listview.setVisibility(View.VISIBLE);
-
-									int event_id = -1;
-									Bundle arguments = getArguments();
-									if (arguments != null)
-										event_id = arguments.getInt("event_id",
-												-1);
-									if (event_id != -1)
-										selectCurrentEventDownload(event_id);
+									setupAdapterData();
 								}
 
 							} catch (JSONException e) {
@@ -103,6 +92,62 @@ public class DownloadsFragment extends Fragment {
 		}
 
 		return fragment;
+	}
+
+	public void setupAdapterData() {
+		for (int i = 0; i < downloads.size(); i++) {
+			DownloadInstance download = downloads.get(i);
+			switch (download.getStatus()) {
+			case 3:
+				if (eventIsDownloaded(download.getEventId())) {
+					Event event = db.getEvent(download.getEventId());
+					if (event.getLastEditTime() < download.getLastEditTime()) {
+						downloads.get(i).setStatus(2); // need update
+					} else {
+						downloads.get(i).setStatus(1); // status OK
+					}
+
+				} else {
+					// status is 3 (not downloaded yet)
+				}
+
+				break;
+			case 4:
+				downloads.get(i).setStatus(4); // not available
+				break;
+
+			default:
+				break;
+			}
+
+		}
+
+		if (adapter == null) {
+			adapter = new DownloadsAdapter(getActivity(), downloads);
+		} else {
+			adapter.notifyDataSetChanged();
+		}
+		listview.setAdapter(adapter);
+		progressBarTelecharge.setVisibility(View.GONE);
+		listview.setVisibility(View.VISIBLE);
+
+		int event_id = -1;
+		Bundle arguments = getArguments();
+		if (arguments != null)
+			event_id = arguments.getInt("event_id", -1);
+		if (event_id != -1)
+			selectCurrentEventDownload(event_id);
+
+		db.closeDB();
+	}
+
+	public boolean eventIsDownloaded(int eventId) {
+		for (int i = 0; i < dbEvents.size(); i++) {
+			if (dbEvents.get(i).getId() == eventId)
+				return true;
+		}
+
+		return false;
 	}
 
 	private void selectCurrentEventDownload(final int eventId) {

@@ -268,29 +268,26 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentTop="true"
                     android:layout_marginTop="10dp"
+                    android:layout_weight="0.5"
                     android:background="@color/app_main_color"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:layout_weight="0.5"
                     android:text="ENONCÉ"
                     android:textColor="@android:color/white"
                     android:textSize="23sp" />
 
-        
-
-                    <ListView
-                        android:id="@+id/questionsListView"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@+id/ennouncer"
-                        android:layout_marginTop="10dp"
-                        android:choiceMode="singleChoice"
-                             android:layout_weight="10"
-                        android:divider="@android:color/transparent"
-                        android:dividerHeight="1dp"
-                        android:minHeight="250dp" >
-                    </ListView>
-      
+                <ListView
+                    android:id="@+id/questionsListView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/ennouncer"
+                    android:layout_marginTop="10dp"
+                    android:layout_weight="10"
+                    android:choiceMode="singleChoice"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="1dp"
+                    android:minHeight="250dp" >
+                </ListView>
 
                 <Button
                     android:id="@+id/abandonner"
@@ -298,10 +295,10 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/questionsListView"
                     android:layout_marginTop="10dp"
+                    android:layout_weight="0.5"
                     android:background="@color/app_main_color"
                     android:gravity="center"
                     android:padding="5dp"
-                         android:layout_weight="0.5"
                     android:text="ABANDONNER"
                     android:textColor="@android:color/white"
                     android:textSize="23sp" />
