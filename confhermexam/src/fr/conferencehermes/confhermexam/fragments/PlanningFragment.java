@@ -3,7 +3,6 @@ package fr.conferencehermes.confhermexam.fragments;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -13,6 +12,7 @@ import org.json.JSONObject;
 
 import android.app.Dialog;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -117,8 +117,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			Toast.makeText(
 					getActivity().getApplicationContext(),
 					getActivity().getResources().getString(
-							R.string.no_internet_connection), Toast.LENGTH_SHORT)
-					.show();
+							R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
 		}
 		return fragment;
 	}
@@ -366,26 +366,28 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			if (event != null) { // event is downloaded
 				if (event.getLastEditTime() >= ts.getLast_edit_time()) {
 					status.setText("Telechargement: OK");
-					download.setEnabled(false);
-					download.setBackgroundColor(Color.parseColor("#eeeeee"));
-					download.setCompoundDrawables(
-							getResources().getDrawable(R.drawable.exam_checked),
-							null, null, null);
+					download.setEnabled(true);
+					download.setText("Open exams");
+					download.setCompoundDrawablesWithIntrinsicBounds(
+							getResources().getDrawable(
+									R.drawable.exam_checked_d), null, null,
+							null);
 					eventStatus = 1;
 				} else {
 					status.setText("Telechargement: Need update");
 					download.setEnabled(true);
-					download.setCompoundDrawables(
-							getResources().getDrawable(R.drawable.exam_refresh),
-							null, null, null);
+					download.setCompoundDrawablesWithIntrinsicBounds(
+							getResources().getDrawable(
+									R.drawable.exam_refresh_d), null, null,
+							null);
 					eventStatus = 2;
 				}
 			} else {
 				status.setText("Telechargement: Not downloaded yet");
 				download.setEnabled(true);
-				download.setCompoundDrawables(
-						getResources().getDrawable(R.drawable.white_download),
-						null, null, null);
+				download.setCompoundDrawablesWithIntrinsicBounds(getResources()
+						.getDrawable(R.drawable.white_download_d), null, null,
+						null);
 				eventStatus = 3;
 			}
 
@@ -394,9 +396,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			status.setText("Telechargement: "
 					+ getResources().getString(R.string.examen_not_avaible));
 			download.setEnabled(false);
-			download.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.exam_x), null, null,
-					null);
+			download.setCompoundDrawablesWithIntrinsicBounds(getResources()
+					.getDrawable(R.drawable.exam_x_d), null, null, null);
 			eventStatus = 4;
 			break;
 
@@ -410,6 +411,9 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 				dialog.dismiss();
 				if (eventStatus == 2 || eventStatus == 3)
 					openDownloads(ts, eventStatus);
+				else if (eventStatus == 1) {
+					openExams();
+				}
 			}
 		});
 
@@ -429,6 +433,14 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 							R.dimen.planning_dialog_height));
 		}
 
+	}
+
+	private void openExams() {
+		ExamineFragment fragobj = new ExamineFragment();
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		FragmentTransaction fragmentTransaction = fm.beginTransaction();
+		fragmentTransaction.replace(R.id.fragmentContainer, fragobj);
+		fragmentTransaction.commit();
 	}
 
 	private void openDownloads(TimeSlot ts, int eventStatus) {

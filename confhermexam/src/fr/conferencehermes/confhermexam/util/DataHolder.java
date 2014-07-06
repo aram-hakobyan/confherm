@@ -18,7 +18,7 @@ public class DataHolder {
 	private ArrayList<Training> trainings;
 	private ArrayList<DownloadInstance> downloads;
 	private ArrayList<Correction> corrections;
-	private int trainingDuration = 0;
+	private long millisUntilFinished;
 
 	private DataHolder() {
 		setExams(new ArrayList<Exam>());
@@ -86,12 +86,12 @@ public class DataHolder {
 		this.corrections = corrections;
 	}
 
-	public int getTrainingDuration() {
-		return trainingDuration;
+	public long getMillisUntilFinished() {
+		return millisUntilFinished;
 	}
 
-	public void setTrainingDuration(int trainingDuration) {
-		this.trainingDuration = trainingDuration;
+	public void setMillisUntilFinished(long millisUntilFinished) {
+		this.millisUntilFinished = millisUntilFinished;
 	}
 
 }

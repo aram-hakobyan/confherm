@@ -257,7 +257,6 @@ public class JSONParser {
 
 				JSONObject data = json.getJSONObject("data");
 				int duration = data.getInt("duration");
-				DataHolder.getInstance().setTrainingDuration(duration * 1000);
 
 				JSONArray exObj = data.getJSONArray("exercises");
 				for (int i = 0; i < exObj.length(); i++) {
@@ -266,6 +265,7 @@ public class JSONParser {
 
 					t.setExercise_id(obj.getInt("exercise_id"));
 					t.setTitle(obj.getString("title"));
+					t.setDuration(duration * 1000);
 
 					exercises.add(t);
 
@@ -553,7 +553,7 @@ public class JSONParser {
 		ArrayList<TimeSlot> planningResult = new ArrayList<TimeSlot>();
 		try {
 			if (planJson.has(Constants.KEY_DATA)
-					&& planJson.get(Constants.KEY_DATA) != null) {				
+					&& planJson.get(Constants.KEY_DATA) != null) {
 				JSONArray data = planJson.getJSONArray(Constants.KEY_DATA);
 				if (data.length() != 0) {
 					for (int i = 0; i < data.length(); i++) {

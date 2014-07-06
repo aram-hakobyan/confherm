@@ -3,6 +3,7 @@ package fr.conferencehermes.confhermexam.parser;
 public class TrainingExercise {
 	private int exercise_id;
 	private String title;
+	private int duration;
 
 	public TrainingExercise() {
 
@@ -22,6 +23,14 @@ public class TrainingExercise {
 
 	public void setTitle(String title) {
 		this.title = title;
+	}
+
+	public int getDuration() {
+		return duration;
+	}
+
+	public void setDuration(int duration) {
+		this.duration = duration;
 	}
 
 }

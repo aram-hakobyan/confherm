@@ -7,8 +7,8 @@
 
     <Button
         android:id="@+id/buttonClose"
-        android:layout_width="20dp"
-        android:layout_height="20dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
@@ -92,13 +92,13 @@
     <Button
         android:id="@+id/downloadBtn"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="20dp"
         android:background="@color/app_main_color"
         android:drawableLeft="@drawable/download_icon_white"
-        android:drawablePadding="10dp"
+        android:drawablePadding="20dp"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:text="@string/plannig_popup_donwload"

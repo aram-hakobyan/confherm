@@ -5,8 +5,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="file_dialog_width">800dp</dimen>
     <dimen name="file_dialog_height">600dp</dimen>
-    <dimen name="planning_dialog_width">650dp</dimen>
-    <dimen name="planning_dialog_height">400dp</dimen>
+    <dimen name="planning_dialog_width">750dp</dimen>
+    <dimen name="planning_dialog_height">500dp</dimen>
     <dimen name="listview_divider_height">2dp</dimen>
 
 </resources>
