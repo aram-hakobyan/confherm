@@ -11,12 +11,11 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
-import fr.conferencehermes.confhermexam.CorrectionActivity;
 import fr.conferencehermes.confhermexam.CorrectionExercisesActivity;
 import fr.conferencehermes.confhermexam.NotesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Result;
 
 public class ResultsAdapter extends BaseAdapter {
@@ -30,7 +29,7 @@ public class ResultsAdapter extends BaseAdapter {
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.c = context;
-	
+
 	}
 
 	@Override
@@ -76,20 +75,20 @@ public class ResultsAdapter extends BaseAdapter {
 						db = new DatabaseHelper(c);
 						Log.i("Exam ID", itemID + "");
 						Log.i("Exam", db.getExam(itemID).getTitle() + "");
-					//	if (db.getExam(itemID).getTitle() != null) {
+						// if (db.getExam(itemID).getTitle() != null) {
+						ArrayList<Exam> allExams = db.getAllExams();
 
-						
-							Intent intent = new Intent(c,
-									CorrectionExercisesActivity.class);
-							intent.putExtra("exam_id", itemID);
-							c.startActivity(intent);
+						Intent intent = new Intent(c,
+								CorrectionExercisesActivity.class);
+						intent.putExtra("exam_id", itemID);
+						c.startActivity(intent);
 
-						//} else {
-							//Toast.makeText(c,
-								//	"Please donwload examen before check",
-								//	Toast.LENGTH_SHORT).show();
+						// } else {
+						// Toast.makeText(c,
+						// "Please donwload examen before check",
+						// Toast.LENGTH_SHORT).show();
 
-						//}
+						// }
 
 					} finally {
 						db.closeDB();

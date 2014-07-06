@@ -95,6 +95,8 @@ public class DownloadsFragment extends Fragment {
 	}
 
 	public void setupAdapterData() {
+		DataHolder.getInstance().setDownloadPercents(new int[downloads.size()]);
+
 		for (int i = 0; i < downloads.size(); i++) {
 			DownloadInstance download = downloads.get(i);
 			switch (download.getStatus()) {

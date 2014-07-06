@@ -19,6 +19,7 @@ public class DataHolder {
 	private ArrayList<DownloadInstance> downloads;
 	private ArrayList<Correction> corrections;
 	private long millisUntilFinished;
+	private int[] downloadPercents;
 
 	private DataHolder() {
 		setExams(new ArrayList<Exam>());
@@ -27,6 +28,7 @@ public class DataHolder {
 		setTrainingExercises(new ArrayList<TrainingExercise>());
 		setDownloads(new ArrayList<DownloadInstance>());
 		setCorrections(new ArrayList<Correction>());
+
 	}
 
 	public static DataHolder getInstance() {
@@ -92,6 +94,14 @@ public class DataHolder {
 
 	public void setMillisUntilFinished(long millisUntilFinished) {
 		this.millisUntilFinished = millisUntilFinished;
+	}
+
+	public int[] getDownloadPercents() {
+		return downloadPercents;
+	}
+
+	public void setDownloadPercents(int[] downloadPercents) {
+		this.downloadPercents = downloadPercents;
 	}
 
 }
