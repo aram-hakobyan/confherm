@@ -59,7 +59,7 @@ public class ExerciseAdapter extends BaseAdapter {
 			holder.name.setText(mListItems.get(position).getExersiceName());
 		}
 
-		view.setBackgroundColor(Color.parseColor("#eeeeee"));
+		//view.setBackgroundColor(Color.parseColor("#eeeeee"));
 
 		return view;
 
