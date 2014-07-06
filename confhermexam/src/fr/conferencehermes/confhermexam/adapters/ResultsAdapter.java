@@ -75,8 +75,8 @@ public class ResultsAdapter extends BaseAdapter {
 					try {
 						db = new DatabaseHelper(c);
 						Log.i("Exam ID", itemID + "");
-						Log.i("Exam", db.getExam(itemID).getTitle() + "");
-					//	if (db.getExam(itemID).getTitle() != null) {
+						Log.i("Exam", db.getEvent(itemID).getId() + "");
+						if (db.getEvent(itemID).getId() != 0) {
 
 						
 							Intent intent = new Intent(c,
@@ -84,12 +84,12 @@ public class ResultsAdapter extends BaseAdapter {
 							intent.putExtra("exam_id", itemID);
 							c.startActivity(intent);
 
-						//} else {
-							//Toast.makeText(c,
-								//	"Please donwload examen before check",
-								//	Toast.LENGTH_SHORT).show();
+						} else {
+							Toast.makeText(c,
+									"Please donwload examen before check it",
+									Toast.LENGTH_SHORT).show();
 
-						//}
+						}
 
 					} finally {
 						db.closeDB();
