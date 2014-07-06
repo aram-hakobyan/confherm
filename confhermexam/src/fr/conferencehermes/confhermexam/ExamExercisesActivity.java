@@ -41,6 +41,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 	private CounterClass timer;
 	private long timeToResume;
 	private long duration = 0;
+	private boolean TIMER_PAUSED = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -61,7 +62,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 				int e_id = exercises.get(position).getId();
-				openExercise(e_id);
+				if (!TIMER_PAUSED)
+					openExercise(e_id);
 			}
 		});
 
@@ -91,25 +93,23 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		gvMain.setAdapter(adapter);
 
 		timePause.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				timePause.setVisibility(View.GONE);
 				timePlay.setVisibility(View.VISIBLE);
 				timer.cancel();
-
+				TIMER_PAUSED = true;
 			}
 		});
 
 		timePlay.setOnClickListener(new OnClickListener() {
-
 			@Override
 			public void onClick(View v) {
 				timePause.setVisibility(View.VISIBLE);
 				timePlay.setVisibility(View.GONE);
 				timer = new CounterClass(timeToResume, 1000);
 				timer.start();
-
+				TIMER_PAUSED = false;
 			}
 		});
 
