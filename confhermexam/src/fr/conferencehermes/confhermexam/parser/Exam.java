@@ -12,6 +12,7 @@ public class Exam {
 	private long endDate;
 	private long lastEditTime;
 	private int status;
+	private int isAlreadyPassed = 0;
 	private String description;
 	private String password;
 	private String event_name;
@@ -124,5 +125,13 @@ public class Exam {
 
 	public void setLastEditTime(long lastEditTime) {
 		this.lastEditTime = lastEditTime;
+	}
+
+	public int getIsAlreadyPassed() {
+		return isAlreadyPassed;
+	}
+
+	public void setIsAlreadyPassed(int isAlreadyPassed) {
+		this.isAlreadyPassed = isAlreadyPassed;
 	}
 }

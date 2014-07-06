@@ -77,7 +77,7 @@ public class ExamsAdapter extends BaseAdapter {
 			}
 
 			Calendar calendar = new GregorianCalendar(
-					TimeZone.getTimeZone("France"));
+					TimeZone.getTimeZone("Europe/Paris"));
 			calendar.setTimeInMillis(exam.getStartDate() * 1000);
 			final String startTimeString = Utilities.timeConverter(calendar
 					.get(Calendar.HOUR_OF_DAY))
@@ -111,7 +111,7 @@ public class ExamsAdapter extends BaseAdapter {
 				holder.button.setBackgroundResource(R.drawable.exam_x);
 			}
 
-			if (exam.getStatus() == 1 && canStartExam(exam))
+			if (canStartExam(exam))
 				view.setBackgroundColor(c.getResources().getColor(
 						R.color.app_main_color));
 			else
@@ -124,7 +124,9 @@ public class ExamsAdapter extends BaseAdapter {
 	}
 
 	public boolean canStartExam(Exam e) {
-		long currentTime = System.currentTimeMillis() / 1000;
+		Calendar calendar = new GregorianCalendar(
+				TimeZone.getTimeZone("Europe/Paris"));
+		long currentTime = calendar.getTimeInMillis() / 1000;
 		return e.getStartDate() < currentTime && e.getEndDate() > currentTime;
 
 	}

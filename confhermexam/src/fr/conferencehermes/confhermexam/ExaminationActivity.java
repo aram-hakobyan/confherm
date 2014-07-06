@@ -71,6 +71,7 @@ import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
+import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.parser.Question;
@@ -444,6 +445,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 					"No internet connection. Exam will be submitted after connection.");
 		}
 
+		Exam exam = db.getExam(exam_id);
+		exam.setIsAlreadyPassed(1);
+		db.updateExam(exam);
+
 	}
 
 	public void showAlertDialog(Context context, String title, String message) {
@@ -639,7 +644,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(updatedTime)));
 
-			 //temps1.setText("" + mins + ":" + String.format("%02d", secs));
+			// temps1.setText("" + mins + ":" + String.format("%02d", secs));
 			temps2.setText("Temps exam - " + hms);
 			customHandler.postDelayed(this, 0);
 
@@ -647,9 +652,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 	};
 
-	
-	
-	
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {

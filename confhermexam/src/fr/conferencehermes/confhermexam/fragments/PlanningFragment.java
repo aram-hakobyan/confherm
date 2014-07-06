@@ -91,7 +91,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		SAT = (TextView) fragment.findViewById(R.id.textView6);
 		SUN = (TextView) fragment.findViewById(R.id.textView7);
 
-		Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("France"));
+		Calendar cal = Calendar.getInstance(TimeZone
+				.getTimeZone("Europe/Paris"));
 		cal.set(Calendar.HOUR_OF_DAY, 7);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
@@ -143,8 +144,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 										&& json.get("data") != null) {
 									timeSlotsArray = JSONParser
 											.parsePlannig(json);
-									Calendar cal = new GregorianCalendar(
-											TimeZone.getTimeZone("France"));
+									Calendar cal = Calendar.getInstance(TimeZone
+											.getTimeZone("Europe/Paris"));
 									if (!timeSlotsArray.isEmpty()) {
 										for (int i = 0; i < timeSlotsArray
 												.size(); i++) {
@@ -153,7 +154,6 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 											drawTimeSlot(
 													timeSlotsArray.get(i),
 													cal.get(Calendar.DAY_OF_WEEK));
-
 										}
 
 									}
@@ -169,8 +169,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 	}
 
 	private void setCalendarHeader(long mills) {
-		Calendar calendar = new GregorianCalendar(
-				TimeZone.getTimeZone("France"));
+		Calendar calendar = Calendar.getInstance(TimeZone
+				.getTimeZone("Europe/Paris"));
 		calendar.setTimeInMillis(mills);
 		MON.setText("LUN "
 				+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
@@ -210,8 +210,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 
 	private void drawTimeSlot(final TimeSlot timeSlot, int day) {
 
-		Calendar calendar = new GregorianCalendar(
-				TimeZone.getTimeZone("France"));
+		Calendar calendar = Calendar.getInstance(TimeZone
+				.getTimeZone("Europe/Paris"));
 		calendar.setTimeInMillis(timeSlot.getStart_date() * 1000);
 		final String startTimeString = Utilities.timeConverter(calendar
 				.get(Calendar.HOUR_OF_DAY))
@@ -283,7 +283,9 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
 				TEXTVIEW_WIDTH, TEXTVIEW_HEIGHT);
 		params.leftMargin = LEFT_MARGIN;
-		params.topMargin = TOP_MARGIN + LAYOUT_TOP_MARGIN;
+		params.topMargin = TOP_MARGIN + LAYOUT_TOP_MARGIN > LAYOUT_TOP_MARGIN
+				- txt1.getHeight() / 2 ? TOP_MARGIN + LAYOUT_TOP_MARGIN
+				: LAYOUT_TOP_MARGIN - txt1.getHeight() / 2;
 
 		timeSlotText.setOnClickListener(new OnClickListener() {
 			@Override
@@ -317,8 +319,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		adress.setText(ts.getPlace());
 		city.setText(ts.getAcademy());
 
-		Calendar calendar = new GregorianCalendar(
-				TimeZone.getTimeZone("France"));
+		Calendar calendar = Calendar.getInstance(TimeZone
+				.getTimeZone("Europe/Paris"));
 		calendar.setTimeInMillis(ts.getStart_date() * 1000);
 		String DAY_TEXT = "";
 		switch (calendar.get(Calendar.DAY_OF_WEEK)) {
@@ -365,14 +367,15 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 				if (event.getLastEditTime() >= ts.getLast_edit_time()) {
 					status.setText("Telechargement: OK");
 					download.setEnabled(false);
-					status.setCompoundDrawables(
+					download.setBackgroundColor(Color.parseColor("#eeeeee"));
+					download.setCompoundDrawables(
 							getResources().getDrawable(R.drawable.exam_checked),
 							null, null, null);
 					eventStatus = 1;
 				} else {
 					status.setText("Telechargement: Need update");
 					download.setEnabled(true);
-					status.setCompoundDrawables(
+					download.setCompoundDrawables(
 							getResources().getDrawable(R.drawable.exam_refresh),
 							null, null, null);
 					eventStatus = 2;
@@ -380,7 +383,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			} else {
 				status.setText("Telechargement: Not downloaded yet");
 				download.setEnabled(true);
-				status.setCompoundDrawables(
+				download.setCompoundDrawables(
 						getResources().getDrawable(R.drawable.white_download),
 						null, null, null);
 				eventStatus = 3;
@@ -391,7 +394,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			status.setText("Telechargement: "
 					+ getResources().getString(R.string.examen_not_avaible));
 			download.setEnabled(false);
-			status.setCompoundDrawables(
+			download.setCompoundDrawables(
 					getResources().getDrawable(R.drawable.exam_x), null, null,
 					null);
 			eventStatus = 4;

@@ -1,8 +1,11 @@
 package fr.conferencehermes.confhermexam.fragments;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,40 +68,60 @@ public class ExamineFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				String password = validExams.get(position).getPassword();
+
+				Exam clickedExam = validExams.get(position);
+				for (int j = 0; j < dbExams.size(); j++) {
+					if (clickedExam.getId() == dbExams.get(j).getId()) {
+						clickedExam.setPassword(dbExams.get(j).getPassword());
+						clickedExam.setIsAlreadyPassed(dbExams.get(j)
+								.getIsAlreadyPassed());
+						break;
+					}
+				}
+
+				String password = clickedExam.getPassword();
 				if (password != null) { // exam is downloaded
-					if (validExams.get(position).getStatus() == 1) {
-						//if (canStartExam(validExams.get(position))) {
+					if (clickedExam.getStatus() == 1) {
+						if (canStartExam(clickedExam)) {
 							if (password.isEmpty()) {
-								Intent intent = new Intent(getActivity(),
-										ExamExercisesActivity.class);
-								intent.putExtra("exam_id",
-										validExams.get(position).getId());
-								intent.putExtra("event_id",
-										validExams.get(position).getEventId());
-								startActivity(intent);
+								if (clickedExam.getIsAlreadyPassed() == 0) {
+									Intent intent = new Intent(getActivity(),
+											ExamExercisesActivity.class);
+									intent.putExtra("exam_id",
+											clickedExam.getId());
+									intent.putExtra("event_id",
+											clickedExam.getEventId());
+									startActivity(intent);
+								} else {
+									Utilities
+											.showAlertDialog(
+													getActivity(),
+													"Attention",
+													getResources()
+															.getString(
+																	R.string.exam_already_passed_alert));
+								}
 							} else {
-								showPasswordAlert(validExams.get(position)
-										.getId(), validExams.get(position)
-										.getEventId());
+								showPasswordAlert(clickedExam.getId(),
+										clickedExam.getEventId());
 							}
-						//} else {
-						//	Utilities.showAlertDialog(getActivity(),
-						//			"Attention", "You can't start exam now.");
-						//}
-					} else if (validExams.get(position).getStatus() == 2) {
+						} else {
+							Utilities.showAlertDialog(getActivity(),
+									"Attention", "You can't start exam now.");
+						}
+					} else if (clickedExam.getStatus() == 2) {
 						Utilities.showAlertDialog(getActivity(), "Attention",
 								"Need update");
 					}
 
 				} else {
-					if (validExams.get(position).getStatus() == 3)
+					if (clickedExam.getStatus() == 3)
 						Utilities.showAlertDialog(
 								getActivity(),
 								"Attention",
 								getResources().getString(
 										R.string.exam_not_downloaded_alert));
-					else if (validExams.get(position).getStatus() == 4)
+					else if (clickedExam.getStatus() == 4)
 						return;
 				}
 			}
@@ -120,15 +143,13 @@ public class ExamineFragment extends Fragment {
 										&& json.get("data") != null) {
 									exams = JSONParser.parseExams(json);
 
-									for (int i = 0; i < dbExams.size(); i++) {
-										if (dbExams.get(i).getStartDate() >= System
-												.currentTimeMillis() / 1000)
-											validExams.add(dbExams.get(i));
-									}
+									Calendar calendar = new GregorianCalendar(
+											TimeZone.getTimeZone("Europe/Paris"));
+									long currentTime = calendar
+											.getTimeInMillis() / 1000;
 
 									for (int j = 0; j < exams.size(); j++) {
-										if (exams.get(j).getStartDate() >= System
-												.currentTimeMillis() / 1000)
+										if (exams.get(j).getEndDate() >= currentTime)
 											validExams.add(exams.get(j));
 									}
 
@@ -142,9 +163,12 @@ public class ExamineFragment extends Fragment {
 						}
 					});
 		} else {
+			Calendar calendar = new GregorianCalendar(
+					TimeZone.getTimeZone("Europe/Paris"));
+			long currentTime = calendar.getTimeInMillis() / 1000;
 			validExams.clear();
 			for (int i = 0; i < dbExams.size(); i++) {
-				if (dbExams.get(i).getStartDate() >= System.currentTimeMillis() / 1000)
+				if (dbExams.get(i).getEndDate() >= currentTime)
 					validExams.add(dbExams.get(i));
 			}
 
@@ -155,8 +179,10 @@ public class ExamineFragment extends Fragment {
 	}
 
 	public boolean canStartExam(Exam e) {
-		long currentTime = System.currentTimeMillis() / 1000;
-		return e.getStartDate() < currentTime && e.getEndDate() > currentTime;
+		Calendar calendar = new GregorianCalendar(
+				TimeZone.getTimeZone("Europe/Paris"));
+		long currentTime = calendar.getTimeInMillis() / 1000;
+		return e.getStartDate() <= currentTime && e.getEndDate() >= currentTime;
 
 	}
 
