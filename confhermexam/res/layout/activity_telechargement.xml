@@ -5,6 +5,15 @@
     android:background="@android:color/white"
     tools:context="fr.conferencehermes.confhermexam.fragments.DownloadsFragment" >
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="15dp"
+        android:text="Attention : le téléchargement de données lourdes peut occasionner des frais auprès de votre opérateur téléphonique.
+Nous vous conseillons de vous connecter en WIFI pour télécharger vos épreuves" />
+
     <ListView
         android:id="@+id/listViewDownloads"
         android:layout_width="match_parent"
@@ -26,5 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
+
+
 
 </RelativeLayout>

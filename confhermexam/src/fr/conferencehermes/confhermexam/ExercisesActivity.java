@@ -21,6 +21,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.androidquery.AQuery;
@@ -42,6 +43,9 @@ public class ExercisesActivity extends FragmentActivity implements
 	private ArrayList<TrainingExercise> exercises;
 	private int training_id;
 	private TextView timerText;
+	private ImageView timePause, timePlay;
+	private long timeToResume;
+	CounterClass timer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +54,9 @@ public class ExercisesActivity extends FragmentActivity implements
 		setContentView(R.layout.activity_exersice);
 		training_id = getIntent().getIntExtra("training_id", 0);
 		timerText = (TextView) findViewById(R.id.timerText);
+
+		timePause = (ImageView) findViewById(R.id.time_pause);
+		timePlay = (ImageView) findViewById(R.id.time_play);
 
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
@@ -100,12 +107,35 @@ public class ExercisesActivity extends FragmentActivity implements
 					}
 				});
 
+		timePause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				timePause.setVisibility(View.GONE);
+				timePlay.setVisibility(View.VISIBLE);
+				timer.cancel();
+
+			}
+		});
+
+		timePlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				timePause.setVisibility(View.VISIBLE);
+				timePlay.setVisibility(View.GONE);
+				timer = new CounterClass(timeToResume, 1000);
+				timer.start();
+
+			}
+		});
+
 	}
 
 	private void updateTimer() {
 		Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished", 0);
-		final CounterClass timer = new CounterClass(DataHolder.getInstance()
-				.getTrainingDuration(), 1000);
+		timer = new CounterClass(
+				DataHolder.getInstance().getTrainingDuration(), 1000);
 		timer.start();
 	}
 
@@ -156,6 +186,8 @@ public class ExercisesActivity extends FragmentActivity implements
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(millis)));
 			timerText.setText("Temps epreuve - " + hms);
+			timeToResume = millis;
+
 		}
 	}
 

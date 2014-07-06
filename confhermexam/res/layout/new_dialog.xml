@@ -7,13 +7,13 @@
 
     <Button
         android:id="@+id/buttonClose2"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:layout_margin="10dp"
         android:background="@drawable/exam_x"
-        android:padding="15dp" />
+        android:padding="35dp" />
 
     <TextView
         android:id="@+id/ennouncerText"
@@ -35,16 +35,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:orientation="vertical" 
-        android:gravity="center">
-
-        <ImageView
-            android:id="@+id/sound_icon"
-            android:layout_width="160dp"
-            android:layout_height="160dp"
-            android:layout_margin="20dp"
-            android:src="@drawable/audio_icon"
-            android:visibility="gone" />
+        android:gravity="center"
+        android:orientation="vertical" >
 
         <LinearLayout
             android:id="@+id/sound_control_layout"

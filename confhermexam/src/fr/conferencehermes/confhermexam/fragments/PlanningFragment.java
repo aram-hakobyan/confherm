@@ -116,7 +116,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			Toast.makeText(
 					getActivity().getApplicationContext(),
 					getActivity().getResources().getString(
-							R.string.no_internet_connection), Toast.LENGTH_LONG)
+							R.string.no_internet_connection), Toast.LENGTH_SHORT)
 					.show();
 		}
 		return fragment;
