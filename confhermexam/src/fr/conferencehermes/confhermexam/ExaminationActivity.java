@@ -699,8 +699,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		final String VIDEO_URL = files.get("video");
 		VIDEO_URL.replaceAll(" ", "%20");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
-		final ImageView audioImage = (ImageView) dialog
-				.findViewById(R.id.sound_icon);
+
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
 
@@ -898,7 +897,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-			audioImage.setVisibility(View.GONE);
+		
 			soundControlLayout.setVisibility(View.GONE);
 
 			break;
@@ -919,7 +918,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-			audioImage.setVisibility(View.GONE);
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 			break;
@@ -928,7 +927,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-			audioImage.setVisibility(View.VISIBLE);
+		
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.VISIBLE);
 
@@ -956,7 +955,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
 			videoControlLayout.setVisibility(View.VISIBLE);
-			audioImage.setVisibility(View.GONE);
+		
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 
@@ -992,7 +991,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 
-						audioImage.setVisibility(View.GONE);
+						
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 					}
@@ -1006,7 +1005,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
-						audioImage.setVisibility(View.VISIBLE);
+					
 						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
@@ -1037,7 +1036,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
 						videoControlLayout.setVisibility(View.VISIBLE);
-						audioImage.setVisibility(View.GONE);
+						
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 

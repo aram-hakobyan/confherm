@@ -94,6 +94,8 @@ import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
+
+
 public class QuestionResponseActivity extends Activity implements
 		OnClickListener {
 	private LayoutInflater inflater;
@@ -137,6 +139,8 @@ public class QuestionResponseActivity extends Activity implements
 	private int resumPlayingSound = 0;
 	private int resumPlayingVideo = 0;
 
+	private int tResumValue; 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -1038,8 +1042,7 @@ public class QuestionResponseActivity extends Activity implements
 		final String VIDEO_URL = files.get("video");
 		VIDEO_URL.replaceAll(" ", "%20");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
-		final ImageView audioImage = (ImageView) dialog
-				.findViewById(R.id.sound_icon);
+	
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
 
@@ -1237,7 +1240,7 @@ public class QuestionResponseActivity extends Activity implements
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-			audioImage.setVisibility(View.GONE);
+
 			soundControlLayout.setVisibility(View.GONE);
 
 			break;
@@ -1258,7 +1261,7 @@ public class QuestionResponseActivity extends Activity implements
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-			audioImage.setVisibility(View.GONE);
+	
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 			break;
@@ -1267,7 +1270,7 @@ public class QuestionResponseActivity extends Activity implements
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-			audioImage.setVisibility(View.VISIBLE);
+		
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.VISIBLE);
 
@@ -1295,7 +1298,7 @@ public class QuestionResponseActivity extends Activity implements
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
 			videoControlLayout.setVisibility(View.VISIBLE);
-			audioImage.setVisibility(View.GONE);
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 
@@ -1331,7 +1334,7 @@ public class QuestionResponseActivity extends Activity implements
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 
-						audioImage.setVisibility(View.GONE);
+					
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 					}
@@ -1345,7 +1348,7 @@ public class QuestionResponseActivity extends Activity implements
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
-						audioImage.setVisibility(View.VISIBLE);
+		
 						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
@@ -1376,7 +1379,7 @@ public class QuestionResponseActivity extends Activity implements
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
 						videoControlLayout.setVisibility(View.VISIBLE);
-						audioImage.setVisibility(View.GONE);
+				
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 
