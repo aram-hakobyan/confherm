@@ -1,6 +1,5 @@
 package fr.conferencehermes.confhermexam;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -22,7 +21,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -41,11 +39,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -57,11 +55,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.androidquery.AQuery;
@@ -71,10 +67,10 @@ import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
+import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.parser.Question;
-import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
@@ -226,6 +222,9 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		}
 
+		Exam exam = db.getExam(exam_id);
+		exam.setIsAlreadyPassed(1);
+		db.updateExam(exam);
 	}
 
 	private void selectQuestion(Question q, int position) {
@@ -639,7 +638,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(updatedTime)));
 
-			 //temps1.setText("" + mins + ":" + String.format("%02d", secs));
+			// temps1.setText("" + mins + ":" + String.format("%02d", secs));
 			temps2.setText("Temps exam - " + hms);
 			customHandler.postDelayed(this, 0);
 
@@ -647,9 +646,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 	};
 
-	
-	
-	
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {
@@ -895,7 +891,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-		
 			soundControlLayout.setVisibility(View.GONE);
 
 			break;
@@ -916,7 +911,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 			break;
@@ -925,7 +919,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-		
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.VISIBLE);
 
@@ -953,7 +946,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
 			videoControlLayout.setVisibility(View.VISIBLE);
-		
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 
@@ -989,7 +982,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 
-						
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 					}
@@ -1003,7 +995,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
-					
+
 						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
@@ -1034,7 +1026,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
 						videoControlLayout.setVisibility(View.VISIBLE);
-						
+
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 

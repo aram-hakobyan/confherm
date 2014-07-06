@@ -56,6 +56,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EXAM_TYPE = "categoryType";
 	private static final String KEY_EXAM_LAST_EDIT_TIME = "lastEditTime";
 	private static final String KEY_EXAM_STATUS = "status";
+	private static final String KEY_EXAM_IS_ALREADY_PASSED = "examIsAlreadyPassed";
 
 	// EXERCISE_FILES column names
 	private static final String KEY_EXERCISE_FILES_ID = "exerciseId";
@@ -118,7 +119,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ " INTEGER," + KEY_EXAM_END_DATE + " INTEGER," + KEY_EXAM_PASSWORD
 			+ " TEXT," + KEY_EXAM_NAME + " TEXT," + KEY_EXAM_TYPE + " TEXT,"
 			+ KEY_EXAM_LAST_EDIT_TIME + " INTEGER," + KEY_EXAM_STATUS
-			+ " INTEGER," + KEY_EXAM_EVENT_NAME + " TEXT" + ")";
+			+ " INTEGER," + KEY_EXAM_IS_ALREADY_PASSED + " INTEGER,"
+			+ KEY_EXAM_EVENT_NAME + " TEXT" + ")";
 
 	// ExerciseFiles table create statement
 	private static final String CREATE_TABLE_EXERCISE_FILES = "CREATE TABLE "
@@ -346,6 +348,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_LAST_EDIT_TIME, exam.getLastEditTime());
 		values.put(KEY_EXAM_STATUS, exam.getStatus());
 		values.put(KEY_EXAM_TYPE, exam.getCategoryType());
+		values.put(KEY_EXAM_IS_ALREADY_PASSED, exam.getIsAlreadyPassed());
 
 		// insert row
 		db.beginTransaction();
@@ -386,6 +389,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
 			exam.setLastEditTime(c.getLong(c
 					.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
+			exam.setIsAlreadyPassed(c.getInt(c
+					.getColumnIndex(KEY_EXAM_IS_ALREADY_PASSED)));
 
 			c.close();
 		}
@@ -422,6 +427,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
 				exam.setLastEditTime(c.getLong(c
 						.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
+				exam.setIsAlreadyPassed(c.getInt(c
+						.getColumnIndex(KEY_EXAM_IS_ALREADY_PASSED)));
 
 				exams.add(exam);
 			} while (c.moveToNext());
@@ -448,9 +455,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_LAST_EDIT_TIME, exam.getLastEditTime());
 		values.put(KEY_EXAM_STATUS, exam.getStatus());
 		values.put(KEY_EXAM_TYPE, exam.getCategoryType());
+		values.put(KEY_EXAM_IS_ALREADY_PASSED, exam.getIsAlreadyPassed());
 
 		// updating row
-		return db.update(TABLE_EVENTS, values, KEY_EVENT_ID + " = ?",
+		return db.update(TABLE_EXAMS, values, KEY_EXAM_ID + " = ?",
 				new String[] { String.valueOf(exam.getId()) });
 	}
 
@@ -495,6 +503,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
 					exam.setLastEditTime(c.getLong(c
 							.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
+					exam.setIsAlreadyPassed(c.getInt(c
+							.getColumnIndex(KEY_EXAM_IS_ALREADY_PASSED)));
 
 					exams.add(exam);
 				}
