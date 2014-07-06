@@ -563,6 +563,7 @@ public class JSONParser {
 						r.setTest_id(gObj.getInt("test_id"));
 						r.setEvent_id(gObj.getInt("event_id"));
 						r.setTest_name(gObj.getString("test_name"));
+						r.setEvent_name(gObj.getString("event_name"));
 						r.setAcademy(gObj.getString("academy"));
 						r.setStart_date(gObj.getLong("start_date"));
 						r.setEnd_date(gObj.getLong("end_date"));

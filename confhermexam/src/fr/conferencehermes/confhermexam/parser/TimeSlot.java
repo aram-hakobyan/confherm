@@ -5,6 +5,8 @@ public class TimeSlot {
 	private int test_id;
 	private int event_id;
 	private String test_name;
+	private String event_name;
+
 	private long start_date;
 	private long end_date;
 	private long last_edit_time;
@@ -15,6 +17,14 @@ public class TimeSlot {
 
 	public TimeSlot() {
 
+	}
+
+	public String getEvent_name() {
+		return event_name;
+	}
+
+	public void setEvent_name(String event_name) {
+		this.event_name = event_name;
 	}
 
 	public int getTimeslot_id() {

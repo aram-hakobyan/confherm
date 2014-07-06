@@ -116,8 +116,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			Toast.makeText(
 					getActivity().getApplicationContext(),
 					getActivity().getResources().getString(
-							R.string.no_internet_connection), Toast.LENGTH_SHORT)
-					.show();
+							R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
 		}
 		return fragment;
 	}
@@ -311,7 +311,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		Button download = (Button) dialog.findViewById(R.id.downloadBtn);
 		Button close = (Button) dialog.findViewById(R.id.buttonClose);
 
-		title.setText(ts.getTest_name());
+		title.setText(ts.getEvent_name() + "/" + ts.getTest_name());
 		date.setText(new Date(ts.getStart_date() * 1000).toString());
 		room.setText(ts.getRoom());
 		adress.setText(ts.getPlace());

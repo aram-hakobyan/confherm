@@ -214,6 +214,9 @@ public class DownloadsAdapter extends BaseAdapter {
 	private void showDialog(final int pos) {
 		AlertDialog.Builder b = new AlertDialog.Builder(c)
 				.setTitle("Remove file?")
+				.setMessage(
+						"Attention, supprimer cette épreuvre vous empechera de faire l'eppreuve ou d'en consulter les resultats  et corrections i vous la supprimer.")
+
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
