@@ -67,10 +67,12 @@ import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
+import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.parser.Question;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
@@ -116,6 +118,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	DatabaseHelper db;
 	private int resumPlayingSound = 0;
 	private int resumPlayingVideo = 0;
+	private CounterClass timer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -153,8 +156,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		ennouncer.setOnClickListener(this);
 		valider.setOnClickListener(this);
 
-		CounterClass timer = new CounterClass(Utilities.readLong(
-				ExaminationActivity.this, "millisUntilFinished", 7200000), 1000);
+		timer = new CounterClass(DataHolder.getInstance()
+				.getMillisUntilFinished(), 1000);
 		timer.start();
 
 		startTime = SystemClock.uptimeMillis();
@@ -408,8 +411,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
 
+		Event event = db.getEvent(event_id);
+
 		data.put("event_id", event_id);
-		data.put("exam_id", exam_id);
+		data.put("exam_id", event.getTestId());
 		data.put("exercise_id", exercise_id);
 		data.put("is_send", 0);
 		data.put("type", exercise.getType());
@@ -1200,8 +1205,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(ExaminationActivity.this,
-					"millisUntilFinished", millisUntilFinished);
+			DataHolder.getInstance()
+					.setMillisUntilFinished(millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
 					TimeUnit.MILLISECONDS.toHours(millis),
@@ -1236,6 +1241,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						});
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		alertDialog.show();
+	}
+
+	@Override
+	protected void onStop() {
+		timer.cancel();
+		super.onStop();
 	}
 
 }

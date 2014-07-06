@@ -43,9 +43,8 @@ public class ExercisesActivity extends FragmentActivity implements
 	private ArrayList<TrainingExercise> exercises;
 	private int training_id;
 	private TextView timerText;
-	private ImageView timePause, timePlay;
-	private long timeToResume;
 	CounterClass timer;
+	private int duration = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,8 +54,7 @@ public class ExercisesActivity extends FragmentActivity implements
 		training_id = getIntent().getIntExtra("training_id", 0);
 		timerText = (TextView) findViewById(R.id.timerText);
 
-		timePause = (ImageView) findViewById(R.id.time_pause);
-		timePlay = (ImageView) findViewById(R.id.time_play);
+		DataHolder.getInstance().setMillisUntilFinished(0);
 
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
@@ -107,35 +105,12 @@ public class ExercisesActivity extends FragmentActivity implements
 					}
 				});
 
-		timePause.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				timePause.setVisibility(View.GONE);
-				timePlay.setVisibility(View.VISIBLE);
-				timer.cancel();
-
-			}
-		});
-
-		timePlay.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				timePause.setVisibility(View.VISIBLE);
-				timePlay.setVisibility(View.GONE);
-				timer = new CounterClass(timeToResume, 1000);
-				timer.start();
-
-			}
-		});
-
 	}
 
 	private void updateTimer() {
-		Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished", 0);
-		timer = new CounterClass(
-				DataHolder.getInstance().getTrainingDuration(), 1000);
+		// Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished",
+		// 0);
+		timer = new CounterClass(exercises.get(0).getDuration(), 1000);
 		timer.start();
 	}
 
@@ -149,10 +124,16 @@ public class ExercisesActivity extends FragmentActivity implements
 
 	private void openExam(int id) {
 		Intent intent = new Intent(ExercisesActivity.this,
-				QuestionResponseActivity.class);
+				TrainingActivity.class);
 		intent.putExtra("exercise_id", id);
 		intent.putExtra("training_id", training_id);
 		startActivity(intent);
+	}
+
+	@Override
+	protected void onStop() {
+		timer.cancel();
+		super.onStop();
 	}
 
 	@Override
@@ -174,8 +155,12 @@ public class ExercisesActivity extends FragmentActivity implements
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished",
-					millisUntilFinished);
+			/*
+			 * Utilities.writeLong(ExercisesActivity.this,
+			 * "millisUntilFinished", millisUntilFinished);
+			 */
+			DataHolder.getInstance()
+					.setMillisUntilFinished(millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
 					TimeUnit.MILLISECONDS.toHours(millis),
@@ -186,7 +171,6 @@ public class ExercisesActivity extends FragmentActivity implements
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(millis)));
 			timerText.setText("Temps epreuve - " + hms);
-			timeToResume = millis;
 
 		}
 	}

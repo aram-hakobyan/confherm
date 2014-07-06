@@ -42,14 +42,16 @@ public class DownloadsAdapter extends BaseAdapter {
 	private Context c;
 	private AQuery aq;
 	int donwloadPercent = 0;
+	int eventId = -1;
 
 	public DownloadsAdapter(Context context,
-			ArrayList<DownloadInstance> arrayList) {
+			ArrayList<DownloadInstance> arrayList, int event_id) {
 		mListItems = arrayList;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.c = context;
 		aq = new AQuery(c);
+		this.eventId = event_id;
 	}
 
 	@Override
@@ -145,6 +147,17 @@ public class DownloadsAdapter extends BaseAdapter {
 		} else {
 			view.setBackgroundColor(Color.parseColor("#e7e7e7"));
 		}
+
+		if (eventId != -1) {
+			if (mListItems.get(position).getEventId() == eventId) {
+				downloadFile(mListItems.get(position).getDownloadUrl(),
+						mListItems.get(position).getName(), position);
+				holder.progressBar.setVisibility(View.VISIBLE);
+				holder.btnAction.setVisibility(View.INVISIBLE);
+				holder.downloadProgressNumber.setVisibility(View.VISIBLE);
+			}
+		}
+
 		return view;
 
 	}

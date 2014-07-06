@@ -86,8 +86,8 @@ public class DownloadsFragment extends Fragment {
 			Toast.makeText(
 					getActivity().getApplicationContext(),
 					getActivity().getResources().getString(
-							R.string.no_internet_connection), Toast.LENGTH_SHORT)
-					.show();
+							R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
 
 		}
 
@@ -122,8 +122,13 @@ public class DownloadsFragment extends Fragment {
 
 		}
 
+		int event_id = -1;
+		Bundle arguments = getArguments();
+		if (arguments != null)
+			event_id = arguments.getInt("event_id", -1);
+
 		if (adapter == null) {
-			adapter = new DownloadsAdapter(getActivity(), downloads);
+			adapter = new DownloadsAdapter(getActivity(), downloads, event_id);
 		} else {
 			adapter.notifyDataSetChanged();
 		}
@@ -131,10 +136,6 @@ public class DownloadsFragment extends Fragment {
 		progressBarTelecharge.setVisibility(View.GONE);
 		listview.setVisibility(View.VISIBLE);
 
-		int event_id = -1;
-		Bundle arguments = getArguments();
-		if (arguments != null)
-			event_id = arguments.getInt("event_id", -1);
 		if (event_id != -1)
 			selectCurrentEventDownload(event_id);
 

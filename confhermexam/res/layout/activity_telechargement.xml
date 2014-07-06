@@ -10,7 +10,10 @@
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_margin="15dp"
+        android:layout_marginLeft="100dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginTop="25dp"
+        android:gravity="center_horizontal"
         android:text="Attention : le téléchargement de données lourdes peut occasionner des frais auprès de votre opérateur téléphonique.
 Nous vous conseillons de vous connecter en WIFI pour télécharger vos épreuves" />
 
@@ -22,7 +25,7 @@ Nous vous conseillons de vous connecter en WIFI pour télécharger vos épreuves
         android:layout_marginBottom="40dp"
         android:layout_marginLeft="100dp"
         android:layout_marginRight="100dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="80dp"
         android:divider="@android:color/transparent"
         android:dividerHeight="@dimen/listview_divider_height"
         android:visibility="gone" >
@@ -35,7 +38,5 @@ Nous vous conseillons de vous connecter en WIFI pour télécharger vos épreuves
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
-
-
 
 </RelativeLayout>

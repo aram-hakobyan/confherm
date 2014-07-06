@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Exam {
 	private int id;
+	private int testId;
 	private int eventId;
 	private String title;
 	private String shortTitle;
@@ -133,5 +134,13 @@ public class Exam {
 
 	public void setIsAlreadyPassed(int isAlreadyPassed) {
 		this.isAlreadyPassed = isAlreadyPassed;
+	}
+
+	public int getTestId() {
+		return testId;
+	}
+
+	public void setTestId(int testId) {
+		this.testId = testId;
 	}
 }
