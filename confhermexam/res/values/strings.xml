@@ -38,10 +38,13 @@
     <!-- Alerts -->
 
     <string name="drop_out_text">L\'application était inactive durant plus de 5 sec. Vos réponses seront envoyées automatiquement pour traitement.</string>
-     <string name="drop_out_text_ok">OK</string>
+    <string name="drop_out_text_ok">OK</string>
     <string name="finish_alert_text">Si vous cliquez sur "Abandonner" vos réponses seront envoyées automatiquement.</string>
     <string name="exercise_finish_text">Attention : si vous cliquez sur le bouton "retour" vos réponses seront envoyées automatiquement. Voulez vous vraiment quitter cette page?</string>
     <string name="exercise_alert_text">Vous avez déjà répondu à ces questions et vous ne pouvez pas répondre une deuxième fois.</string>
+    <string name="exam_not_downloaded_alert">Vous devez télécharger l\'epreuve avant de pouvoir y participer. il est conseiller de vous connecter en wi-fi.</string>
+    <string name="delete_event_alert">Attention, supprimer cette épreuvre vous empechera de faire l\'eppreuve ou d\'en consulter les resultats  et corrections i vous la supprimer.</string>
+    <string name="exam_already_passed_alert">Cet examen est terminé ou vous l\'avez déjà passé vous ne pouvez pas le refaire.</string>
 
     <!-- Login -->
 
@@ -79,7 +82,7 @@
 
     <!-- Exam -->
     <string name="examen_avaible">Disponible</string>
-    <string name="examen_non_avaible">non disponible</string>
+    <string name="examen_not_avaible">non disponible</string>
 
     <!-- Note & Stats -->
     <string name="notes_stats_target">Ma note</string>

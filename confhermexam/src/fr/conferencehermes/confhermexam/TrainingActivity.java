@@ -73,7 +73,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -96,8 +95,7 @@ import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
-public class QuestionResponseActivity extends Activity implements
-		OnClickListener {
+public class TrainingActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
 	private ListView listview;
 	private QuestionsAdapter adapter;
@@ -116,7 +114,7 @@ public class QuestionResponseActivity extends Activity implements
 			startTime;
 	Question currentQuestion;
 	int currentQuestionId = 0;
-	MediaController mc;
+
 	AQuery aq;
 	JSONArray answersArray;
 	private RadioGroup mRadioGroup;
@@ -125,7 +123,6 @@ public class QuestionResponseActivity extends Activity implements
 	int ANSWERED_QUESTIONS_COUNT = 0;
 	ArrayList<EditText> editTextsArray;
 
-	private boolean onPaused = false;
 	private boolean CORRECTED_ANSWERS = false;
 	private boolean DATA_SENT = false;
 
@@ -136,7 +133,9 @@ public class QuestionResponseActivity extends Activity implements
 	private Button btnImageCorrection;
 	private Button btnAudioCorrection;
 	private Button btnVideoCorrection;
-	private int resumPlaying = 0;
+	private int resumPlayingSound = 0;
+	private int resumPlayingVideo = 0;
+	private CounterClass timer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -145,7 +144,7 @@ public class QuestionResponseActivity extends Activity implements
 		setContentView(R.layout.activity_question_response);
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-		aq = new AQuery(QuestionResponseActivity.this);
+		aq = new AQuery(TrainingActivity.this);
 		answersArray = new JSONArray();
 		multipleAnswers = new ArrayList<Integer>();
 		validAnswers = new SparseBooleanArray();
@@ -179,9 +178,8 @@ public class QuestionResponseActivity extends Activity implements
 		ennouncer.setOnClickListener(this);
 		valider.setOnClickListener(this);
 
-		CounterClass timer = new CounterClass(Utilities.readLong(
-				QuestionResponseActivity.this, "millisUntilFinished", 7200000),
-				1000);
+		long time = DataHolder.getInstance().getMillisUntilFinished();
+		timer = new CounterClass(time, 1000);
 		timer.start();
 
 		startTime = SystemClock.uptimeMillis();
@@ -203,7 +201,7 @@ public class QuestionResponseActivity extends Activity implements
 
 		});
 
-		AQuery aq = new AQuery(QuestionResponseActivity.this);
+		AQuery aq = new AQuery(TrainingActivity.this);
 
 		Map<String, Object> params = new HashMap<String, Object>();
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
@@ -224,7 +222,7 @@ public class QuestionResponseActivity extends Activity implements
 								}
 
 								adapter = new QuestionsAdapter(
-										QuestionResponseActivity.this, exercise
+										TrainingActivity.this, exercise
 												.getQuestions());
 
 								listview.setAdapter(adapter);
@@ -312,7 +310,7 @@ public class QuestionResponseActivity extends Activity implements
 
 		// Single choice answer
 		if (q.getType().equalsIgnoreCase("2")) {
-			mRadioGroup = new RadioGroup(QuestionResponseActivity.this);
+			mRadioGroup = new RadioGroup(TrainingActivity.this);
 			mRadioGroup.setOrientation(RadioGroup.VERTICAL);
 			for (int i = answersCount - 1; i >= 0; i--) {
 				RadioButton newRadioButton = new RadioButton(this);
@@ -326,7 +324,9 @@ public class QuestionResponseActivity extends Activity implements
 			}
 			answersLayout.addView(mRadioGroup);
 
-			if (questionAnswers.get(currentQuestionId) != null) {
+			if (questionAnswers.get(currentQuestionId) != null
+					&& questionAnswers.get(currentQuestionId)
+							.getSingleAnswerPosition() != -1) {
 				int pos = questionAnswers.get(currentQuestionId)
 						.getSingleAnswerPosition();
 				View v = mRadioGroup.getChildAt(pos);
@@ -338,12 +338,11 @@ public class QuestionResponseActivity extends Activity implements
 			ArrayList<String> answers = null;
 
 			for (int i = 0; i < answersCount; i++) {
-				checkBoxLayout = new LinearLayout(QuestionResponseActivity.this);
+				checkBoxLayout = new LinearLayout(TrainingActivity.this);
 				checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
-				final CheckBox checkBox = new CheckBox(
-						QuestionResponseActivity.this);
+				final CheckBox checkBox = new CheckBox(TrainingActivity.this);
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
-				TextView text = new TextView(QuestionResponseActivity.this);
+				TextView text = new TextView(TrainingActivity.this);
 				text.setText(q.getAnswers().get(i).getAnswer());
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
@@ -400,7 +399,7 @@ public class QuestionResponseActivity extends Activity implements
 			editTextsArray.clear();
 			int count = Integer.valueOf(q.getInputCount());
 			for (int i = 0; i < count; i++) {
-				EditText editText = new EditText(QuestionResponseActivity.this);
+				EditText editText = new EditText(TrainingActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
 
@@ -528,10 +527,8 @@ public class QuestionResponseActivity extends Activity implements
 	}
 
 	public void sendAnswers() throws JSONException {
-		Utilities.showOrHideActivityIndicator(QuestionResponseActivity.this, 0,
+		Utilities.showOrHideActivityIndicator(TrainingActivity.this, 0,
 				"Please wait...");
-		Utilities.writeBoolean(QuestionResponseActivity.this,
-				String.valueOf("trainingexercise" + exercise_id), false);
 
 		Map<String, String> params = new HashMap<String, String>();
 		JSONObject object = new JSONObject();
@@ -609,8 +606,8 @@ public class QuestionResponseActivity extends Activity implements
 			} catch (IOException e) {
 				e.printStackTrace();
 			} finally {
-				Utilities.showOrHideActivityIndicator(
-						QuestionResponseActivity.this, 1, "Please wait...");
+				Utilities.showOrHideActivityIndicator(TrainingActivity.this, 1,
+						"Please wait...");
 			}
 			return null;
 		}
@@ -663,7 +660,7 @@ public class QuestionResponseActivity extends Activity implements
 		}
 
 		for (int j = 0; j < answerCount; j++) {
-			ImageView img = new ImageView(QuestionResponseActivity.this);
+			ImageView img = new ImageView(TrainingActivity.this);
 
 			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
 					30, 30);
@@ -702,14 +699,13 @@ public class QuestionResponseActivity extends Activity implements
 
 				ArrayList<Integer> userAnswerIDs = questionAnswers.get(
 						currentQuestionId).getMultiAnswerPositions();
+				String currentAsnwerId = allAnswerIDs.get(j);
 				for (int i = 0; i < userAnswerIDs.size(); i++) {
-					String currentAsnwerId = allAnswerIDs.get(j);
 					if (currentAsnwerId.equalsIgnoreCase(String
 							.valueOf(userAnswerIDs.get(i)))) { // User has
 																// checked
 																// this
 																// answer
-
 						for (int k = 0; k < correctionAnswerIDs.size(); k++) {
 							if (correctionAnswerIDs.get(k).equalsIgnoreCase(
 									currentAsnwerId)) // The checked answer
@@ -719,16 +715,12 @@ public class QuestionResponseActivity extends Activity implements
 							else
 								img.setBackgroundResource(R.drawable.correction_false);
 						}
-					} else {
-						for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
-							if (currentAsnwerId
-									.equalsIgnoreCase(correctionAnswerIDs
-											.get(k1)))
-								img.setBackgroundResource(R.drawable.correction_true);
-
-						}
-
 					}
+				}
+				for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
+					if (currentAsnwerId.equalsIgnoreCase(correctionAnswerIDs
+							.get(k1)))
+						img.setBackgroundResource(R.drawable.correction_true);
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
@@ -869,12 +861,13 @@ public class QuestionResponseActivity extends Activity implements
 		switch (v.getId()) {
 		case R.id.validerBtn:
 			try {
-				if (isValidAnswer()) {
+				// if (isValidAnswer())
+				{
 					saveValidation();
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
 					if (areAllAnswersValidated()) {
-						abandonner.setText("SUBMIT");
+						abandonner.setText("ENVOYER");
 						valider.setVisibility(View.GONE);
 					}
 
@@ -883,10 +876,11 @@ public class QuestionResponseActivity extends Activity implements
 						selectQuestion(questions.get(currentQuestionId),
 								currentQuestionId);
 					}
-				} else
-					Toast.makeText(QuestionResponseActivity.this,
-							"Please select at least one answer.",
-							Toast.LENGTH_SHORT).show();
+				} /*
+				 * else Toast.makeText(TrainingActivity.this,
+				 * "Please select at least one answer.",
+				 * Toast.LENGTH_SHORT).show();
+				 */
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -955,8 +949,12 @@ public class QuestionResponseActivity extends Activity implements
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(QuestionResponseActivity.this,
-					"millisUntilFinished", millisUntilFinished);
+			/*
+			 * Utilities.writeLong(TrainingActivity.this, "millisUntilFinished",
+			 * millisUntilFinished);
+			 */
+			DataHolder.getInstance()
+					.setMillisUntilFinished(millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
 					TimeUnit.MILLISECONDS.toHours(millis),
@@ -998,7 +996,7 @@ public class QuestionResponseActivity extends Activity implements
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {
-		dialog = new Dialog(QuestionResponseActivity.this);
+		dialog = new Dialog(TrainingActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
 
@@ -1042,11 +1040,9 @@ public class QuestionResponseActivity extends Activity implements
 		final String VIDEO_URL = files.get("video");
 		VIDEO_URL.replaceAll(" ", "%20");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
-		final ImageView audioImage = (ImageView) dialog
-				.findViewById(R.id.sound_icon);
+
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		mc = new MediaController(QuestionResponseActivity.this);
 
 		final LinearLayout soundControlLayout = (LinearLayout) dialog
 				.findViewById(R.id.sound_control_layout);
@@ -1056,6 +1052,119 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.sound_pause);
 		final ImageView soundReplay = (ImageView) dialog
 				.findViewById(R.id.sound_replay);
+
+		final LinearLayout videoControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.video_control_layout);
+		final ImageView videoPlay = (ImageView) dialog
+				.findViewById(R.id.video_play);
+		final ImageView videoPause = (ImageView) dialog
+				.findViewById(R.id.video_pause);
+		final ImageView videoReplay = (ImageView) dialog
+				.findViewById(R.id.video_replay);
+
+		soundPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.pause();
+						resumPlayingSound = mediaPlayer.getCurrentPosition();
+						soundPlay.setVisibility(View.VISIBLE);
+						soundPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		soundReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(0);
+					mediaPlayer.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (mediaPlayer.isPlaying()) {
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		soundPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(resumPlayingSound);
+					mediaPlayer.start();
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		videoPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+
+					if (video.isPlaying()) {
+						video.pause();
+
+						resumPlayingVideo = video.getCurrentPosition();
+						videoPlay.setVisibility(View.VISIBLE);
+						videoPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		videoReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(0);
+					video.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (video.isPlaying()) {
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		videoPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(resumPlayingVideo);
+					video.start();
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -1084,7 +1193,6 @@ public class QuestionResponseActivity extends Activity implements
 				// mc = new MediaController(this);
 				// mc.setAnchorView(v);
 
-				// video.setMediaController(mc);
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
 
@@ -1132,8 +1240,8 @@ public class QuestionResponseActivity extends Activity implements
 			text.setVisibility(View.VISIBLE);
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.GONE);
-			audioImage.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			soundControlLayout.setVisibility(View.GONE);
 
 			break;
@@ -1152,16 +1260,16 @@ public class QuestionResponseActivity extends Activity implements
 			}
 			img.setVisibility(View.VISIBLE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.GONE);
-			audioImage.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 			break;
 		case 2:
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.VISIBLE);
-			audioImage.setVisibility(View.VISIBLE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.VISIBLE);
 
@@ -1177,57 +1285,6 @@ public class QuestionResponseActivity extends Activity implements
 				e.printStackTrace();
 			}
 
-			soundPause.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						if (mediaPlayer.isPlaying()) {
-							mediaPlayer.pause();
-							resumPlaying = mediaPlayer.getCurrentPosition();
-							soundPlay.setVisibility(View.VISIBLE);
-							soundPause.setVisibility(View.GONE);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-				}
-			});
-
-			soundReplay.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						mediaPlayer.seekTo(0);
-						mediaPlayer.start();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					if (mediaPlayer.isPlaying()) {
-						soundPlay.setVisibility(View.GONE);
-						soundPause.setVisibility(View.VISIBLE);
-					}
-				}
-			});
-
-			soundPlay.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						mediaPlayer.seekTo(resumPlaying);
-						mediaPlayer.start();
-						soundPlay.setVisibility(View.GONE);
-						soundPause.setVisibility(View.VISIBLE);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-
 			break;
 		case 3:
 			try {
@@ -1239,21 +1296,18 @@ public class QuestionResponseActivity extends Activity implements
 			}
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
-			mc.setVisibility(View.GONE);
-			audioImage.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.VISIBLE);
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 
 			try {
 
-				mc = new MediaController(this);
-				;
-				mc.setAnchorView(video);
-				video.setMediaController(mc);
 				video.start();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			break;
 		default:
 			break;
@@ -1277,8 +1331,8 @@ public class QuestionResponseActivity extends Activity implements
 						}
 						img.setVisibility(View.VISIBLE);
 						video.setVisibility(View.GONE);
-						// mc.setVisibility(View.GONE);
-						audioImage.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.GONE);
+
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 					}
@@ -1290,9 +1344,9 @@ public class QuestionResponseActivity extends Activity implements
 					public void onClick(View v) {
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.GONE);
-						// mc.setVisibility(View.VISIBLE);
+						videoControlLayout.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
-						audioImage.setVisibility(View.VISIBLE);
+
 						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
@@ -1322,8 +1376,8 @@ public class QuestionResponseActivity extends Activity implements
 						}
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
-						// mc.setVisibility(View.GONE);
-						audioImage.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.VISIBLE);
+
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 
@@ -1332,6 +1386,7 @@ public class QuestionResponseActivity extends Activity implements
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+
 					}
 				});
 
@@ -1372,12 +1427,19 @@ public class QuestionResponseActivity extends Activity implements
 	protected void onDestroy() {
 		mediaPlayer.stop();
 		mediaPlayer.release();
+
 		super.onDestroy();
+	}
+
+	@Override
+	protected void onStop() {
+		timer.cancel();
+		super.onStop();
 	}
 
 	private void showScoreDialog(String score) {
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				QuestionResponseActivity.this);
+				TrainingActivity.this);
 		if (score.equalsIgnoreCase("")) {
 			score = "No score available.";
 		}

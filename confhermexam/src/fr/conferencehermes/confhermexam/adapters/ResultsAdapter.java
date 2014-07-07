@@ -4,28 +4,34 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import fr.conferencehermes.confhermexam.CorrectionActivity;
+import android.widget.Toast;
 import fr.conferencehermes.confhermexam.CorrectionExercisesActivity;
 import fr.conferencehermes.confhermexam.NotesActivity;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Result;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ResultsAdapter extends BaseAdapter {
 	private ArrayList<Result> mListItems;
 	private LayoutInflater mLayoutInflater;
 	private Context c;
+	DatabaseHelper db;
 
 	public ResultsAdapter(Context context, ArrayList<Result> rList) {
 		mListItems = rList;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.c = context;
+
 	}
 
 	@Override
@@ -47,6 +53,7 @@ public class ResultsAdapter extends BaseAdapter {
 	public View getView(int position, View view, ViewGroup viewGroup) {
 		ViewHolder holder;
 		final int itemID = (int) mListItems.get(position).getExamId();
+
 		if (view == null) {
 			holder = new ViewHolder();
 			view = mLayoutInflater.inflate(R.layout.resultat_rowview, null);
@@ -65,9 +72,22 @@ public class ResultsAdapter extends BaseAdapter {
 			holder.desc.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Intent intent = new Intent(c, CorrectionExercisesActivity.class);
-					intent.putExtra("exam_id", itemID);
-					c.startActivity(intent);
+
+					try {
+						db = new DatabaseHelper(c);
+						if (db.getEvent(itemID).getId() != 0) {
+							Intent intent = new Intent(c,
+									CorrectionExercisesActivity.class);
+							intent.putExtra("exam_id", itemID);
+							c.startActivity(intent);
+						} else {
+							Utilities.showAlertDialog(c, "Attention",
+									"Exam not downloaded.");
+						}
+
+					} finally {
+						db.closeDB();
+					}
 				}
 			});
 

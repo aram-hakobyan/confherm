@@ -1,10 +1,11 @@
 package fr.conferencehermes.confhermexam.fragments;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
-
-import javax.crypto.spec.PSource;
+import java.util.TimeZone;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -44,10 +45,10 @@ public class ExamineFragment extends Fragment {
 	ExamsAdapter adapter;
 	ArrayList<Exam> exams;
 	ArrayList<Exam> dbExams;
+	ArrayList<Exam> validExams;
 	ProgressBar progressBarExamin;
 	AQuery aq;
 	DatabaseHelper db;
-	ArrayList<Integer> downloadedExamIds;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,10 +59,7 @@ public class ExamineFragment extends Fragment {
 		aq = new AQuery(getActivity());
 		db = new DatabaseHelper(getActivity());
 		dbExams = db.getAllExams();
-		downloadedExamIds = new ArrayList<Integer>();
-		for (int i = 0; i < dbExams.size(); i++) {
-			downloadedExamIds.add(dbExams.get(i).getId());
-		}
+		validExams = new ArrayList<Exam>();
 
 		progressBarExamin = (ProgressBar) fragment
 				.findViewById(R.id.progressBarExamin);
@@ -70,45 +68,61 @@ public class ExamineFragment extends Fragment {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if (dbExams != null
-						&& !Utilities.isNetworkAvailable(getActivity())) {
-					String key = "exam"
-							+ String.valueOf(downloadedExamIds.get(position));
-					if (Utilities.readBoolean(getActivity(), key, true)
-							|| position == 0) {
-						if (dbExams.get(position).getPassword().isEmpty()) {
-							Intent intent = new Intent(getActivity(),
-									ExamExercisesActivity.class);
-							intent.putExtra("exam_id", dbExams.get(position)
-									.getId());
-							intent.putExtra("event_id", dbExams.get(position)
-									.getEventId());
-							startActivity(intent);
-						} else {
-							try {
-								showPasswordAlert(
-										dbExams.get(position).getId(), dbExams
-												.get(position).getEventId());
-							} catch (NullPointerException e) {
-								e.printStackTrace();
-							} catch (IndexOutOfBoundsException e) {
-								e.printStackTrace();
-							}
 
-						}
-					} else {
-						Utilities
-								.showAlertDialog(
-										getActivity(),
-										"Attention",
-										"Cet examen est terminé ou vous l'avez déjà passé vous ne pouvez pas le refaire.");
+				Exam clickedExam = validExams.get(position);
+				for (int j = 0; j < dbExams.size(); j++) {
+					if (clickedExam.getId() == dbExams.get(j).getId()) {
+						clickedExam.setPassword(dbExams.get(j).getPassword());
+						clickedExam.setIsAlreadyPassed(dbExams.get(j)
+								.getIsAlreadyPassed());
+						break;
 					}
+				}
+
+				String password = clickedExam.getPassword();
+				if (password != null) { // exam is downloaded
+					if (clickedExam.getStatus() == 1) {
+						if (canStartExam(clickedExam)) {
+							if (password.isEmpty()) {
+								if (clickedExam.getIsAlreadyPassed() == 0) {
+									Intent intent = new Intent(getActivity(),
+											ExamExercisesActivity.class);
+									intent.putExtra("exam_id",
+											clickedExam.getId());
+									intent.putExtra("event_id",
+											clickedExam.getEventId());
+									startActivity(intent);
+								} else {
+									Utilities
+											.showAlertDialog(
+													getActivity(),
+													"Attention",
+													getResources()
+															.getString(
+																	R.string.exam_already_passed_alert));
+								}
+							} else {
+								showPasswordAlert(clickedExam.getId(),
+										clickedExam.getEventId());
+							}
+						} else {
+							Utilities.showAlertDialog(getActivity(),
+									"Attention", "You can't start exam now.");
+						}
+					} else if (clickedExam.getStatus() == 2) {
+						Utilities.showAlertDialog(getActivity(), "Attention",
+								"Need update");
+					}
+
 				} else {
-					Utilities
-							.showAlertDialog(
-									getActivity(),
-									"Attention",
-									"Vous devez télécharger l'epreuve avant de pouvoir y participer. il est conseiller de vous connecter en wi-fi.");
+					if (clickedExam.getStatus() == 3)
+						Utilities.showAlertDialog(
+								getActivity(),
+								"Attention",
+								getResources().getString(
+										R.string.exam_not_downloaded_alert));
+					else if (clickedExam.getStatus() == 4)
+						return;
 				}
 			}
 
@@ -129,16 +143,17 @@ public class ExamineFragment extends Fragment {
 										&& json.get("data") != null) {
 									exams = JSONParser.parseExams(json);
 
-									if (adapter == null) {
-										adapter = new ExamsAdapter(
-												getActivity(), exams,
-												downloadedExamIds);
-									} else {
-										adapter.notifyDataSetChanged();
+									Calendar calendar = new GregorianCalendar(
+											TimeZone.getTimeZone("Europe/Paris"));
+									long currentTime = calendar
+											.getTimeInMillis() / 1000;
+
+									for (int j = 0; j < exams.size(); j++) {
+										if (exams.get(j).getEndDate() >= currentTime)
+											validExams.add(exams.get(j));
 									}
-									listview.setAdapter(adapter);
-									progressBarExamin.setVisibility(View.GONE);
-									listview.setVisibility(View.VISIBLE);
+
+									setupAdapterData();
 								}
 
 							} catch (JSONException e) {
@@ -148,20 +163,77 @@ public class ExamineFragment extends Fragment {
 						}
 					});
 		} else {
-
-			if (adapter == null) {
-				adapter = new ExamsAdapter(getActivity(), dbExams, null);
-			} else {
-				adapter.notifyDataSetChanged();
+			Calendar calendar = new GregorianCalendar(
+					TimeZone.getTimeZone("Europe/Paris"));
+			long currentTime = calendar.getTimeInMillis() / 1000;
+			validExams.clear();
+			for (int i = 0; i < dbExams.size(); i++) {
+				if (dbExams.get(i).getEndDate() >= currentTime)
+					validExams.add(dbExams.get(i));
 			}
-			listview.setAdapter(adapter);
-			progressBarExamin.setVisibility(View.GONE);
-			listview.setVisibility(View.VISIBLE);
 
+			setupAdapterData();
 		}
-		db.closeDB();
 
 		return fragment;
+	}
+
+	public boolean canStartExam(Exam e) {
+		Calendar calendar = new GregorianCalendar(
+				TimeZone.getTimeZone("Europe/Paris"));
+		long currentTime = calendar.getTimeInMillis() / 1000;
+		return e.getStartDate() <= currentTime && e.getEndDate() >= currentTime;
+
+	}
+
+	public void setupAdapterData() {
+		for (int i = 0; i < validExams.size(); i++) {
+			Exam exam = validExams.get(i);
+			switch (exam.getStatus()) {
+			case 3:
+				if (examIsDownloaded(exam.getId())) {
+					Exam downloadedExam = db.getExam(exam.getId());
+					if (downloadedExam.getLastEditTime() < exam
+							.getLastEditTime()) {
+						validExams.get(i).setStatus(2); // need update
+					} else {
+						validExams.get(i).setStatus(1); // status OK
+					}
+
+				} else {
+					// status is 3 (not downloaded yet)
+				}
+
+				break;
+			case 4:
+				validExams.get(i).setStatus(4); // not available
+				break;
+
+			default:
+				break;
+			}
+
+		}
+
+		if (adapter == null) {
+			adapter = new ExamsAdapter(getActivity(), validExams, null);
+		} else {
+			adapter.notifyDataSetChanged();
+		}
+		listview.setAdapter(adapter);
+		progressBarExamin.setVisibility(View.GONE);
+		listview.setVisibility(View.VISIBLE);
+
+		db.closeDB();
+	}
+
+	public boolean examIsDownloaded(int examId) {
+		for (int i = 0; i < dbExams.size(); i++) {
+			if (dbExams.get(i).getId() == examId)
+				return true;
+		}
+
+		return false;
 	}
 
 	private void showPasswordAlert(final int id, final int eventId) {

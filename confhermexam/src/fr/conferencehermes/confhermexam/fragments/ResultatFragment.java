@@ -87,7 +87,7 @@ public class ResultatFragment extends Fragment {
 			Toast.makeText(
 					getActivity().getApplicationContext(),
 					getActivity().getResources().getString(
-							R.string.no_internet_connection), Toast.LENGTH_LONG)
+							R.string.no_internet_connection), Toast.LENGTH_SHORT)
 					.show();
 
 		}

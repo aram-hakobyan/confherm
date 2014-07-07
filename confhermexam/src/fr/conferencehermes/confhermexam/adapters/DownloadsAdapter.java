@@ -30,10 +30,12 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.service.DownloadService;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class DownloadsAdapter extends BaseAdapter {
@@ -42,14 +44,16 @@ public class DownloadsAdapter extends BaseAdapter {
 	private Context c;
 	private AQuery aq;
 	int donwloadPercent = 0;
+	int eventId = -1;
 
 	public DownloadsAdapter(Context context,
-			ArrayList<DownloadInstance> arrayList) {
+			ArrayList<DownloadInstance> arrayList, int event_id) {
 		mListItems = arrayList;
 		mLayoutInflater = (LayoutInflater) context
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.c = context;
 		aq = new AQuery(c);
+		this.eventId = event_id;
 	}
 
 	@Override
@@ -103,14 +107,27 @@ public class DownloadsAdapter extends BaseAdapter {
 			} else if (status == 2) {
 				holder.desc.setText("Mettre a jour");
 				holder.btnAction.setBackgroundResource(R.drawable.exam_refresh);
-				holder.btnRemove
-						.setBackgroundResource(R.drawable.exam_delete_disabled);
+				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
 			} else if (status == 3) {
 				holder.desc.setText("Telecharger");
 				holder.btnAction
 						.setBackgroundResource(R.drawable.exam_download);
 				holder.btnRemove
 						.setBackgroundResource(R.drawable.exam_delete_disabled);
+			}
+
+			int progress = DataHolder.getInstance().getDownloadPercents()[position];
+			if (progress > 0 && progress < 100) {
+				holder.downloadProgressNumber.setText(String.valueOf(progress)
+						+ "%");
+			} else if (progress == 100) {
+				holder.desc.setText("Disponible");
+				holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
+				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
+				holder.progressBar.setVisibility(View.INVISIBLE);
+				holder.downloadProgressNumber.setVisibility(View.INVISIBLE);
+				holder.btnAction.setVisibility(View.VISIBLE);
+				mListItems.get(position).setStatus(1);
 			}
 
 			holder.btnAction.setOnClickListener(new OnClickListener() {
@@ -133,8 +150,51 @@ public class DownloadsAdapter extends BaseAdapter {
 				@Override
 				public void onClick(View v) {
 					int status = mListItems.get(position).getStatus();
-					if (status == 1) {
-						showDialog(position);
+					if (status == 1 || status == 2) {
+						// showDialog(position);
+
+						AlertDialog.Builder b = new AlertDialog.Builder(c)
+								.setTitle("Remove file?")
+								.setMessage(
+										c.getResources().getString(
+												R.string.delete_event_alert))
+
+								.setPositiveButton("Yes",
+										new DialogInterface.OnClickListener() {
+											public void onClick(
+													DialogInterface dialog,
+													int whichButton) {
+												removeFile(mListItems.get(
+														position)
+														.getRemoveUrl());
+												DatabaseHelper db = new DatabaseHelper(
+														c);
+												db.deleteEvent(mListItems.get(
+														position).getEventId());
+												db.close();
+
+												holder.desc
+														.setText("Telecharger");
+												holder.btnAction
+														.setBackgroundResource(R.drawable.exam_download);
+												holder.btnRemove
+														.setBackgroundResource(R.drawable.exam_delete_disabled);
+												mListItems.get(position)
+														.setStatus(3);
+											}
+										})
+								.setNegativeButton("Cancel",
+										new DialogInterface.OnClickListener() {
+											public void onClick(
+													DialogInterface dialog,
+													int whichButton) {
+												dialog.dismiss();
+											}
+										});
+
+						AlertDialog alertDialog = b.create();
+						alertDialog.setCancelable(true);
+						alertDialog.show();
 					}
 
 				}
@@ -146,6 +206,17 @@ public class DownloadsAdapter extends BaseAdapter {
 		} else {
 			view.setBackgroundColor(Color.parseColor("#e7e7e7"));
 		}
+
+		if (eventId != -1) {
+			if (mListItems.get(position).getEventId() == eventId) {
+				downloadFile(mListItems.get(position).getDownloadUrl(),
+						mListItems.get(position).getName(), position);
+				holder.progressBar.setVisibility(View.VISIBLE);
+				holder.btnAction.setVisibility(View.INVISIBLE);
+				holder.downloadProgressNumber.setVisibility(View.VISIBLE);
+			}
+		}
+
 		return view;
 
 	}
@@ -204,7 +275,11 @@ public class DownloadsAdapter extends BaseAdapter {
 				donwloadPercent = progress;
 				int pos = resultData.getInt("position");
 
-				Log.d("DOWNLOADED: ", String.valueOf(progress));
+				DataHolder.getInstance().getDownloadPercents()[pos] = progress;
+				notifyDataSetChanged();
+
+				Log.d(String.valueOf(pos) + " DOWNLOADED: ",
+						String.valueOf(progress));
 				if (progress == 100) {
 					// DownloadsAdapter.this.get
 				}
@@ -215,11 +290,17 @@ public class DownloadsAdapter extends BaseAdapter {
 	private void showDialog(final int pos) {
 		AlertDialog.Builder b = new AlertDialog.Builder(c)
 				.setTitle("Remove file?")
+				.setMessage(
+						c.getResources().getString(R.string.delete_event_alert))
+
 				.setPositiveButton("Yes",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
 								removeFile(mListItems.get(pos).getRemoveUrl());
+								DatabaseHelper db = new DatabaseHelper(c);
+								db.deleteEvent(mListItems.get(pos).getEventId());
+								db.close();
 							}
 						})
 				.setNegativeButton("Cancel",
@@ -247,9 +328,10 @@ public class DownloadsAdapter extends BaseAdapter {
 			public void callback(String url, JSONObject json, AjaxStatus status) {
 
 				try {
-					if (json.has("data") && json.get("data") != null) {
-
-					}
+					if (json != null)
+						if (json.has("status") && json.getInt("status") == 200) {
+							notifyDataSetChanged();
+						}
 
 				} catch (JSONException e) {
 					e.printStackTrace();

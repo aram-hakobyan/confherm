@@ -8,14 +8,11 @@ import java.util.concurrent.TimeUnit;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,7 +20,6 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.TextView;
 
@@ -35,7 +31,6 @@ import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.TrainingExercise;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
-import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExercisesActivity extends FragmentActivity implements
 		OnClickListener {
@@ -46,6 +41,8 @@ public class ExercisesActivity extends FragmentActivity implements
 	private ArrayList<TrainingExercise> exercises;
 	private int training_id;
 	private TextView timerText;
+	CounterClass timer;
+	private int duration = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +52,8 @@ public class ExercisesActivity extends FragmentActivity implements
 		training_id = getIntent().getIntExtra("training_id", 0);
 		timerText = (TextView) findViewById(R.id.timerText);
 
+		DataHolder.getInstance().setMillisUntilFinished(0);
+
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
 		gvMain.setOnItemClickListener(new OnItemClickListener() {
@@ -63,19 +62,8 @@ public class ExercisesActivity extends FragmentActivity implements
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 				int e_id = exercises.get(position).getExercise_id();
-				String key = "trainingexercise" + String.valueOf(e_id);
-				if (Utilities.readBoolean(ExercisesActivity.this, key, true)
-						|| position == 0) {
-					openExam(e_id);
-				} else {
-					Utilities
-							.showAlertDialog(
-									ExercisesActivity.this,
-									"Attention",
-									"Cet examen est terminé ou vous l'avez déjà passé vous ne pouvez pas le refaire.");
-				}
+				openExam(e_id);
 			}
-
 		});
 
 		AQuery aq = new AQuery(ExercisesActivity.this);
@@ -118,9 +106,9 @@ public class ExercisesActivity extends FragmentActivity implements
 	}
 
 	private void updateTimer() {
-		Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished", 0);
-		final CounterClass timer = new CounterClass(DataHolder.getInstance()
-				.getTrainingDuration(), 1000);
+		// Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished",
+		// 0);
+		timer = new CounterClass(exercises.get(0).getDuration(), 1000);
 		timer.start();
 	}
 
@@ -134,38 +122,16 @@ public class ExercisesActivity extends FragmentActivity implements
 
 	private void openExam(int id) {
 		Intent intent = new Intent(ExercisesActivity.this,
-				QuestionResponseActivity.class);
+				TrainingActivity.class);
 		intent.putExtra("exercise_id", id);
 		intent.putExtra("training_id", training_id);
 		startActivity(intent);
 	}
 
-	private void showPasswordAlert(final int id) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		builder.setTitle("Enter Password");
-
-		final EditText input = new EditText(this);
-		input.setInputType(InputType.TYPE_CLASS_TEXT
-				| InputType.TYPE_TEXT_VARIATION_PASSWORD);
-		builder.setView(input);
-
-		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-			@Override
-			public void onClick(DialogInterface dialog, int which) {
-				if (!input.getText().toString().trim().isEmpty()) {
-					openExam(id);
-				}
-			}
-		});
-		builder.setNegativeButton("Cancel",
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						dialog.cancel();
-					}
-				});
-
-		builder.show();
+	@Override
+	protected void onStop() {
+		timer.cancel();
+		super.onStop();
 	}
 
 	@Override
@@ -187,8 +153,12 @@ public class ExercisesActivity extends FragmentActivity implements
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished",
-					millisUntilFinished);
+			/*
+			 * Utilities.writeLong(ExercisesActivity.this,
+			 * "millisUntilFinished", millisUntilFinished);
+			 */
+			DataHolder.getInstance()
+					.setMillisUntilFinished(millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
 					TimeUnit.MILLISECONDS.toHours(millis),
@@ -199,6 +169,7 @@ public class ExercisesActivity extends FragmentActivity implements
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(millis)));
 			timerText.setText("Temps epreuve - " + hms);
+
 		}
 	}
 

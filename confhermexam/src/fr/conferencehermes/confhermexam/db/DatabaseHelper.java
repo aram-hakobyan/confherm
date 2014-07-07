@@ -43,6 +43,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EVENT_TEST_ID = "testId";
 	private static final String KEY_EVENT_CREATION_DATE = "creationDate";
 	private static final String KEY_EVENT_AUTHOR = "author";
+	private static final String KEY_EVENT_LAST_EDIT_TIME = "lastEditTime";
 
 	// EXAM column names
 	private static final String KEY_EXAM_ID = "examId";
@@ -52,6 +53,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EXAM_START_DATE = "startDate";
 	private static final String KEY_EXAM_END_DATE = "endDate";
 	private static final String KEY_EXAM_PASSWORD = "creationDate";
+	private static final String KEY_EXAM_TYPE = "categoryType";
+	private static final String KEY_EXAM_LAST_EDIT_TIME = "lastEditTime";
+	private static final String KEY_EXAM_STATUS = "status";
+	private static final String KEY_EXAM_IS_ALREADY_PASSED = "examIsAlreadyPassed";
 
 	// EXERCISE_FILES column names
 	private static final String KEY_EXERCISE_FILES_ID = "exerciseId";
@@ -104,15 +109,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ TABLE_EVENTS + "(" + KEY_EVENT_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_EVENT_NAME + " TEXT," + KEY_EVENT_VALIDATION + " INTEGER,"
 			+ KEY_EVENT_TEST_ID + " INTEGER," + KEY_EVENT_AUTHOR + " INTEGER,"
-			+ KEY_EVENT_CREATION_DATE + " INTEGER" + ")";
+			+ KEY_EVENT_CREATION_DATE + " INTEGER," + KEY_EVENT_LAST_EDIT_TIME
+			+ " INTEGER" + ")";
 
 	// Exam table create statement
 	private static final String CREATE_TABLE_EXAM = "CREATE TABLE "
 			+ TABLE_EXAMS + "(" + KEY_EXAM_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_EXAM_EVENT_ID + " INTEGER," + KEY_EXAM_START_DATE
 			+ " INTEGER," + KEY_EXAM_END_DATE + " INTEGER," + KEY_EXAM_PASSWORD
-			+ " TEXT," + KEY_EXAM_NAME + " TEXT," + KEY_EXAM_EVENT_NAME
-			+ " TEXT" + ")";
+			+ " TEXT," + KEY_EXAM_NAME + " TEXT," + KEY_EXAM_TYPE + " TEXT,"
+			+ KEY_EXAM_LAST_EDIT_TIME + " INTEGER," + KEY_EXAM_STATUS
+			+ " INTEGER," + KEY_EXAM_IS_ALREADY_PASSED + " INTEGER,"
+			+ KEY_EXAM_EVENT_NAME + " TEXT" + ")";
 
 	// ExerciseFiles table create statement
 	private static final String CREATE_TABLE_EXERCISE_FILES = "CREATE TABLE "
@@ -217,6 +225,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EVENT_NAME, event.getName());
 		values.put(KEY_EVENT_TEST_ID, event.getTestId());
 		values.put(KEY_EVENT_VALIDATION, event.getValidation());
+		values.put(KEY_EVENT_LAST_EDIT_TIME, event.getLastEditTime());
 
 		// insert row
 		db.beginTransaction();
@@ -247,11 +256,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if (c != null && c.moveToFirst()) {
 			event.setId(c.getInt(c.getColumnIndex(KEY_EVENT_ID)));
 			event.setAuthor((c.getString(c.getColumnIndex(KEY_EVENT_AUTHOR))));
-			event.setCreationDate(c.getInt(c
+			event.setCreationDate(c.getLong(c
 					.getColumnIndex(KEY_EVENT_CREATION_DATE)));
 			event.setName(c.getString(c.getColumnIndex(KEY_EVENT_NAME)));
 			event.setTestId(c.getInt(c.getColumnIndex(KEY_EVENT_TEST_ID)));
 			event.setValidation(c.getInt(c.getColumnIndex(KEY_EVENT_VALIDATION)));
+			event.setLastEditTime(c.getLong(c
+					.getColumnIndex(KEY_EVENT_LAST_EDIT_TIME)));
 			c.close();
 		}
 
@@ -261,8 +272,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	/*
 	 * getting all events
 	 */
-	public List<Event> getAllEvents() {
-		List<Event> events = new ArrayList<Event>();
+	public ArrayList<Event> getAllEvents() {
+		ArrayList<Event> events = new ArrayList<Event>();
 		String selectQuery = "SELECT  * FROM " + TABLE_EVENTS;
 
 		SQLiteDatabase db = this.getReadableDatabase();
@@ -280,6 +291,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				event.setTestId(c.getInt(c.getColumnIndex(KEY_EVENT_TEST_ID)));
 				event.setValidation(c.getInt(c
 						.getColumnIndex(KEY_EVENT_VALIDATION)));
+				event.setLastEditTime(c.getLong(c
+						.getColumnIndex(KEY_EVENT_LAST_EDIT_TIME)));
 
 				events.add(event);
 			} while (c.moveToNext());
@@ -302,6 +315,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EVENT_NAME, event.getName());
 		values.put(KEY_EVENT_TEST_ID, event.getTestId());
 		values.put(KEY_EVENT_VALIDATION, event.getValidation());
+		values.put(KEY_EVENT_LAST_EDIT_TIME, event.getLastEditTime());
 
 		// updating row
 		return db.update(TABLE_EVENTS, values, KEY_EVENT_ID + " = ?",
@@ -331,6 +345,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_END_DATE, (int) exam.getEndDate());
 		values.put(KEY_EXAM_NAME, exam.getTitle());
 		values.put(KEY_EXAM_EVENT_NAME, exam.getEvent_name());
+		values.put(KEY_EXAM_LAST_EDIT_TIME, exam.getLastEditTime());
+		values.put(KEY_EXAM_STATUS, exam.getStatus());
+		values.put(KEY_EXAM_TYPE, exam.getCategoryType());
+		values.put(KEY_EXAM_IS_ALREADY_PASSED, exam.getIsAlreadyPassed());
 
 		// insert row
 		db.beginTransaction();
@@ -361,12 +379,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if (c != null && c.moveToFirst()) {
 			exam.setId(c.getInt(c.getColumnIndex(KEY_EXAM_ID)));
 			exam.setEventId((c.getInt(c.getColumnIndex(KEY_EXAM_EVENT_ID))));
-			exam.setStartDate(c.getInt(c.getColumnIndex(KEY_EXAM_START_DATE)));
-			exam.setEndDate(c.getInt(c.getColumnIndex(KEY_EXAM_END_DATE)));
+			exam.setStartDate(c.getLong(c.getColumnIndex(KEY_EXAM_START_DATE)));
+			exam.setEndDate(c.getLong(c.getColumnIndex(KEY_EXAM_END_DATE)));
 			exam.setPassword(c.getString(c.getColumnIndex(KEY_EXAM_PASSWORD)));
 			exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
-			exam.setEvent_name(c.getString(c.getColumnIndex(KEY_EXAM_EVENT_NAME)));
-			
+			exam.setEvent_name(c.getString(c
+					.getColumnIndex(KEY_EXAM_EVENT_NAME)));
+			exam.setCategoryType(c.getString(c.getColumnIndex(KEY_EXAM_TYPE)));
+			exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
+			exam.setLastEditTime(c.getLong(c
+					.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
+			exam.setIsAlreadyPassed(c.getInt(c
+					.getColumnIndex(KEY_EXAM_IS_ALREADY_PASSED)));
+
 			c.close();
 		}
 
@@ -397,6 +422,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				exam.setPassword(c.getString(c
 						.getColumnIndex(KEY_EXAM_PASSWORD)));
 				exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
+				exam.setCategoryType(c.getString(c
+						.getColumnIndex(KEY_EXAM_TYPE)));
+				exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
+				exam.setLastEditTime(c.getLong(c
+						.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
+				exam.setIsAlreadyPassed(c.getInt(c
+						.getColumnIndex(KEY_EXAM_IS_ALREADY_PASSED)));
 
 				exams.add(exam);
 			} while (c.moveToNext());
@@ -420,9 +452,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXAM_PASSWORD, exam.getPassword());
 		values.put(KEY_EXAM_START_DATE, exam.getStartDate());
 		values.put(KEY_EXAM_NAME, exam.getTitle());
+		values.put(KEY_EXAM_LAST_EDIT_TIME, exam.getLastEditTime());
+		values.put(KEY_EXAM_STATUS, exam.getStatus());
+		values.put(KEY_EXAM_TYPE, exam.getCategoryType());
+		values.put(KEY_EXAM_IS_ALREADY_PASSED, exam.getIsAlreadyPassed());
 
 		// updating row
-		return db.update(TABLE_EVENTS, values, KEY_EVENT_ID + " = ?",
+		return db.update(TABLE_EXAMS, values, KEY_EXAM_ID + " = ?",
 				new String[] { String.valueOf(exam.getId()) });
 	}
 
@@ -462,6 +498,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					exam.setTitle(c.getString(c.getColumnIndex(KEY_EXAM_NAME)));
 					exam.setEvent_name(c.getString(c
 							.getColumnIndex(KEY_EXAM_EVENT_NAME)));
+					exam.setCategoryType(c.getString(c
+							.getColumnIndex(KEY_EXAM_TYPE)));
+					exam.setStatus(c.getInt(c.getColumnIndex(KEY_EXAM_STATUS)));
+					exam.setLastEditTime(c.getLong(c
+							.getColumnIndex(KEY_EXAM_LAST_EDIT_TIME)));
+					exam.setIsAlreadyPassed(c.getInt(c
+							.getColumnIndex(KEY_EXAM_IS_ALREADY_PASSED)));
 
 					exams.add(exam);
 				}

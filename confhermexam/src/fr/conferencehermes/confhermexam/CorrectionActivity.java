@@ -2,6 +2,11 @@ package fr.conferencehermes.confhermexam;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -15,6 +20,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -22,7 +29,6 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -39,9 +45,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -60,6 +64,7 @@ import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
+import fr.conferencehermes.confhermexam.parser.CorrectionAnswer;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
@@ -93,6 +98,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
 	DatabaseHelper db;
+	private int resumPlayingSound = 0;
+	private int resumPlayingVideo = 0;
+	private ArrayList<Correction> corrections;
+	private ArrayList<CorrectionAnswer> answers;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -186,9 +195,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			for (int i = 0; i < questions.size(); i++) {
 				questionAnswers.add(null);
 			}
-			selectQuestion(questions.get(0), 0);
-			getCorrections();
 
+			getCorrections();
 		}
 
 	}
@@ -206,7 +214,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			}
 		}
 
-		currentQuestionId = position;
+		currentQuestionId = q.getId();
 		currentQuestion = q;
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
 
@@ -218,7 +226,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
 		if (currentQuestionFiles != null)
-			setFileIcons(currentQuestionFiles);
+			if (!currentQuestionFiles.isEmpty())
+				setFileIcons(currentQuestionFiles);
 
 		currentQuestionAnswers = db.getAllAnswersByQuestionId(currentQuestion
 				.getId());
@@ -241,13 +250,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 			}
 			answersLayout.addView(mRadioGroup);
-
-			if (questionAnswers.get(currentQuestionId) != null) {
-				int pos = questionAnswers.get(currentQuestionId)
-						.getSingleAnswerPosition();
-				View v = mRadioGroup.getChildAt(pos);
-				mRadioGroup.check(v.getId());
-			}
 
 		} else // Multichoice answer
 		if (q.getType().equalsIgnoreCase("1")) {
@@ -290,27 +292,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				});
 			}
 
-			if (questionAnswers.get(currentQuestionId) != null) {
-				ArrayList<Integer> answerIds = new ArrayList<Integer>();
-				answerIds.addAll(questionAnswers.get(currentQuestionId)
-						.getMultiAnswerPositions());
-				for (int j = 0; j < answersLayout.getChildCount(); j++) {
-					try {
-						LinearLayout layout = (LinearLayout) answersLayout
-								.getChildAt(j);
-						CheckBox box = (CheckBox) layout.getChildAt(0);
-						int currentId = currentQuestionAnswers.get(j).getId();
-						for (int k = 0; k < answerIds.size(); k++) {
-							if (answerIds.get(k) == currentId)
-								box.setChecked(true);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-				}
-			}
-
 		} else if (q.getType().equalsIgnoreCase("3")) {
 			editTextsArray.clear();
 			int count = Integer.valueOf(q.getInputCount());
@@ -329,16 +310,12 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 					layoutParams.setMargins(0, 10, 0, 0);
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
-
-			}
-			if (questionAnswers.get(currentQuestionId) != null) {
-				ArrayList<String> answers = questionAnswers.get(
-						currentQuestionId).getTextAnswers();
-				for (int c = 0; c < editTextsArray.size(); c++) {
-					editTextsArray.get(c).setText(answers.get(c));
-				}
 			}
 		}
+
+		if (corrections != null & !corrections.isEmpty() && answers != null
+				&& !answers.isEmpty())
+			drawCorrections();
 
 	}
 
@@ -380,36 +357,33 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		aq.ajax(Constants.EXAM_EXERCISE_CORRECTIONS_URL, params,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
+
 					@Override
 					public void callback(String url, JSONObject json,
 							AjaxStatus status) {
 
 						try {
 							if (json.has("data") && json.get("data") != null) {
-								ArrayList<Correction> corrections = JSONParser
+								corrections = JSONParser
 										.parseResultCorrections(json);
-								drawCorrections(corrections);
+								answers = JSONParser
+										.parseCorrectionAnswers(json);
+								selectQuestion(questions.get(0), 0);
 							}
 						} catch (JSONException e) {
 							e.printStackTrace();
-
 						}
 					}
 				});
 
 	}
 
-	private void drawCorrections(ArrayList<Correction> corrections) {
+	private void drawCorrections() {
 		correctionsLayout.removeAllViews();
-		ArrayList<String> correctionAnswerIDs = new ArrayList<String>();
-		for (Correction c : corrections) {
-			if (currentQuestion.getId() == Integer.valueOf(c.getQuestionId())) {
-				correctionAnswerIDs = c.getAnswersArray();
-			}
-		}
 
 		ArrayList<String> allAnswerIDs = new ArrayList<String>();
-		ArrayList<Answer> allAnswers = currentQuestion.getAnswers();
+		ArrayList<Answer> allAnswers = db
+				.getAllAnswersByQuestionId(currentQuestionId);
 		for (int i = 0; i < allAnswers.size(); i++) {
 			allAnswerIDs.add(String.valueOf(allAnswers.get(i).getId()));
 		}
@@ -422,8 +396,9 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		}
 
 		for (int j = 0; j < answerCount; j++) {
+			// Current answer's id
+			String currentAnswerId = String.valueOf(allAnswers.get(j).getId());
 			ImageView img = new ImageView(CorrectionActivity.this);
-
 			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
 					30, 30);
 
@@ -433,19 +408,34 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				}
 
 				imageParams.setMargins(0, 7, 0, 0);
-				int userAnswerIDs = questionAnswers.get(currentQuestionId)
-						.getSingleAnswerPosition();
 
-				if (userAnswerIDs == j) {
-					if (allAnswerIDs.get(userAnswerIDs).equalsIgnoreCase(
-							correctionAnswerIDs.get(0)))
-						img.setBackgroundResource(R.drawable.correction_true);
-					else
-						img.setBackgroundResource(R.drawable.correction_false);
-				} else {
-					if (allAnswerIDs.get(j).equalsIgnoreCase(
-							correctionAnswerIDs.get(0)))
-						img.setBackgroundResource(R.drawable.correction_true);
+				String userAnswerId = "";
+				for (int i = 0; i < answers.size(); i++) {
+					if (answers.get(i).getQuestionId() == currentQuestionId)
+						userAnswerId = answers.get(i).getAnswers().get(0);
+				}
+
+				String correctAnswerId = "";
+				for (int i = 0; i < corrections.size(); i++) {
+					if (corrections
+							.get(i)
+							.getQuestionId()
+							.equalsIgnoreCase(String.valueOf(currentQuestionId)))
+						correctAnswerId = corrections.get(i).getAnswersArray()
+								.get(0);
+				}
+
+				boolean USER_IS_RIGHT = userAnswerId
+						.equalsIgnoreCase(correctAnswerId);
+				boolean CURRENT_IS_RIGHT = currentAnswerId
+						.equalsIgnoreCase(correctAnswerId);
+				boolean CURRENT_IS_USER = currentAnswerId
+						.equalsIgnoreCase(userAnswerId);
+
+				if (CURRENT_IS_RIGHT) {
+					img.setBackgroundResource(R.drawable.correction_true);
+				} else if (CURRENT_IS_USER) {
+					img.setBackgroundResource(R.drawable.correction_false);
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
@@ -459,54 +449,81 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 				imageParams.setMargins(0, 5, 0, 0);
 
-				ArrayList<Integer> userAnswerIDs = questionAnswers.get(
-						currentQuestionId).getMultiAnswerPositions();
-				for (int i = 0; i < userAnswerIDs.size(); i++) {
-					String currentAsnwerId = allAnswerIDs.get(j);
-					if (currentAsnwerId.equalsIgnoreCase(String
-							.valueOf(userAnswerIDs.get(i)))) { // User has
-																// checked
-																// this
-																// answer
-
-						for (int k = 0; k < correctionAnswerIDs.size(); k++) {
-							if (correctionAnswerIDs.get(k).equalsIgnoreCase(
-									currentAsnwerId)) // The checked answer
-														// exists in correct
-														// answers
-								img.setBackgroundResource(R.drawable.correction_true);
-							else
-								img.setBackgroundResource(R.drawable.correction_false);
-						}
-					} else {
-						for (int k1 = 0; k1 < correctionAnswerIDs.size(); k1++) {
-							if (currentAsnwerId
-									.equalsIgnoreCase(correctionAnswerIDs
-											.get(k1)))
-								img.setBackgroundResource(R.drawable.correction_true);
-
+				// User's answers
+				ArrayList<String> userAnswerIds = new ArrayList<String>();
+				for (int i = 0; i < answers.size(); i++) {
+					if (answers.get(i).getQuestionId() == currentQuestionId) {
+						for (int k = 0; k < answers.get(i).getAnswers().size(); k++) {
+							userAnswerIds.add(answers.get(i).getAnswers()
+									.get(k));
 						}
 
 					}
+				}
+
+				// Correct answers
+				ArrayList<String> correctAnswerIds = new ArrayList<String>();
+				for (int i = 0; i < corrections.size(); i++) {
+					if (corrections
+							.get(i)
+							.getQuestionId()
+							.equalsIgnoreCase(String.valueOf(currentQuestionId)))
+						for (int k = 0; k < corrections.get(i)
+								.getAnswersArray().size(); k++) {
+							correctAnswerIds.add(corrections.get(i)
+									.getAnswersArray().get(k));
+						}
+				}
+
+				boolean CURRENT_IS_RIGHT = false;
+				for (int i = 0; i < correctAnswerIds.size(); i++) {
+					if (correctAnswerIds.get(i).equalsIgnoreCase(
+							currentAnswerId)) {
+						{
+							CURRENT_IS_RIGHT = true;
+							break;
+						}
+					}
+				}
+
+				boolean CURRENT_IS_USER = false;
+				for (int i = 0; i < userAnswerIds.size(); i++) {
+					if (userAnswerIds.get(i).equalsIgnoreCase(currentAnswerId)) {
+						{
+							CURRENT_IS_USER = true;
+							break;
+						}
+					}
+				}
+
+				if (CURRENT_IS_RIGHT) {
+					img.setBackgroundResource(R.drawable.correction_true);
+				} else if (CURRENT_IS_USER) {
+					img.setBackgroundResource(R.drawable.correction_false);
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
 				imageParams.setMargins(0, 20, 0, 0);
 
 				try {
-					JSONObject corObj = new JSONObject(corrections
-							.get(currentQuestionId).getAnswersArray().get(j));
-					String answerText = corObj.getString("name");
-					editTextsArray.get(j).setText(answerText);
-					editTextsArray.get(j).setEnabled(false);
+					for (int i = 0; i < answers.size(); i++) {
+						if (answers.get(i).getQuestionId() == currentQuestionId) {
+							JSONObject corObj = new JSONObject(answers.get(i)
+									.getAnswers().get(j));
+							String answerText = corObj.getString("name");
+							editTextsArray.get(j).setText(answerText);
+							editTextsArray.get(j).setEnabled(false);
 
-					int IS_GOOD = corObj.getInt("is_good");
-					if (IS_GOOD == 1) {
-						img.setBackgroundResource(R.drawable.correction_true);
-					} else {
-						img.setBackgroundResource(R.drawable.correction_false);
+							int IS_GOOD = corObj.getInt("is_good");
+							if (IS_GOOD == 1) {
+								img.setBackgroundResource(R.drawable.correction_true);
+							} else {
+								img.setBackgroundResource(R.drawable.correction_false);
+							}
+
+							break;
+						}
 					}
-
 				} catch (JSONException e) {
 					e.printStackTrace();
 				} catch (IndexOutOfBoundsException e) {
@@ -520,18 +537,17 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			correctionsLayout.addView(img, imageParams);
 		}
 
+		String corrText = "";
+		for (int i = 0; i < corrections.size(); i++) {
+			if (corrections.get(i).getQuestionId()
+					.equalsIgnoreCase(String.valueOf(currentQuestionId))) {
+				corrText = corrections.get(i).getText();
+				break;
+			}
+		}
+
 		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
-		correctionText.setText(corrections.get(currentQuestionId).getText());
-		LinearLayout correctionButtons = (LinearLayout) findViewById(R.id.correctionButtons);
-		correctionButtons.setVisibility(View.VISIBLE);
-
-		btnImageCorrection = (Button) findViewById(R.id.btnImageCorrection);
-		btnAudioCorrection = (Button) findViewById(R.id.btnAudioCorrection);
-		btnVideoCorrection = (Button) findViewById(R.id.btnVideoCorrection);
-		btnImageCorrection.setOnClickListener(this);
-		btnAudioCorrection.setOnClickListener(this);
-		btnVideoCorrection.setOnClickListener(this);
-
+		correctionText.setText(corrText);
 	}
 
 	@Override
@@ -577,7 +593,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		final TextView text = (TextView) dialog
 				.findViewById(R.id.ennouncerText);
 
-		if (files.get("image") == null) {
+		if (files.get("image").isEmpty()) {
 			button1.setBackgroundResource(R.drawable.ic_camera_gray);
 			button1.setEnabled(false);
 			button1.setAlpha(0.5f);
@@ -586,7 +602,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			button1.setEnabled(true);
 			button1.setAlpha(1.0f);
 		}
-		if (files.get("sound") == null) {
+		if (files.get("sound").isEmpty()) {
 			button2.setBackgroundResource(R.drawable.ic_sound_gray);
 			button2.setEnabled(false);
 			button2.setAlpha(0.5f);
@@ -595,7 +611,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			button2.setEnabled(true);
 			button2.setAlpha(1f);
 		}
-		if (files.get("video") == null) {
+		if (files.get("video").isEmpty()) {
 			button3.setBackgroundResource(R.drawable.ic_video_gray);
 			button3.setEnabled(false);
 			button3.setAlpha(0.5f);
@@ -608,13 +624,133 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		final String IMAGE_URL = files.get("image");
 		final String AUDIO_URL = files.get("sound");
 		final String VIDEO_URL = files.get("video");
-
+		VIDEO_URL.replaceAll(" ", "%20");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
-		final ImageView audioImage = (ImageView) dialog
-				.findViewById(R.id.sound_icon);
+
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = new MediaController(CorrectionActivity.this);
+
+		final LinearLayout soundControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.sound_control_layout);
+		final ImageView soundPlay = (ImageView) dialog
+				.findViewById(R.id.sound_play);
+		final ImageView soundPause = (ImageView) dialog
+				.findViewById(R.id.sound_pause);
+		final ImageView soundReplay = (ImageView) dialog
+				.findViewById(R.id.sound_replay);
+
+		final LinearLayout videoControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.video_control_layout);
+		final ImageView videoPlay = (ImageView) dialog
+				.findViewById(R.id.video_play);
+		final ImageView videoPause = (ImageView) dialog
+				.findViewById(R.id.video_pause);
+		final ImageView videoReplay = (ImageView) dialog
+				.findViewById(R.id.video_replay);
+
+		soundPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.pause();
+						resumPlayingSound = mediaPlayer.getCurrentPosition();
+						soundPlay.setVisibility(View.VISIBLE);
+						soundPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		soundReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(0);
+					mediaPlayer.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (mediaPlayer.isPlaying()) {
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		soundPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(resumPlayingSound);
+					mediaPlayer.start();
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		videoPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+
+					if (video.isPlaying()) {
+						video.pause();
+
+						resumPlayingVideo = video.getCurrentPosition();
+						videoPlay.setVisibility(View.VISIBLE);
+						videoPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		videoReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(0);
+					video.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (video.isPlaying()) {
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		videoPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(resumPlayingVideo);
+					video.start();
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -637,27 +773,60 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			}
 		if (VIDEO_URL != null)
 			if (!VIDEO_URL.isEmpty()) {
-				// VIDEO_URL.replaceAll(" ", "%20");
-				mc.setAnchorView(video);
 				Uri videoURI = Uri.parse(VIDEO_URL);
-				video.setMediaController(mc);
+
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
+
 			}
 
 		if (IMAGE_URL != null)
 			if (!IMAGE_URL.isEmpty()) {
-				img.setImageURI(Uri.parse(new File(IMAGE_URL).toString()));
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							URL url = new URL(IMAGE_URL);
+							URLConnection conn = url.openConnection();
+							HttpURLConnection httpConn = (HttpURLConnection) conn;
+							httpConn.setRequestMethod("GET");
+							httpConn.connect();
+							if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+								InputStream inputStream = httpConn
+										.getInputStream();
+								final Bitmap bitmap = BitmapFactory
+										.decodeStream(inputStream);
+								inputStream.close();
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										img.setImageBitmap(bitmap);
+										img.refreshDrawableState();
+										img.invalidate();
+									}
+								});
+
+							}
+						} catch (MalformedURLException e1) {
+							e1.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
 			}
 
 		switch (from) {
 		case 0:
 			text.setText(exercise.getText());
 			text.setVisibility(View.VISIBLE);
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
+	
+			soundControlLayout.setVisibility(View.GONE);
+
 			break;
 		case 1:
 			if (mediaPlayer != null) {
@@ -673,26 +842,34 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				video.stopPlayback();
 			}
 			img.setVisibility(View.VISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			video.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
+	
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 			break;
 		case 2:
-			img.setVisibility(View.INVISIBLE);
-			video.setVisibility(View.INVISIBLE);
-			mc.setVisibility(View.VISIBLE);
-			audioImage.setVisibility(View.VISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
+			video.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
+		
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.VISIBLE);
+
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
 			try {
 				mediaPlayer.seekTo(0);
 				mediaPlayer.start();
+				soundPlay.setVisibility(View.GONE);
+				soundPause.setVisibility(View.VISIBLE);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			break;
 		case 3:
 			try {
@@ -702,17 +879,20 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			img.setVisibility(View.INVISIBLE);
+			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
-			mc.setVisibility(View.INVISIBLE);
-			audioImage.setVisibility(View.INVISIBLE);
-			text.setVisibility(View.INVISIBLE);
+			videoControlLayout.setVisibility(View.VISIBLE);
+			
+			text.setVisibility(View.GONE);
+			soundControlLayout.setVisibility(View.GONE);
 
 			try {
+
 				video.start();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			break;
 		default:
 			break;
@@ -735,33 +915,40 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 							video.stopPlayback();
 						}
 						img.setVisibility(View.VISIBLE);
-						video.setVisibility(View.INVISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						video.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.GONE);
+
+					
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 					}
 				});
+
 		dialog.findViewById(R.id.button2).setOnClickListener(
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						img.setVisibility(View.INVISIBLE);
-						video.setVisibility(View.INVISIBLE);
-						mc.setVisibility(View.VISIBLE);
-						text.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.VISIBLE);
+						img.setVisibility(View.GONE);
+						video.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.GONE);
+						text.setVisibility(View.GONE);
+				
+						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
 						}
 						try {
 							mediaPlayer.seekTo(0);
 							mediaPlayer.start();
+							soundPlay.setVisibility(View.GONE);
+							soundPause.setVisibility(View.VISIBLE);
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 
 					}
 				});
+
 		dialog.findViewById(R.id.button3).setOnClickListener(
 				new OnClickListener() {
 					@Override
@@ -773,17 +960,19 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-						img.setVisibility(View.INVISIBLE);
+						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
-						mc.setVisibility(View.INVISIBLE);
-						audioImage.setVisibility(View.INVISIBLE);
-						text.setVisibility(View.INVISIBLE);
+						videoControlLayout.setVisibility(View.VISIBLE);
+				
+						text.setVisibility(View.GONE);
+						soundControlLayout.setVisibility(View.GONE);
 
 						try {
 							video.start();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+
 					}
 				});
 

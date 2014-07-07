@@ -18,8 +18,10 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.ImageView;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
@@ -35,15 +37,22 @@ public class ExamExercisesActivity extends FragmentActivity implements
 	DatabaseHelper db;
 	private int examId;
 	private int eventId;
+	private ImageView timePause, timePlay;
+	private CounterClass timer;
+	private long timeToResume;
+	private long duration = 0;
+	private boolean TIMER_PAUSED = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_exersice);
+		setContentView(R.layout.activity_exam_exersice);
 
 		db = new DatabaseHelper(ExamExercisesActivity.this);
 		timerText = (TextView) findViewById(R.id.timerText);
+		timePause = (ImageView) findViewById(R.id.time_pause);
+		timePlay = (ImageView) findViewById(R.id.time_play);
 
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
@@ -53,20 +62,9 @@ public class ExamExercisesActivity extends FragmentActivity implements
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 				int e_id = exercises.get(position).getId();
-				String key = "exercise" + String.valueOf(e_id);
-				if (Utilities
-						.readBoolean(ExamExercisesActivity.this, key, true)
-						|| position == 0) {
+				if (!TIMER_PAUSED)
 					openExercise(e_id);
-				} else {
-					Utilities
-							.showAlertDialog(
-									ExamExercisesActivity.this,
-									"Attention",
-									"Cet examen est terminé ou vous l'avez déjà passé vous ne pouvez pas le refaire.");
-				}
 			}
-
 		});
 
 		examId = getIntent().getIntExtra("exam_id", -1);
@@ -77,19 +75,48 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			data[i] = exercises.get(i).getName();
 		}
 
+		DataHolder.getInstance().setMillisUntilFinished(0);
+		Exam exam = db.getExam(examId);
+		long startTime = exam.getStartDate() * 1000;
+		long endTime = exam.getEndDate() * 1000;
+		duration = endTime - startTime;
+		updateTimer();
+
+		if (db.getExam(examId).getCategoryType().equalsIgnoreCase("2")) {
+			timePause.setVisibility(View.GONE);
+			timePlay.setVisibility(View.GONE);
+		}
+
 		adapter = new ArrayAdapter<String>(ExamExercisesActivity.this,
 				R.layout.item, R.id.tvText, data);
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		gvMain.setAdapter(adapter);
-		updateTimer();
+
+		timePause.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				timePause.setVisibility(View.GONE);
+				timePlay.setVisibility(View.VISIBLE);
+				timer.cancel();
+				TIMER_PAUSED = true;
+			}
+		});
+
+		timePlay.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				timePause.setVisibility(View.VISIBLE);
+				timePlay.setVisibility(View.GONE);
+				timer = new CounterClass(timeToResume, 1000);
+				timer.start();
+				TIMER_PAUSED = false;
+			}
+		});
 
 	}
 
 	private void updateTimer() {
-		Utilities.writeLong(ExamExercisesActivity.this, "millisUntilFinished",
-				0);
-		final CounterClass timer = new CounterClass(DataHolder.getInstance()
-				.getTrainingDuration(), 1000);
+		timer = new CounterClass(duration, 1000);
 		timer.start();
 	}
 
@@ -116,6 +143,19 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 	}
 
+	@Override
+	protected void onStop() {
+		timer.cancel();
+		super.onStop();
+	}
+
+	@Override
+	protected void onStart() {
+		if (timer != null)
+			timer.start();
+		super.onStart();
+	}
+
 	public class CounterClass extends CountDownTimer {
 		public CounterClass(long millisInFuture, long countDownInterval) {
 			super(millisInFuture, countDownInterval);
@@ -129,8 +169,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(ExamExercisesActivity.this,
-					"millisUntilFinished", millisUntilFinished);
+			DataHolder.getInstance()
+					.setMillisUntilFinished(millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
 					TimeUnit.MILLISECONDS.toHours(millis),
@@ -141,6 +181,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(millis)));
 			timerText.setText("Temps epreuve - " + hms);
+			timeToResume = millis;
 		}
 	}
 

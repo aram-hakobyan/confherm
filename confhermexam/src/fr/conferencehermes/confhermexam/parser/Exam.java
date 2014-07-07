@@ -4,18 +4,20 @@ import java.util.ArrayList;
 
 public class Exam {
 	private int id;
+	private int testId;
 	private int eventId;
 	private String title;
 	private String shortTitle;
 	private String categoryType;
 	private long startDate;
 	private long endDate;
+	private long lastEditTime;
 	private int status;
+	private int isAlreadyPassed = 0;
 	private String description;
 	private String password;
 	private String event_name;
-	
-	
+
 	public String getEvent_name() {
 		return event_name;
 	}
@@ -26,7 +28,7 @@ public class Exam {
 
 	private ArrayList<Exercise> exercises;
 
-	public void Exam() {
+	public Exam() {
 		setExercises(new ArrayList<Exercise>());
 	}
 
@@ -116,5 +118,29 @@ public class Exam {
 
 	public void setExercises(ArrayList<Exercise> exercises) {
 		this.exercises = exercises;
+	}
+
+	public long getLastEditTime() {
+		return lastEditTime;
+	}
+
+	public void setLastEditTime(long lastEditTime) {
+		this.lastEditTime = lastEditTime;
+	}
+
+	public int getIsAlreadyPassed() {
+		return isAlreadyPassed;
+	}
+
+	public void setIsAlreadyPassed(int isAlreadyPassed) {
+		this.isAlreadyPassed = isAlreadyPassed;
+	}
+
+	public int getTestId() {
+		return testId;
+	}
+
+	public void setTestId(int testId) {
+		this.testId = testId;
 	}
 }

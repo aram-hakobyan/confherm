@@ -1,7 +1,11 @@
 package fr.conferencehermes.confhermexam;
 
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -17,7 +21,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
-import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -38,6 +43,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -49,11 +55,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.VideoView;
 
 import com.androidquery.AQuery;
@@ -63,10 +67,12 @@ import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
+import fr.conferencehermes.confhermexam.parser.Event;
+import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.parser.Question;
-import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
@@ -110,12 +116,16 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	MediaPlayer mediaPlayer;
 	private int resumPlaying = 0;
 	DatabaseHelper db;
+	private int resumPlayingSound = 0;
+	private int resumPlayingVideo = 0;
+	private CounterClass timer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_question_response);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		aq = new AQuery(ExaminationActivity.this);
@@ -146,8 +156,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		ennouncer.setOnClickListener(this);
 		valider.setOnClickListener(this);
 
-		CounterClass timer = new CounterClass(Utilities.readLong(
-				ExaminationActivity.this, "millisUntilFinished", 7200000), 1000);
+		timer = new CounterClass(DataHolder.getInstance()
+				.getMillisUntilFinished(), 1000);
 		timer.start();
 
 		startTime = SystemClock.uptimeMillis();
@@ -215,6 +225,9 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		}
 
+		Exam exam = db.getExam(exam_id);
+		exam.setIsAlreadyPassed(1);
+		db.updateExam(exam);
 	}
 
 	private void selectQuestion(Question q, int position) {
@@ -398,8 +411,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
 
+		Event event = db.getEvent(event_id);
+
 		data.put("event_id", event_id);
-		data.put("exam_id", exam_id);
+		data.put("exam_id", event.getTestId());
 		data.put("exercise_id", exercise_id);
 		data.put("is_send", 0);
 		data.put("type", exercise.getType());
@@ -549,7 +564,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.validerBtn:
 			try {
-				if (isValidAnswer()) {
+				// if (isValidAnswer())
+				{
 					saveValidation();
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
@@ -564,10 +580,11 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						selectQuestion(questions.get(currentQuestionId),
 								currentQuestionId);
 					}
-				} else
-					Toast.makeText(ExaminationActivity.this,
-							"Please select at least one answer.",
-							Toast.LENGTH_SHORT).show();
+				} /*
+				 * else Toast.makeText(ExaminationActivity.this,
+				 * "Please select at least one answer.",
+				 * Toast.LENGTH_SHORT).show();
+				 */
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -626,13 +643,14 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(updatedTime)));
 
-			// temps2.setText("" + mins + ":" + String.format("%02d", secs));
+			// temps1.setText("" + mins + ":" + String.format("%02d", secs));
 			temps2.setText("Temps exam - " + hms);
 			customHandler.postDelayed(this, 0);
 
 		}
 
 	};
+
 	private Dialog dialog = null;
 
 	public void openDialog(HashMap<String, String> files, int from) {
@@ -647,7 +665,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		final TextView text = (TextView) dialog
 				.findViewById(R.id.ennouncerText);
 
-		if (files.get("image") == null) {
+		if (files.get("image").isEmpty()) {
 			button1.setBackgroundResource(R.drawable.ic_camera_gray);
 			button1.setEnabled(false);
 			button1.setAlpha(0.5f);
@@ -656,7 +674,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			button1.setEnabled(true);
 			button1.setAlpha(1.0f);
 		}
-		if (files.get("sound") == null) {
+		if (files.get("sound").isEmpty()) {
 			button2.setBackgroundResource(R.drawable.ic_sound_gray);
 			button2.setEnabled(false);
 			button2.setAlpha(0.5f);
@@ -665,7 +683,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			button2.setEnabled(true);
 			button2.setAlpha(1f);
 		}
-		if (files.get("video") == null) {
+		if (files.get("video").isEmpty()) {
 			button3.setBackgroundResource(R.drawable.ic_video_gray);
 			button3.setEnabled(false);
 			button3.setAlpha(0.5f);
@@ -678,13 +696,11 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		final String IMAGE_URL = files.get("image");
 		final String AUDIO_URL = files.get("sound");
 		final String VIDEO_URL = files.get("video");
-
+		VIDEO_URL.replaceAll(" ", "%20");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
-		final ImageView audioImage = (ImageView) dialog
-				.findViewById(R.id.sound_icon);
+
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		final MediaController mc = new MediaController(ExaminationActivity.this);
 
 		final LinearLayout soundControlLayout = (LinearLayout) dialog
 				.findViewById(R.id.sound_control_layout);
@@ -694,6 +710,119 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				.findViewById(R.id.sound_pause);
 		final ImageView soundReplay = (ImageView) dialog
 				.findViewById(R.id.sound_replay);
+
+		final LinearLayout videoControlLayout = (LinearLayout) dialog
+				.findViewById(R.id.video_control_layout);
+		final ImageView videoPlay = (ImageView) dialog
+				.findViewById(R.id.video_play);
+		final ImageView videoPause = (ImageView) dialog
+				.findViewById(R.id.video_pause);
+		final ImageView videoReplay = (ImageView) dialog
+				.findViewById(R.id.video_replay);
+
+		soundPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					if (mediaPlayer.isPlaying()) {
+						mediaPlayer.pause();
+						resumPlayingSound = mediaPlayer.getCurrentPosition();
+						soundPlay.setVisibility(View.VISIBLE);
+						soundPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		soundReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(0);
+					mediaPlayer.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (mediaPlayer.isPlaying()) {
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		soundPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					mediaPlayer.seekTo(resumPlayingSound);
+					mediaPlayer.start();
+					soundPlay.setVisibility(View.GONE);
+					soundPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+
+		videoPause.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+
+					if (video.isPlaying()) {
+						video.pause();
+
+						resumPlayingVideo = video.getCurrentPosition();
+						videoPlay.setVisibility(View.VISIBLE);
+						videoPause.setVisibility(View.GONE);
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+			}
+		});
+
+		videoReplay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(0);
+					video.start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				if (video.isPlaying()) {
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				}
+			}
+		});
+
+		videoPlay.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				try {
+					video.seekTo(resumPlayingVideo);
+					video.start();
+					videoPlay.setVisibility(View.GONE);
+					videoPause.setVisibility(View.VISIBLE);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 
 		if (AUDIO_URL != null)
 			if (!AUDIO_URL.isEmpty()) {
@@ -716,17 +845,47 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			}
 		if (VIDEO_URL != null)
 			if (!VIDEO_URL.isEmpty()) {
-				// VIDEO_URL.replaceAll(" ", "%20");
-				mc.setAnchorView(video);
 				Uri videoURI = Uri.parse(VIDEO_URL);
-				video.setMediaController(mc);
+
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
+
 			}
 
 		if (IMAGE_URL != null)
 			if (!IMAGE_URL.isEmpty()) {
-				img.setImageURI(Uri.parse(new File(IMAGE_URL).toString()));
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							URL url = new URL(IMAGE_URL);
+							URLConnection conn = url.openConnection();
+							HttpURLConnection httpConn = (HttpURLConnection) conn;
+							httpConn.setRequestMethod("GET");
+							httpConn.connect();
+							if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+								InputStream inputStream = httpConn
+										.getInputStream();
+								final Bitmap bitmap = BitmapFactory
+										.decodeStream(inputStream);
+								inputStream.close();
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										img.setImageBitmap(bitmap);
+										img.refreshDrawableState();
+										img.invalidate();
+									}
+								});
+
+							}
+						} catch (MalformedURLException e1) {
+							e1.printStackTrace();
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+				}).start();
 			}
 
 		switch (from) {
@@ -735,8 +894,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			text.setVisibility(View.VISIBLE);
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.GONE);
-			audioImage.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			soundControlLayout.setVisibility(View.GONE);
 
 			break;
@@ -755,78 +914,30 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			}
 			img.setVisibility(View.VISIBLE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.GONE);
-			audioImage.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 			break;
 		case 2:
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.GONE);
-			mc.setVisibility(View.VISIBLE);
-			audioImage.setVisibility(View.VISIBLE);
+			videoControlLayout.setVisibility(View.GONE);
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.VISIBLE);
+
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
 			try {
 				mediaPlayer.seekTo(0);
 				mediaPlayer.start();
+				soundPlay.setVisibility(View.GONE);
+				soundPause.setVisibility(View.VISIBLE);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-
-			soundPause.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						if (mediaPlayer.isPlaying()) {
-							mediaPlayer.pause();
-							resumPlaying = mediaPlayer.getCurrentPosition();
-							soundPlay.setVisibility(View.VISIBLE);
-							soundPause.setVisibility(View.GONE);
-						}
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-				}
-			});
-
-			soundReplay.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						mediaPlayer.seekTo(0);
-						mediaPlayer.start();
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-
-					if (mediaPlayer.isPlaying()) {
-						soundPlay.setVisibility(View.GONE);
-						soundPause.setVisibility(View.VISIBLE);
-					}
-				}
-			});
-
-			soundPlay.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					try {
-						mediaPlayer.seekTo(resumPlaying);
-						mediaPlayer.start();
-						soundPlay.setVisibility(View.GONE);
-						soundPause.setVisibility(View.VISIBLE);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
 
 			break;
 		case 3:
@@ -839,16 +950,18 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			}
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
-			mc.setVisibility(View.GONE);
-			audioImage.setVisibility(View.GONE);
+			videoControlLayout.setVisibility(View.VISIBLE);
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 
 			try {
+
 				video.start();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
+
 			break;
 		default:
 			break;
@@ -872,21 +985,22 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						}
 						img.setVisibility(View.VISIBLE);
 						video.setVisibility(View.GONE);
-						mc.setVisibility(View.GONE);
-						audioImage.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.GONE);
+
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 					}
 				});
+
 		dialog.findViewById(R.id.button2).setOnClickListener(
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.GONE);
-						mc.setVisibility(View.VISIBLE);
+						videoControlLayout.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
-						audioImage.setVisibility(View.VISIBLE);
+
 						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
@@ -902,6 +1016,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 					}
 				});
+
 		dialog.findViewById(R.id.button3).setOnClickListener(
 				new OnClickListener() {
 					@Override
@@ -915,8 +1030,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						}
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
-						mc.setVisibility(View.GONE);
-						audioImage.setVisibility(View.GONE);
+						videoControlLayout.setVisibility(View.VISIBLE);
+
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 
@@ -925,6 +1040,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
+
 					}
 				});
 
@@ -1089,8 +1205,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		@Override
 		public void onTick(long millisUntilFinished) {
 			long millis = millisUntilFinished;
-			Utilities.writeLong(ExaminationActivity.this,
-					"millisUntilFinished", millisUntilFinished);
+			DataHolder.getInstance()
+					.setMillisUntilFinished(millisUntilFinished);
 			String hms = String.format(
 					"%02d:%02d:%02d",
 					TimeUnit.MILLISECONDS.toHours(millis),
@@ -1125,6 +1241,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						});
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		alertDialog.show();
+	}
+
+	@Override
+	protected void onStop() {
+		timer.cancel();
+		super.onStop();
 	}
 
 }

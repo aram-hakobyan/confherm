@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -76,7 +77,7 @@ public class ExamsAdapter extends BaseAdapter {
 			}
 
 			Calendar calendar = new GregorianCalendar(
-					TimeZone.getTimeZone("France"));
+					TimeZone.getTimeZone("Europe/Paris"));
 			calendar.setTimeInMillis(exam.getStartDate() * 1000);
 			final String startTimeString = Utilities.timeConverter(calendar
 					.get(Calendar.HOUR_OF_DAY))
@@ -95,25 +96,38 @@ public class ExamsAdapter extends BaseAdapter {
 
 			int status = exam.getStatus();
 			if (status == 1) {
-				holder.status.setText(c.getResources().getString(
-						R.string.examen_avaible));
+				holder.status.setText("Status OK");
 				holder.button.setBackgroundResource(R.drawable.exam_checked);
 			} else if (status == 2) {
 				holder.status.setText("Need update");
 				holder.button.setBackgroundResource(R.drawable.exam_refresh);
 			} else if (status == 3) {
 				holder.status.setText(c.getResources().getString(
-						R.string.examen_non_avaible));
+						R.string.examen_avaible));
 				holder.button.setBackgroundResource(R.drawable.exam_download);
-
 			} else if (status == 4) {
-				holder.status.setText("Non disponible");
+				holder.status.setText(c.getResources().getString(
+						R.string.examen_not_avaible));
 				holder.button.setBackgroundResource(R.drawable.exam_x);
 			}
+
+			if (canStartExam(exam))
+				view.setBackgroundColor(c.getResources().getColor(
+						R.color.app_main_color));
+			else
+				view.setBackgroundColor(Color.parseColor("#eeeeee"));
 
 		}
 
 		return view;
+
+	}
+
+	public boolean canStartExam(Exam e) {
+		Calendar calendar = new GregorianCalendar(
+				TimeZone.getTimeZone("Europe/Paris"));
+		long currentTime = calendar.getTimeInMillis() / 1000;
+		return e.getStartDate() < currentTime && e.getEndDate() > currentTime;
 
 	}
 

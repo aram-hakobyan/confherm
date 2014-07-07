@@ -36,6 +36,7 @@ public class MyProfileFragment extends Fragment {
 	private SharedPreferences groupsShared;
 	private SharedPreferences.Editor groupsEditor;
 
+
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -82,6 +83,9 @@ public class MyProfileFragment extends Fragment {
 
 				logoutPrefs = getActivity().getSharedPreferences("logoutPrefs",
 						Context.MODE_PRIVATE);
+
+
+
 				boolean b = logoutPrefs.getBoolean(
 						Constants.LOGOUT_SHAREDPREFS_KEY, false);
 				Log.i("Utils", b + "");
@@ -102,7 +106,7 @@ public class MyProfileFragment extends Fragment {
 				profileEditor.putString("profileEmail", pData.getEmailAdress());
 			}
 
-			if (pData != null && pData.getGroups().size() == 0) {
+			if (pData == null || pData.getGroups().size() == 0) {
 				pGroups.setText(groups + "no groups available");
 			} else {
 				HashMap<String, String> groupsHashmap = pData.getGroups();

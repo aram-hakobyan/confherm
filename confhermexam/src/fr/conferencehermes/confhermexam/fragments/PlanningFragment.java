@@ -3,7 +3,6 @@ package fr.conferencehermes.confhermexam.fragments;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -13,6 +12,7 @@ import org.json.JSONObject;
 
 import android.app.Dialog;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -36,6 +36,8 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.connection.NetworkReachability;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.TimeSlot;
 import fr.conferencehermes.confhermexam.util.Constants;
@@ -50,6 +52,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 	private TextView MON, TUE, WED, THU, FRI, SAT, SUN;
 	private AQuery aq;
 	private RelativeLayout calendarContainer;
+	private int eventStatus = 0;;
 	private static final long WEEK = 7 * 24 * 3600;
 	private static final long DAY_MILLS = 24 * 3600 * 1000;
 
@@ -88,7 +91,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		SAT = (TextView) fragment.findViewById(R.id.textView6);
 		SUN = (TextView) fragment.findViewById(R.id.textView7);
 
-		Calendar cal = new GregorianCalendar(TimeZone.getTimeZone("France"));
+		Calendar cal = Calendar.getInstance(TimeZone
+				.getTimeZone("Europe/Paris"));
 		cal.set(Calendar.HOUR_OF_DAY, 7);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
@@ -113,8 +117,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			Toast.makeText(
 					getActivity().getApplicationContext(),
 					getActivity().getResources().getString(
-							R.string.no_internet_connection), Toast.LENGTH_LONG)
-					.show();
+							R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
 		}
 		return fragment;
 	}
@@ -140,8 +144,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 										&& json.get("data") != null) {
 									timeSlotsArray = JSONParser
 											.parsePlannig(json);
-									Calendar cal = new GregorianCalendar(
-											TimeZone.getTimeZone("France"));
+									Calendar cal = Calendar.getInstance(TimeZone
+											.getTimeZone("Europe/Paris"));
 									if (!timeSlotsArray.isEmpty()) {
 										for (int i = 0; i < timeSlotsArray
 												.size(); i++) {
@@ -150,7 +154,6 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 											drawTimeSlot(
 													timeSlotsArray.get(i),
 													cal.get(Calendar.DAY_OF_WEEK));
-
 										}
 
 									}
@@ -166,8 +169,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 	}
 
 	private void setCalendarHeader(long mills) {
-		Calendar calendar = new GregorianCalendar(
-				TimeZone.getTimeZone("France"));
+		Calendar calendar = Calendar.getInstance(TimeZone
+				.getTimeZone("Europe/Paris"));
 		calendar.setTimeInMillis(mills);
 		MON.setText("LUN "
 				+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
@@ -207,16 +210,17 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 
 	private void drawTimeSlot(final TimeSlot timeSlot, int day) {
 
-		Calendar calendar = new GregorianCalendar(
-				TimeZone.getTimeZone("France"));
+		Calendar calendar = Calendar.getInstance(TimeZone
+				.getTimeZone("Europe/Paris"));
 		calendar.setTimeInMillis(timeSlot.getStart_date() * 1000);
 		final String startTimeString = Utilities.timeConverter(calendar
 				.get(Calendar.HOUR_OF_DAY))
 				+ ":"
 				+ Utilities.timeConverter(calendar.get(Calendar.MINUTE));
 		int STARTING_HOUR = calendar.get(Calendar.HOUR_OF_DAY);
-		if (STARTING_HOUR < 6 || STARTING_HOUR > 22)
-			return;
+		/*
+		 * if (STARTING_HOUR < 6 || STARTING_HOUR > 22) return;
+		 */
 		calendar.setTimeInMillis(timeSlot.getEnd_date() * 1000);
 		final String endTimeString = Utilities.timeConverter(calendar
 				.get(Calendar.HOUR_OF_DAY))
@@ -279,7 +283,9 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
 				TEXTVIEW_WIDTH, TEXTVIEW_HEIGHT);
 		params.leftMargin = LEFT_MARGIN;
-		params.topMargin = TOP_MARGIN + LAYOUT_TOP_MARGIN;
+		params.topMargin = TOP_MARGIN + LAYOUT_TOP_MARGIN > LAYOUT_TOP_MARGIN
+				- txt1.getHeight() / 2 ? TOP_MARGIN + LAYOUT_TOP_MARGIN
+				: LAYOUT_TOP_MARGIN - txt1.getHeight() / 2;
 
 		timeSlotText.setOnClickListener(new OnClickListener() {
 			@Override
@@ -307,14 +313,14 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		Button download = (Button) dialog.findViewById(R.id.downloadBtn);
 		Button close = (Button) dialog.findViewById(R.id.buttonClose);
 
-		title.setText(ts.getTest_name());
+		title.setText(ts.getEvent_name() + "/" + ts.getTest_name());
 		date.setText(new Date(ts.getStart_date() * 1000).toString());
 		room.setText(ts.getRoom());
 		adress.setText(ts.getPlace());
 		city.setText(ts.getAcademy());
 
-		Calendar calendar = new GregorianCalendar(
-				TimeZone.getTimeZone("France"));
+		Calendar calendar = Calendar.getInstance(TimeZone
+				.getTimeZone("Europe/Paris"));
 		calendar.setTimeInMillis(ts.getStart_date() * 1000);
 		String DAY_TEXT = "";
 		switch (calendar.get(Calendar.DAY_OF_WEEK)) {
@@ -347,42 +353,67 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		hour.setText("De " + startTime + " a " + endTime);
 
 		switch (ts.getStatus()) {
-		case 1:
-			status.setText("Telechargement: Disponible");
-			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.white_exam_checked),
-					null, null, null);
-			download.setEnabled(true);
-			break;
-		case 2:
-			status.setText("Telechargement: Need update");
-			download.setEnabled(true);
-			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.white_refresh), null,
-					null, null);
-			break;
+
 		case 3:
-			status.setText("Telechargement: Not downloaded yet");
-			download.setEnabled(true);
-			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.white_download),
-					null, null, null);
+			DatabaseHelper db = new DatabaseHelper(getActivity());
+			Event event = null;
+			ArrayList<Event> events = db.getAllEvents();
+			for (int i = 0; i < events.size(); i++) {
+				if (ts.getEvent_id() == events.get(i).getId())
+					event = events.get(i);
+			}
+
+			if (event != null) { // event is downloaded
+				if (event.getLastEditTime() >= ts.getLast_edit_time()) {
+					status.setText("Telechargement: OK");
+					download.setEnabled(true);
+					download.setText("Open exams");
+					download.setCompoundDrawablesWithIntrinsicBounds(
+							getResources().getDrawable(
+									R.drawable.exam_checked_d), null, null,
+							null);
+					eventStatus = 1;
+				} else {
+					status.setText("Telechargement: Need update");
+					download.setEnabled(true);
+					download.setCompoundDrawablesWithIntrinsicBounds(
+							getResources().getDrawable(
+									R.drawable.exam_refresh_d), null, null,
+							null);
+					eventStatus = 2;
+				}
+			} else {
+				status.setText("Telechargement: Not downloaded yet");
+				download.setEnabled(true);
+				download.setCompoundDrawablesWithIntrinsicBounds(getResources()
+						.getDrawable(R.drawable.white_download_d), null, null,
+						null);
+				eventStatus = 3;
+			}
+
 			break;
 		case 4:
-			status.setText("Telechargement: Non disponible");
+			status.setText("Telechargement: "
+					+ getResources().getString(R.string.examen_not_avaible));
 			download.setEnabled(false);
-			status.setCompoundDrawables(
-					getResources().getDrawable(R.drawable.exam_x), null, null,
-					null);
+			download.setCompoundDrawablesWithIntrinsicBounds(getResources()
+					.getDrawable(R.drawable.exam_x_d), null, null, null);
+			eventStatus = 4;
 			break;
 
+		default:
+			break;
 		}
 
 		download.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dialog.dismiss();
-				openExams(ts);
+				if (eventStatus == 2 || eventStatus == 3)
+					openDownloads(ts, eventStatus);
+				else if (eventStatus == 1) {
+					openExams();
+				}
 			}
 		});
 
@@ -404,9 +435,17 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 
 	}
 
-	private void openExams(TimeSlot ts) {
+	private void openExams() {
+		ExamineFragment fragobj = new ExamineFragment();
+		FragmentManager fm = getActivity().getSupportFragmentManager();
+		FragmentTransaction fragmentTransaction = fm.beginTransaction();
+		fragmentTransaction.replace(R.id.fragmentContainer, fragobj);
+		fragmentTransaction.commit();
+	}
+
+	private void openDownloads(TimeSlot ts, int eventStatus) {
 		Bundle bundle = new Bundle();
-		bundle.putInt("timeslot_id", ts.getTimeslot_id());
+		bundle.putInt("event_id", ts.getEvent_id());
 		DownloadsFragment fragobj = new DownloadsFragment();
 		fragobj.setArguments(bundle);
 		FragmentManager fm = getActivity().getSupportFragmentManager();

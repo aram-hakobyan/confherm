@@ -89,7 +89,7 @@ public class NotesActivity extends Activity {
 
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
-
+	
 		listviewEx.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -232,7 +232,7 @@ public class NotesActivity extends Activity {
 											adapterEx = new ExerciseAdapter(
 													NotesActivity.this, listEx);
 											listviewEx.setAdapter(adapterEx);
-
+											
 											teacherName
 													.setText(ExamExercise.created_by);
 											examName.setText(ExamExercise.exam_name);

@@ -34,7 +34,7 @@ public class ExamJsonParser {
 		event.setName(obj.getString("event_name"));
 		event.setTestId(obj.getInt("test_id"));
 		event.setValidation(obj.getInt("validation"));
-		event.setCreationDate(obj.getLong("last_edit_time"));
+		event.setLastEditTime(obj.getLong("last_edit_time"));
 		return event;
 	}
 
@@ -49,9 +49,14 @@ public class ExamJsonParser {
 				e.setId(obj.getInt("exam_id"));
 				e.setEventId(obj.getInt("event_id"));
 				e.setTitle(obj.getString("exam_name"));
-				e.setEvent_name(obj.getString("event_name"));  
+
+				e.setEvent_name(obj.getString("event_name"));
+
 				e.setStartDate(obj.getLong("start_date"));
 				e.setEndDate(obj.getLong("end_date"));
+				e.setStatus(1);
+				e.setCategoryType(obj.getString("type"));
+				e.setLastEditTime(System.currentTimeMillis() / 1000);
 				e.setPassword(obj.getString("password"));
 
 				ArrayList<Exercise> exercises = new ArrayList<Exercise>();

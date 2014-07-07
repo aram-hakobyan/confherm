@@ -44,7 +44,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	private SharedPreferences.Editor logoutEditor;
 	private SharedPreferences logoutPrefs;
 	public static Context context;
-
+	boolean logout ;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,7 +67,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	
 
 			logoutPrefs = getSharedPreferences("logoutPrefs", MODE_PRIVATE);
-			boolean logout = logoutPrefs.getBoolean(
+		   logout = logoutPrefs.getBoolean(
 					Constants.LOGOUT_SHAREDPREFS_KEY, false);
 			Log.i("Utils1111", logout + "");
 			if (logout == false) {
@@ -124,7 +124,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		final String uname =  username.getText().toString().trim();
 		final String pass =  password.getText().toString().trim();
 		RequestCreator creator = new RequestCreator();
-		if (restoredAuthKey != null) {
+		if (restoredAuthKey != null && logout != true) {
 			logonOrAuth = Constants.SERVER_URL_AUTH;
 			params = creator.createAppropriateMapRequest("auth_key",
 					restoredAuthKey);

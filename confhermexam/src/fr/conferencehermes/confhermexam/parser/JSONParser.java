@@ -74,6 +74,7 @@ public class JSONParser {
 					e.setStartDate(obj.getLong("start_date"));
 					e.setEndDate(obj.getLong("end_date"));
 					e.setStatus(obj.getInt("status"));
+					e.setLastEditTime(obj.getLong("last_edit_time"));
 					exams.add(e);
 				}
 			}
@@ -256,7 +257,6 @@ public class JSONParser {
 
 				JSONObject data = json.getJSONObject("data");
 				int duration = data.getInt("duration");
-				DataHolder.getInstance().setTrainingDuration(duration * 1000);
 
 				JSONArray exObj = data.getJSONArray("exercises");
 				for (int i = 0; i < exObj.length(); i++) {
@@ -265,6 +265,7 @@ public class JSONParser {
 
 					t.setExercise_id(obj.getInt("exercise_id"));
 					t.setTitle(obj.getString("title"));
+					t.setDuration(duration * 1000);
 
 					exercises.add(t);
 
@@ -526,8 +527,7 @@ public class JSONParser {
 
 				JSONObject data = json.getJSONObject("data");
 
-				JSONArray corrections = data
-						.getJSONArray("question_answers");
+				JSONArray corrections = data.getJSONArray("question_answers");
 
 				for (int i = 0; i < corrections.length(); i++) {
 					Correction c = new Correction();
@@ -548,13 +548,12 @@ public class JSONParser {
 		}
 		return correctionsList;
 	}
-	
+
 	public static ArrayList<TimeSlot> parsePlannig(JSONObject planJson) {
 		ArrayList<TimeSlot> planningResult = new ArrayList<TimeSlot>();
 		try {
 			if (planJson.has(Constants.KEY_DATA)
 					&& planJson.get(Constants.KEY_DATA) != null) {
-				// JSONObject obj = rJson.getJSONObject(Constants.KEY_DATA);
 				JSONArray data = planJson.getJSONArray(Constants.KEY_DATA);
 				if (data.length() != 0) {
 					for (int i = 0; i < data.length(); i++) {
@@ -562,13 +561,16 @@ public class JSONParser {
 						TimeSlot r = new TimeSlot();
 						r.setTimeslot_id(gObj.getInt("timeslot_id"));
 						r.setTest_id(gObj.getInt("test_id"));
+						r.setEvent_id(gObj.getInt("event_id"));
 						r.setTest_name(gObj.getString("test_name"));
+						r.setEvent_name(gObj.getString("event_name"));
 						r.setAcademy(gObj.getString("academy"));
 						r.setStart_date(gObj.getLong("start_date"));
 						r.setEnd_date(gObj.getLong("end_date"));
 						r.setPlace(gObj.getString("place"));
 						r.setRoom(gObj.getString("room"));
 						r.setStatus(gObj.getInt("status"));
+						r.setLast_edit_time(gObj.getLong("last_edit_time"));
 						planningResult.add(r);
 					}
 				}
@@ -609,33 +611,37 @@ public class JSONParser {
 		return corExercises;
 	}
 
-	public static ArrayList<CorrectionsExercise> parseCorrectionsQuestionAnswers(
+	public static ArrayList<CorrectionAnswer> parseCorrectionAnswers(
 			JSONObject json) {
-		ArrayList<CorrectionsExercise> corExercises = new ArrayList<CorrectionsExercise>();
+		ArrayList<CorrectionAnswer> correctionsList = new ArrayList<CorrectionAnswer>();
 
 		try {
 			if (json.has(Constants.KEY_DATA)
 					&& json.get(Constants.KEY_DATA) != null) {
 
-				JSONArray exObj = json.getJSONArray("data");
-				for (int i = 0; i < exObj.length(); i++) {
-					CorrectionsExercise t = new CorrectionsExercise();
-					JSONObject obj = exObj.getJSONObject(i);
+				JSONObject data = json.getJSONObject("data");
 
-					t.setExam_id(obj.getInt("exam_id"));
-					t.setExercise_id(obj.getInt("exercise_id"));
-					t.setName(obj.getString("name"));
+				JSONArray corrections = data.getJSONArray("question_answers");
 
-					corExercises.add(t);
-
+				for (int i = 0; i < corrections.length(); i++) {
+					CorrectionAnswer c = new CorrectionAnswer();
+					JSONObject obj = corrections.getJSONObject(i);
+					c.setQuestionId(obj.getInt("question_id"));
+					c.setQuestionType(obj.getInt("question_type"));
+					ArrayList<String> answersArray = new ArrayList<String>();
+					JSONArray answers = obj.getJSONArray("answers");
+					for (int j = 0; j < answers.length(); j++) {
+						answersArray.add(String.valueOf(answers.get(j)));
+					}
+					c.setAnswers(answersArray);
+					correctionsList.add(c);
 				}
-
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
 
-		return corExercises;
+		return correctionsList;
 	}
 
 }
