@@ -41,6 +41,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -1044,8 +1046,7 @@ public class QuestionResponseActivity extends Activity implements
 				.findViewById(R.id.sound_icon);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
-		 mc = new
-		 MediaController(QuestionResponseActivity.this);
+		mc = new MediaController(QuestionResponseActivity.this);
 
 		final LinearLayout soundControlLayout = (LinearLayout) dialog
 				.findViewById(R.id.sound_control_layout);
@@ -1078,15 +1079,15 @@ public class QuestionResponseActivity extends Activity implements
 		if (VIDEO_URL != null)
 			if (!VIDEO_URL.isEmpty()) {
 				Uri videoURI = Uri.parse(VIDEO_URL);
+				//
+				// View v = (View) dialog.findViewById(R.id.videoMedioControls);
+				// mc = new MediaController(this);
+				// mc.setAnchorView(v);
 
-				View v = (View) dialog.findViewById(R.id.videoMedioControls);
-				mc = new MediaController(this);
-				mc.setAnchorView(v);
-
-				video.setMediaController(mc);
+				// video.setMediaController(mc);
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
-				v.bringToFront();
+
 			}
 
 		if (IMAGE_URL != null)
@@ -1245,6 +1246,10 @@ public class QuestionResponseActivity extends Activity implements
 
 			try {
 
+				mc = new MediaController(this);
+				;
+				mc.setAnchorView(video);
+				video.setMediaController(mc);
 				video.start();
 			} catch (Exception e) {
 				e.printStackTrace();

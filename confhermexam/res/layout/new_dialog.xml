@@ -117,4 +117,11 @@
             android:background="@drawable/ic_video" />
     </LinearLayout>
 
+    <MediaController
+        android:id="@+id/mediaController1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="22dp" >
+    </MediaController>
+
 </RelativeLayout>
