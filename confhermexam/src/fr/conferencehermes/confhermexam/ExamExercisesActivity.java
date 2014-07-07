@@ -62,8 +62,18 @@ public class ExamExercisesActivity extends FragmentActivity implements
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 				int e_id = exercises.get(position).getId();
-				if (!TIMER_PAUSED)
-					openExercise(e_id);
+				String key = "exercise_passed" + String.valueOf(e_id);
+				if (!Utilities.readBoolean(ExamExercisesActivity.this, key,
+						false)) {
+					if (!TIMER_PAUSED)
+						openExercise(e_id);
+				} else {
+					Utilities.showAlertDialog(
+							ExamExercisesActivity.this,
+							"Attention",
+							getResources().getString(
+									R.string.exam_already_passed_alert));
+				}
 			}
 		});
 
@@ -73,6 +83,9 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		String[] data = new String[exercises.size()];
 		for (int i = 0; i < exercises.size(); i++) {
 			data[i] = exercises.get(i).getName();
+			String key = "exercise_passed"
+					+ String.valueOf(exercises.get(i).getId());
+			Utilities.writeBoolean(ExamExercisesActivity.this, key, false);
 		}
 
 		DataHolder.getInstance().setMillisUntilFinished(0);
@@ -117,6 +130,12 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			}
 		});
 
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
 	}
 
 	private void updateTimer() {

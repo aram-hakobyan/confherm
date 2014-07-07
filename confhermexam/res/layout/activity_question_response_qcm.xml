@@ -207,7 +207,7 @@
         android:background="@drawable/blue_bg"
         android:gravity="center"
         android:padding="5dp"
-        android:text="ENNOUNCER"
+        android:text="ENONCÉ"
         android:textColor="@android:color/white" />
 
     <ListView

@@ -1,11 +1,6 @@
 package fr.conferencehermes.confhermexam;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -68,7 +63,6 @@ import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Event;
-import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.parser.Question;
@@ -115,7 +109,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private LinearLayout checkBoxLayout;
 	MediaPlayer mediaPlayer;
 	private int resumPlaying = 0;
-	DatabaseHelper db;
 	private int resumPlayingSound = 0;
 	private int resumPlayingVideo = 0;
 	private CounterClass timer;
@@ -180,13 +173,19 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		});
 
-		db = new DatabaseHelper(ExaminationActivity.this);
+		DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
 
 		exercise = db.getExercise(exercise_id);
+		// exercise.setExerciseIsAlreadyPassed(1);
+		// db.updateExercise(exercise);
 		exerciseFiles = db.getExerciseFile(exercise_id);
 		if (exercise.getExerciseType() == 2) {
 			ennouncer.setVisibility(View.GONE);
 		}
+		db.close();
+
+		String key = "exercise_passed" + String.valueOf(exercise_id);
+		Utilities.writeBoolean(ExaminationActivity.this, key, true);
 
 		questions = db.getAllQuestionsByExerciseId(exercise_id);
 		adapter = new QuestionsAdapter(ExaminationActivity.this, questions);
@@ -240,9 +239,11 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			}
 		}
 
+		DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
 		currentQuestionId = position;
 		currentQuestion = q;
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
+		db.close();
 
 		answersLayout.removeAllViews();
 		correctionsLayout.removeAllViews();
@@ -412,6 +413,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
 
+		DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
 		Event event = db.getEvent(event_id);
 
 		data.put("event_id", event_id);
@@ -437,17 +439,17 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			transmitter.execute(object);
 			finish();
 		} else {
-			DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
 			ExerciseAnswer exerciseAnswer = new ExerciseAnswer();
 			exerciseAnswer.setExerciseId(exercise.getId());
 			exerciseAnswer.setExamId(exam_id);
 			exerciseAnswer.setEventId(event_id);
 			exerciseAnswer.setJsonString(data.toString());
 			db.createExerciseAnswer(exerciseAnswer);
-			db.closeDB();
 			showAlertDialog(ExaminationActivity.this, "Attention",
 					"No internet connection. Exam will be submitted after connection.");
 		}
+
+		db.closeDB();
 
 	}
 
@@ -571,7 +573,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
 					if (areAllAnswersValidated()) {
-						abandonner.setText("SUBMIT");
+						abandonner.setText("ENVOYER");
 						valider.setVisibility(View.GONE);
 						SEND_DATA = true;
 					}
@@ -592,16 +594,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			validAnswers.put(currentQuestionId, true);
 			break;
 		case R.id.abandonner:
-			try {
-				if (SEND_DATA)
-					sendAnswers();
-				else
-					showAlertDialogWhenFinishPressed("Attention",
-							getResources()
-									.getString(R.string.finish_alert_text));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			if (SEND_DATA)
+				showAlertDialogWhenFinishPressed("Attention", getResources()
+						.getString(R.string.finish_alert_text));
+			else
+				showAlertDialogWhenFinishPressed("Attention", getResources()
+						.getString(R.string.finish_alert_text_abandonner));
 			break;
 		case R.id.ennouncer:
 			if (exerciseFiles != null)
@@ -1201,6 +1199,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				.setCancelable(false)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						try {
+							sendAnswers();
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 						finish();
 					}
 				})

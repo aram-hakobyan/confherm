@@ -3,19 +3,14 @@ package fr.conferencehermes.confhermexam;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
-import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -23,9 +18,7 @@ import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.EditText;
 import android.widget.GridView;
-import android.widget.TextView;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
@@ -33,10 +26,7 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.parser.CorrectionsExercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
-import fr.conferencehermes.confhermexam.parser.TrainingExercise;
 import fr.conferencehermes.confhermexam.util.Constants;
-import fr.conferencehermes.confhermexam.util.DataHolder;
-import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class CorrectionExercisesActivity extends FragmentActivity implements
 		OnClickListener {

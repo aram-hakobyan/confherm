@@ -9,6 +9,7 @@ public class Exercise {
 	private String name;
 	private String type;
 	private int exerciseType;
+	private int exerciseIsAlreadyPassed = 0;
 	private String text;
 	private String intro;
 	private String teacher;
@@ -162,6 +163,14 @@ public class Exercise {
 
 	public void setExamId(int examId) {
 		this.examId = examId;
+	}
+
+	public int getExerciseIsAlreadyPassed() {
+		return exerciseIsAlreadyPassed;
+	}
+
+	public void setExerciseIsAlreadyPassed(int exerciseIsAlreadyPassed) {
+		this.exerciseIsAlreadyPassed = exerciseIsAlreadyPassed;
 	}
 
 }

@@ -93,7 +93,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 
 		Calendar cal = Calendar.getInstance(TimeZone
 				.getTimeZone("Europe/Paris"));
-		cal.set(Calendar.HOUR_OF_DAY, 7);
+		cal.set(Calendar.HOUR_OF_DAY, 0);
 		cal.set(Calendar.MINUTE, 0);
 		cal.set(Calendar.SECOND, 0);
 		cal.set(Calendar.MILLISECOND, 0);
@@ -101,7 +101,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		cal.set(Calendar.DAY_OF_WEEK, cal.getFirstDayOfWeek());
 		currentTime = cal.getTimeInMillis() / 1000;
 		cal.add(Calendar.WEEK_OF_YEAR, 1);
-		currentTimeAddWeek = cal.getTimeInMillis() / 1000;
+		currentTimeAddWeek = cal.getTimeInMillis() / 1000 - 2 * 3600;
 
 		fragment.findViewById(R.id.buttonPrevious).setOnClickListener(this);
 		fragment.findViewById(R.id.buttonNext).setOnClickListener(this);
@@ -241,8 +241,9 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		timeSlotText.setTextColor(Color.WHITE);
 		timeSlotText.setGravity(Gravity.CENTER);
 
-		timeSlotText.setText(startTimeString + " - " + endTimeString + "\n"
-				+ timeSlot.getTest_name());
+		timeSlotText.setText(startTimeString + " - " + endTimeString + "\n");
+		if (!timeSlot.getTest_name().equalsIgnoreCase("null"))
+			timeSlotText.append(timeSlot.getTest_name());
 
 		RelativeLayout calendarMenu = (RelativeLayout) fragment
 				.findViewById(R.id.calendarMenu);

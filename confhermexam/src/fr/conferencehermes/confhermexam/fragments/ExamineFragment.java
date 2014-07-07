@@ -83,8 +83,9 @@ public class ExamineFragment extends Fragment {
 				if (password != null) { // exam is downloaded
 					if (clickedExam.getStatus() == 1) {
 						if (canStartExam(clickedExam)) {
-							if (password.isEmpty()) {
-								if (clickedExam.getIsAlreadyPassed() == 0) {
+							if (clickedExam.getIsAlreadyPassed() == 0) {
+								if (password.isEmpty()) {
+
 									Intent intent = new Intent(getActivity(),
 											ExamExercisesActivity.class);
 									intent.putExtra("exam_id",
@@ -92,18 +93,19 @@ public class ExamineFragment extends Fragment {
 									intent.putExtra("event_id",
 											clickedExam.getEventId());
 									startActivity(intent);
+									getActivity().finish();
 								} else {
-									Utilities
-											.showAlertDialog(
-													getActivity(),
-													"Attention",
-													getResources()
-															.getString(
-																	R.string.exam_already_passed_alert));
+									showPasswordAlert(clickedExam.getId(),
+											clickedExam.getEventId(), password);
 								}
 							} else {
-								showPasswordAlert(clickedExam.getId(),
-										clickedExam.getEventId());
+								Utilities
+										.showAlertDialog(
+												getActivity(),
+												"Attention",
+												getResources()
+														.getString(
+																R.string.exam_already_passed_alert));
 							}
 						} else {
 							Utilities.showAlertDialog(getActivity(),
@@ -178,6 +180,11 @@ public class ExamineFragment extends Fragment {
 		return fragment;
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+	}
+
 	public boolean canStartExam(Exam e) {
 		Calendar calendar = new GregorianCalendar(
 				TimeZone.getTimeZone("Europe/Paris"));
@@ -236,7 +243,8 @@ public class ExamineFragment extends Fragment {
 		return false;
 	}
 
-	private void showPasswordAlert(final int id, final int eventId) {
+	private void showPasswordAlert(final int id, final int eventId,
+			final String password) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setTitle("Enter Password");
 
@@ -248,12 +256,15 @@ public class ExamineFragment extends Fragment {
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				if (!input.getText().toString().trim().isEmpty()) {
+				if (!input.getText().toString().trim().isEmpty()
+						&& input.getText().toString().trim()
+								.equalsIgnoreCase(password)) {
 					Intent intent = new Intent(getActivity(),
 							ExamExercisesActivity.class);
 					intent.putExtra("exam_id", id);
 					intent.putExtra("event_id", eventId);
 					startActivity(intent);
+					getActivity().finish();
 				}
 			}
 		});

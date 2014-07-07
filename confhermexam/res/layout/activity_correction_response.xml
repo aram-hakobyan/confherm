@@ -93,7 +93,7 @@
                         android:id="@+id/question"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/lorem_ipsum"
+                        android:text=""
                         android:textSize="16sp" />
                 </ScrollView>
 
@@ -241,7 +241,7 @@
                     android:background="@color/app_main_color"
                     android:gravity="center"
                     android:padding="5dp"
-                    android:text="ENNOUNCER"
+                    android:text="ENONCÉ"
                     android:textColor="@android:color/white"
                     android:textSize="23sp" />
 

@@ -1,12 +1,6 @@
 package fr.conferencehermes.confhermexam;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +16,7 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -49,7 +44,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.MediaController;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -210,7 +204,9 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			listview.getChildAt(wantedChild).setBackgroundColor(
 					getResources().getColor(R.color.app_main_color_dark));
 			for (int i = 0; i < listview.getChildCount(); i++) {
-
+				if (i != wantedChild)
+					listview.getChildAt(i).setBackgroundColor(
+							getResources().getColor(R.color.app_main_color));
 			}
 		}
 
@@ -400,8 +396,50 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			answerCount = allAnswers.size();
 		}
 
-		if (!allAnswers.isEmpty()) {
-			for (int j = 0; j < answerCount; j++) {
+		int count = answerCount;
+		if (currentQuestion.getType().equalsIgnoreCase("3")) {
+			try {
+				count = Integer.valueOf(currentQuestion.getInputCount());
+
+				for (int i = 0; i < count; i++) {
+					ImageView img = new ImageView(CorrectionActivity.this);
+					LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+							30, 30);
+					imageParams.setMargins(0, 20, 0, 0);
+
+					try {
+						for (int k = 0; k < answers.size(); k++) {
+							if (answers.get(k).getQuestionId() == currentQuestionId) {
+								ArrayList<String> answersArr = answers.get(k)
+										.getAnswers();
+
+								String answerText = answersArr.get(i);
+								// editTextsArray.get(k).setText(answerText);
+								// editTextsArray.get(k).setEnabled(false);
+
+								boolean IS_GOOD = !answerText.isEmpty();
+								if (IS_GOOD) {
+									img.setBackgroundResource(R.drawable.correction_true);
+								} else {
+									img.setBackgroundResource(R.drawable.correction_false);
+								}
+
+								break;
+							}
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					correctionsLayout.addView(img, imageParams);
+				}
+
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+		} else
+
+		if (count != 0) {
+			for (int j = 0; j < count; j++) {
 				// Current answer's id
 				String currentAnswerId = String.valueOf(allAnswers.get(j)
 						.getId());
@@ -444,6 +482,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						img.setBackgroundResource(R.drawable.correction_true);
 					} else if (CURRENT_IS_USER) {
 						img.setBackgroundResource(R.drawable.correction_false);
+					}
+
+					if (CURRENT_IS_USER) {
+						View v = mRadioGroup.getChildAt(j);
+						mRadioGroup.check(v.getId());
 					}
 
 				} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
@@ -513,34 +556,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						img.setBackgroundResource(R.drawable.correction_false);
 					}
 
-				} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-					imageParams.setMargins(0, 20, 0, 0);
-
-					try {
-						for (int i = 0; i < answers.size(); i++) {
-							if (answers.get(i).getQuestionId() == currentQuestionId) {
-								JSONObject corObj = new JSONObject(answers
-										.get(i).getAnswers().get(j));
-								String answerText = corObj.getString("name");
-								editTextsArray.get(j).setText(answerText);
-								editTextsArray.get(j).setEnabled(false);
-
-								int IS_GOOD = corObj.getInt("is_good");
-								if (IS_GOOD == 1) {
-									img.setBackgroundResource(R.drawable.correction_true);
-								} else {
-									img.setBackgroundResource(R.drawable.correction_false);
-								}
-
-								break;
-							}
-						}
-					} catch (JSONException e) {
-						e.printStackTrace();
-					} catch (IndexOutOfBoundsException e) {
-						e.printStackTrace();
-					} catch (NullPointerException e) {
-						e.printStackTrace();
+					if (CURRENT_IS_USER) {
+						LinearLayout layout = (LinearLayout) answersLayout
+								.getChildAt(j);
+						CheckBox box = (CheckBox) layout.getChildAt(0);
+						box.setChecked(true);
 					}
 
 				}
