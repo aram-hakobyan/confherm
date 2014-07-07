@@ -225,9 +225,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		}
 
-		Exam exam = db.getExam(exam_id);
-		exam.setIsAlreadyPassed(1);
-		db.updateExam(exam);
 	}
 
 	private void selectQuestion(Question q, int position) {
@@ -254,8 +251,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		title.setText("QUESTION " + String.valueOf(position + 1));
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
-		if (currentQuestionFiles != null)
-			setFileIcons(currentQuestionFiles);
+		try {
+			if (currentQuestionFiles != null)
+				setFileIcons(currentQuestionFiles);
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
 
 		currentQuestionAnswers = db.getAllAnswersByQuestionId(currentQuestion
 				.getId());
@@ -378,7 +379,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	private void setFileIcons(HashMap<String, String> files) {
-		if (files.get("image") == null) {
+		if (files.get("image").isEmpty()) {
 			btnImage.setBackgroundResource(R.drawable.ic_camera_gray);
 			btnImage.setClickable(false);
 			btnImage.setAlpha(0.5f);
@@ -387,7 +388,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			btnImage.setClickable(true);
 			btnImage.setAlpha(1f);
 		}
-		if (files.get("sound") == null) {
+		if (files.get("sound").isEmpty()) {
 			btnAudio.setBackgroundResource(R.drawable.ic_sound_gray);
 			btnAudio.setClickable(false);
 			btnAudio.setAlpha(0.5f);
@@ -396,7 +397,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			btnAudio.setClickable(true);
 			btnAudio.setAlpha(1f);
 		}
-		if (files.get("video") == null) {
+		if (files.get("video").isEmpty()) {
 			btnVideo.setBackgroundResource(R.drawable.ic_video_gray);
 			btnVideo.setClickable(false);
 			btnVideo.setAlpha(0.5f);
@@ -854,38 +855,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		if (IMAGE_URL != null)
 			if (!IMAGE_URL.isEmpty()) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							URL url = new URL(IMAGE_URL);
-							URLConnection conn = url.openConnection();
-							HttpURLConnection httpConn = (HttpURLConnection) conn;
-							httpConn.setRequestMethod("GET");
-							httpConn.connect();
-							if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-								InputStream inputStream = httpConn
-										.getInputStream();
-								final Bitmap bitmap = BitmapFactory
-										.decodeStream(inputStream);
-								inputStream.close();
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										img.setImageBitmap(bitmap);
-										img.refreshDrawableState();
-										img.invalidate();
-									}
-								});
-
-							}
-						} catch (MalformedURLException e1) {
-							e1.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}).start();
+				Bitmap bitmap = BitmapFactory.decodeFile(IMAGE_URL);
+				img.setImageBitmap(bitmap);
 			}
 
 		switch (from) {

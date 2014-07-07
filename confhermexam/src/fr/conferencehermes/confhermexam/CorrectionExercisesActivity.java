@@ -62,7 +62,7 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 					int position, long id) {
 				view.setBackgroundColor(Color.parseColor("#0d5c7c"));
 				int exersice_id = corExercises.get(position).getExercise_id();
-				int exam_id = corExercises.get(position).getExam_id();
+				int exam_id = corExercises.get(position).getEvent_id();
 				openExamCorrection(exersice_id, exam_id);
 			}
 
@@ -118,7 +118,7 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 		Intent intent = new Intent(CorrectionExercisesActivity.this,
 				CorrectionActivity.class);
 		intent.putExtra("exercise_id", exersice_id);
-		intent.putExtra("exam_id", exam_id);
+		intent.putExtra("event_id", exam_id);
 		startActivity(intent);
 	}
 

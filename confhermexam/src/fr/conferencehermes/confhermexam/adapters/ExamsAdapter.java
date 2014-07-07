@@ -96,7 +96,7 @@ public class ExamsAdapter extends BaseAdapter {
 
 			int status = exam.getStatus();
 			if (status == 1) {
-				holder.status.setText("Status OK");
+				holder.status.setText("OK");
 				holder.button.setBackgroundResource(R.drawable.exam_checked);
 			} else if (status == 2) {
 				holder.status.setText("Need update");
@@ -112,8 +112,7 @@ public class ExamsAdapter extends BaseAdapter {
 			}
 
 			if (canStartExam(exam))
-				view.setBackgroundColor(c.getResources().getColor(
-						R.color.app_main_color));
+				view.setBackgroundColor(Color.parseColor("#558abb"));
 			else
 				view.setBackgroundColor(Color.parseColor("#eeeeee"));
 

@@ -3,6 +3,7 @@ package fr.conferencehermes.confhermexam.adapters;
 import java.util.ArrayList;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,8 @@ public class TrainingsAdapter extends BaseAdapter {
 				holder.name.setText(training.getTitle());
 			}
 		}
+
+		view.setBackgroundColor(Color.parseColor("#eeeeee"));
 
 		return view;
 

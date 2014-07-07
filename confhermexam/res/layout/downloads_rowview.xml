@@ -17,7 +17,7 @@
 
         <TextView
             android:id="@+id/examName"
-            android:layout_width="500dp"
+            android:layout_width="@dimen/exam_name_width"
             android:layout_height="match_parent"
             android:gravity="center_vertical"
             android:padding="5dp"

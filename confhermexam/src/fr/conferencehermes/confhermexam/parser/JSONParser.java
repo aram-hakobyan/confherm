@@ -596,6 +596,7 @@ public class JSONParser {
 					JSONObject obj = exObj.getJSONObject(i);
 
 					t.setExam_id(obj.getInt("exam_id"));
+					t.setEvent_id(obj.getInt("event_id"));
 					t.setExercise_id(obj.getInt("exercise_id"));
 					t.setName(obj.getString("name"));
 

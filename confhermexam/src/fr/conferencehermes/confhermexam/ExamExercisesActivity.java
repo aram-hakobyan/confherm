@@ -87,6 +87,10 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			timePlay.setVisibility(View.GONE);
 		}
 
+		exam.setIsAlreadyPassed(1);
+		db.updateExam(exam);
+		db.close();
+
 		adapter = new ArrayAdapter<String>(ExamExercisesActivity.this,
 				R.layout.item, R.id.tvText, data);
 		gvMain = (GridView) findViewById(R.id.gvMain);

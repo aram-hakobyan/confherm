@@ -225,9 +225,13 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		title.setText("QUESTION " + String.valueOf(position + 1));
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
-		if (currentQuestionFiles != null)
-			if (!currentQuestionFiles.isEmpty())
-				setFileIcons(currentQuestionFiles);
+		try {
+			if (currentQuestionFiles != null)
+				if (!currentQuestionFiles.isEmpty())
+					setFileIcons(currentQuestionFiles);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 		currentQuestionAnswers = db.getAllAnswersByQuestionId(currentQuestion
 				.getId());
@@ -320,7 +324,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	}
 
 	private void setFileIcons(HashMap<String, String> files) {
-		if (files.get("image") == null) {
+		if (files.get("image").isEmpty()) {
 			btnImage.setBackgroundResource(R.drawable.ic_camera_gray);
 			btnImage.setClickable(false);
 			btnImage.setAlpha(0.5f);
@@ -329,7 +333,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			btnImage.setClickable(true);
 			btnImage.setAlpha(1f);
 		}
-		if (files.get("sound") == null) {
+		if (files.get("sound").isEmpty()) {
 			btnAudio.setBackgroundResource(R.drawable.ic_sound_gray);
 			btnAudio.setClickable(false);
 			btnAudio.setAlpha(0.5f);
@@ -338,7 +342,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			btnAudio.setClickable(true);
 			btnAudio.setAlpha(1f);
 		}
-		if (files.get("video") == null) {
+		if (files.get("video").isEmpty()) {
 			btnVideo.setBackgroundResource(R.drawable.ic_video_gray);
 			btnVideo.setClickable(false);
 			btnVideo.setAlpha(0.5f);
@@ -384,6 +388,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		ArrayList<String> allAnswerIDs = new ArrayList<String>();
 		ArrayList<Answer> allAnswers = db
 				.getAllAnswersByQuestionId(currentQuestionId);
+		ArrayList<Answer> allAnswersDB = db.getAllAnswers();
 		for (int i = 0; i < allAnswers.size(); i++) {
 			allAnswerIDs.add(String.valueOf(allAnswers.get(i).getId()));
 		}
@@ -395,148 +400,154 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			answerCount = allAnswers.size();
 		}
 
-		for (int j = 0; j < answerCount; j++) {
-			// Current answer's id
-			String currentAnswerId = String.valueOf(allAnswers.get(j).getId());
-			ImageView img = new ImageView(CorrectionActivity.this);
-			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-					30, 30);
+		if (!allAnswers.isEmpty()) {
+			for (int j = 0; j < answerCount; j++) {
+				// Current answer's id
+				String currentAnswerId = String.valueOf(allAnswers.get(j)
+						.getId());
+				ImageView img = new ImageView(CorrectionActivity.this);
+				LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
+						30, 30);
 
-			if (currentQuestion.getType().equalsIgnoreCase("2")) {
-				for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
-					mRadioGroup.getChildAt(i).setEnabled(false);
-				}
-
-				imageParams.setMargins(0, 7, 0, 0);
-
-				String userAnswerId = "";
-				for (int i = 0; i < answers.size(); i++) {
-					if (answers.get(i).getQuestionId() == currentQuestionId)
-						userAnswerId = answers.get(i).getAnswers().get(0);
-				}
-
-				String correctAnswerId = "";
-				for (int i = 0; i < corrections.size(); i++) {
-					if (corrections
-							.get(i)
-							.getQuestionId()
-							.equalsIgnoreCase(String.valueOf(currentQuestionId)))
-						correctAnswerId = corrections.get(i).getAnswersArray()
-								.get(0);
-				}
-
-				boolean USER_IS_RIGHT = userAnswerId
-						.equalsIgnoreCase(correctAnswerId);
-				boolean CURRENT_IS_RIGHT = currentAnswerId
-						.equalsIgnoreCase(correctAnswerId);
-				boolean CURRENT_IS_USER = currentAnswerId
-						.equalsIgnoreCase(userAnswerId);
-
-				if (CURRENT_IS_RIGHT) {
-					img.setBackgroundResource(R.drawable.correction_true);
-				} else if (CURRENT_IS_USER) {
-					img.setBackgroundResource(R.drawable.correction_false);
-				}
-
-			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-				for (int i = 0; i < answersLayout.getChildCount(); i++) {
-					LinearLayout layout = (LinearLayout) answersLayout
-							.getChildAt(i);
-					for (int i1 = 0; i1 < layout.getChildCount(); i1++) {
-						layout.getChildAt(i1).setEnabled(false);
+				if (currentQuestion.getType().equalsIgnoreCase("2")) {
+					for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
+						mRadioGroup.getChildAt(i).setEnabled(false);
 					}
-				}
 
-				imageParams.setMargins(0, 5, 0, 0);
+					imageParams.setMargins(0, 7, 0, 0);
 
-				// User's answers
-				ArrayList<String> userAnswerIds = new ArrayList<String>();
-				for (int i = 0; i < answers.size(); i++) {
-					if (answers.get(i).getQuestionId() == currentQuestionId) {
-						for (int k = 0; k < answers.get(i).getAnswers().size(); k++) {
-							userAnswerIds.add(answers.get(i).getAnswers()
-									.get(k));
-						}
-
+					String userAnswerId = "";
+					for (int i = 0; i < answers.size(); i++) {
+						if (answers.get(i).getQuestionId() == currentQuestionId)
+							userAnswerId = answers.get(i).getAnswers().get(0);
 					}
-				}
 
-				// Correct answers
-				ArrayList<String> correctAnswerIds = new ArrayList<String>();
-				for (int i = 0; i < corrections.size(); i++) {
-					if (corrections
-							.get(i)
-							.getQuestionId()
-							.equalsIgnoreCase(String.valueOf(currentQuestionId)))
-						for (int k = 0; k < corrections.get(i)
-								.getAnswersArray().size(); k++) {
-							correctAnswerIds.add(corrections.get(i)
-									.getAnswersArray().get(k));
-						}
-				}
+					String correctAnswerId = "";
+					for (int i = 0; i < corrections.size(); i++) {
+						if (corrections
+								.get(i)
+								.getQuestionId()
+								.equalsIgnoreCase(
+										String.valueOf(currentQuestionId)))
+							correctAnswerId = corrections.get(i)
+									.getAnswersArray().get(0);
+					}
 
-				boolean CURRENT_IS_RIGHT = false;
-				for (int i = 0; i < correctAnswerIds.size(); i++) {
-					if (correctAnswerIds.get(i).equalsIgnoreCase(
-							currentAnswerId)) {
-						{
-							CURRENT_IS_RIGHT = true;
-							break;
+					boolean USER_IS_RIGHT = userAnswerId
+							.equalsIgnoreCase(correctAnswerId);
+					boolean CURRENT_IS_RIGHT = currentAnswerId
+							.equalsIgnoreCase(correctAnswerId);
+					boolean CURRENT_IS_USER = currentAnswerId
+							.equalsIgnoreCase(userAnswerId);
+
+					if (CURRENT_IS_RIGHT) {
+						img.setBackgroundResource(R.drawable.correction_true);
+					} else if (CURRENT_IS_USER) {
+						img.setBackgroundResource(R.drawable.correction_false);
+					}
+
+				} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
+					for (int i = 0; i < answersLayout.getChildCount(); i++) {
+						LinearLayout layout = (LinearLayout) answersLayout
+								.getChildAt(i);
+						for (int i1 = 0; i1 < layout.getChildCount(); i1++) {
+							layout.getChildAt(i1).setEnabled(false);
 						}
 					}
-				}
 
-				boolean CURRENT_IS_USER = false;
-				for (int i = 0; i < userAnswerIds.size(); i++) {
-					if (userAnswerIds.get(i).equalsIgnoreCase(currentAnswerId)) {
-						{
-							CURRENT_IS_USER = true;
-							break;
-						}
-					}
-				}
+					imageParams.setMargins(0, 5, 0, 0);
 
-				if (CURRENT_IS_RIGHT) {
-					img.setBackgroundResource(R.drawable.correction_true);
-				} else if (CURRENT_IS_USER) {
-					img.setBackgroundResource(R.drawable.correction_false);
-				}
-
-			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-				imageParams.setMargins(0, 20, 0, 0);
-
-				try {
+					// User's answers
+					ArrayList<String> userAnswerIds = new ArrayList<String>();
 					for (int i = 0; i < answers.size(); i++) {
 						if (answers.get(i).getQuestionId() == currentQuestionId) {
-							JSONObject corObj = new JSONObject(answers.get(i)
-									.getAnswers().get(j));
-							String answerText = corObj.getString("name");
-							editTextsArray.get(j).setText(answerText);
-							editTextsArray.get(j).setEnabled(false);
-
-							int IS_GOOD = corObj.getInt("is_good");
-							if (IS_GOOD == 1) {
-								img.setBackgroundResource(R.drawable.correction_true);
-							} else {
-								img.setBackgroundResource(R.drawable.correction_false);
+							for (int k = 0; k < answers.get(i).getAnswers()
+									.size(); k++) {
+								userAnswerIds.add(answers.get(i).getAnswers()
+										.get(k));
 							}
 
-							break;
 						}
 					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				} catch (IndexOutOfBoundsException e) {
-					e.printStackTrace();
-				} catch (NullPointerException e) {
-					e.printStackTrace();
+
+					// Correct answers
+					ArrayList<String> correctAnswerIds = new ArrayList<String>();
+					for (int i = 0; i < corrections.size(); i++) {
+						if (corrections
+								.get(i)
+								.getQuestionId()
+								.equalsIgnoreCase(
+										String.valueOf(currentQuestionId)))
+							for (int k = 0; k < corrections.get(i)
+									.getAnswersArray().size(); k++) {
+								correctAnswerIds.add(corrections.get(i)
+										.getAnswersArray().get(k));
+							}
+					}
+
+					boolean CURRENT_IS_RIGHT = false;
+					for (int i = 0; i < correctAnswerIds.size(); i++) {
+						if (correctAnswerIds.get(i).equalsIgnoreCase(
+								currentAnswerId)) {
+							{
+								CURRENT_IS_RIGHT = true;
+								break;
+							}
+						}
+					}
+
+					boolean CURRENT_IS_USER = false;
+					for (int i = 0; i < userAnswerIds.size(); i++) {
+						if (userAnswerIds.get(i).equalsIgnoreCase(
+								currentAnswerId)) {
+							{
+								CURRENT_IS_USER = true;
+								break;
+							}
+						}
+					}
+
+					if (CURRENT_IS_RIGHT) {
+						img.setBackgroundResource(R.drawable.correction_true);
+					} else if (CURRENT_IS_USER) {
+						img.setBackgroundResource(R.drawable.correction_false);
+					}
+
+				} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
+					imageParams.setMargins(0, 20, 0, 0);
+
+					try {
+						for (int i = 0; i < answers.size(); i++) {
+							if (answers.get(i).getQuestionId() == currentQuestionId) {
+								JSONObject corObj = new JSONObject(answers
+										.get(i).getAnswers().get(j));
+								String answerText = corObj.getString("name");
+								editTextsArray.get(j).setText(answerText);
+								editTextsArray.get(j).setEnabled(false);
+
+								int IS_GOOD = corObj.getInt("is_good");
+								if (IS_GOOD == 1) {
+									img.setBackgroundResource(R.drawable.correction_true);
+								} else {
+									img.setBackgroundResource(R.drawable.correction_false);
+								}
+
+								break;
+							}
+						}
+					} catch (JSONException e) {
+						e.printStackTrace();
+					} catch (IndexOutOfBoundsException e) {
+						e.printStackTrace();
+					} catch (NullPointerException e) {
+						e.printStackTrace();
+					}
+
 				}
 
+				correctionsLayout.addView(img, imageParams);
 			}
-
-			correctionsLayout.addView(img, imageParams);
 		}
-
 		String corrText = "";
 		for (int i = 0; i < corrections.size(); i++) {
 			if (corrections.get(i).getQuestionId()
@@ -782,38 +793,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		if (IMAGE_URL != null)
 			if (!IMAGE_URL.isEmpty()) {
-				new Thread(new Runnable() {
-					@Override
-					public void run() {
-						try {
-							URL url = new URL(IMAGE_URL);
-							URLConnection conn = url.openConnection();
-							HttpURLConnection httpConn = (HttpURLConnection) conn;
-							httpConn.setRequestMethod("GET");
-							httpConn.connect();
-							if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
-								InputStream inputStream = httpConn
-										.getInputStream();
-								final Bitmap bitmap = BitmapFactory
-										.decodeStream(inputStream);
-								inputStream.close();
-								runOnUiThread(new Runnable() {
-									@Override
-									public void run() {
-										img.setImageBitmap(bitmap);
-										img.refreshDrawableState();
-										img.invalidate();
-									}
-								});
-
-							}
-						} catch (MalformedURLException e1) {
-							e1.printStackTrace();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-				}).start();
+				if (!IMAGE_URL.isEmpty()) {
+					Bitmap bitmap = BitmapFactory.decodeFile(IMAGE_URL);
+					img.setImageBitmap(bitmap);
+				}
 			}
 
 		switch (from) {
@@ -824,7 +807,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-	
 			soundControlLayout.setVisibility(View.GONE);
 
 			break;
@@ -845,7 +827,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-	
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 			break;
@@ -854,7 +835,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
 
-		
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.VISIBLE);
 
@@ -882,7 +862,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
 			videoControlLayout.setVisibility(View.VISIBLE);
-			
+
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
 
@@ -918,7 +898,6 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 
-					
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 					}
@@ -932,7 +911,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
-				
+
 						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
@@ -963,7 +942,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
 						videoControlLayout.setVisibility(View.VISIBLE);
-				
+
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 

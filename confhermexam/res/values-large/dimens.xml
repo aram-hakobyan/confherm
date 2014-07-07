@@ -8,5 +8,7 @@
     <dimen name="planning_dialog_width">750dp</dimen>
     <dimen name="planning_dialog_height">500dp</dimen>
     <dimen name="listview_divider_height">2dp</dimen>
+    <dimen name="exam_name_width">500dp</dimen>
+    <dimen name="main_menu_top_margin">80dp</dimen>
 
 </resources>
