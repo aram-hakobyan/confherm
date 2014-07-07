@@ -101,15 +101,15 @@ public class DownloadsAdapter extends BaseAdapter {
 
 			int status = mListItems.get(position).getStatus();
 			if (status == 1) {
-				holder.desc.setText("Disponible");
+				holder.desc.setText("OK");
 				holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
 				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
 			} else if (status == 2) {
-				holder.desc.setText("Mettre a jour");
+				holder.desc.setText("Mettre à jour");
 				holder.btnAction.setBackgroundResource(R.drawable.exam_refresh);
 				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
 			} else if (status == 3) {
-				holder.desc.setText("Telecharger");
+				holder.desc.setText("Disponible");
 				holder.btnAction
 						.setBackgroundResource(R.drawable.exam_download);
 				holder.btnRemove
@@ -121,7 +121,7 @@ public class DownloadsAdapter extends BaseAdapter {
 				holder.downloadProgressNumber.setText(String.valueOf(progress)
 						+ "%");
 			} else if (progress == 100) {
-				holder.desc.setText("Disponible");
+				holder.desc.setText("OK");
 				holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
 				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
 				holder.progressBar.setVisibility(View.INVISIBLE);
