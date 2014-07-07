@@ -41,6 +41,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -1186,6 +1188,10 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		if (VIDEO_URL != null)
 			if (!VIDEO_URL.isEmpty()) {
 				Uri videoURI = Uri.parse(VIDEO_URL);
+				//
+				// View v = (View) dialog.findViewById(R.id.videoMedioControls);
+				// mc = new MediaController(this);
+				// mc.setAnchorView(v);
 
 				video.setVideoURI(videoURI);
 				video.setZOrderOnTop(true);
