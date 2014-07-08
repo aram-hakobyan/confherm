@@ -1,9 +1,11 @@
 package fr.conferencehermes.confhermexam.lifecycle;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application.ActivityLifecycleCallbacks;
 import android.os.Bundle;
 
+@SuppressLint("NewApi")
 public class HermesLifeCycleHandler implements ActivityLifecycleCallbacks {
     // I use four separate variables here. You can, of course, just use two and
     // increment/decrement them instead of using four and incrementing them all.

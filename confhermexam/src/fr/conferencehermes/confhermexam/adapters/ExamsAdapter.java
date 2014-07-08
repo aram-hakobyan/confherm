@@ -91,15 +91,17 @@ public class ExamsAdapter extends BaseAdapter {
 			holder.desc.setText("Actif le "
 					+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
 					+ String.valueOf(calendar.get(Calendar.MONTH) + 1) + "/"
-					+ String.valueOf(calendar.get(Calendar.YEAR)) + " a  "
-					+ startTimeString + " to " + endTimeString);
+					+ String.valueOf(calendar.get(Calendar.YEAR)) + " "
+					+ "at" + " "
+					+ startTimeString);
 
 			int status = exam.getStatus();
 			if (status == 1) {
 				holder.status.setText("OK");
 				holder.button.setBackgroundResource(R.drawable.exam_checked);
 			} else if (status == 2) {
-				holder.status.setText("Need update");
+				holder.status.setText(c.getResources().getString(
+						R.string.need_update));
 				holder.button.setBackgroundResource(R.drawable.exam_refresh);
 			} else if (status == 3) {
 				holder.status.setText(c.getResources().getString(
@@ -112,7 +114,7 @@ public class ExamsAdapter extends BaseAdapter {
 			}
 
 			if (canStartExam(exam))
-				view.setBackgroundColor(Color.parseColor("#558abb"));
+				view.setBackgroundColor(Color.parseColor("#69a2b9"));
 			else
 				view.setBackgroundColor(Color.parseColor("#eeeeee"));
 

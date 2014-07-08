@@ -36,16 +36,15 @@
 
             <LinearLayout
                 android:id="@+id/homeButton1"
-                android:layout_width="280dp"
+                android:layout_width="@dimen/main_menu_button_size"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
 
                 <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="@dimen/main_menu_image_size"
+                    android:layout_height="@dimen/main_menu_image_size"
                     android:background="@drawable/home_profile" />
 
                 <TextView
@@ -54,21 +53,21 @@
                     android:layout_margin="10dp"
                     android:text="@string/home_my_profile"
                     android:textColor="#0d5c7c"
-                    android:textSize="25sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/homeButton2"
-                android:layout_width="280dp"
+                android:layout_width="@dimen/main_menu_button_size"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginLeft="60dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
 
                 <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="@dimen/main_menu_image_size"
+                    android:layout_height="@dimen/main_menu_image_size"
                     android:background="@drawable/home_calendar" />
 
                 <TextView
@@ -77,21 +76,21 @@
                     android:layout_margin="10dp"
                     android:text="@string/home_planning"
                     android:textColor="#0d5c7c"
-                    android:textSize="25sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/homeButton3"
-                android:layout_width="280dp"
+                android:layout_width="@dimen/main_menu_button_size"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginLeft="60dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
 
                 <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="@dimen/main_menu_image_size"
+                    android:layout_height="@dimen/main_menu_image_size"
                     android:background="@drawable/home_examin" />
 
                 <TextView
@@ -100,28 +99,28 @@
                     android:layout_margin="10dp"
                     android:text="@string/home_examen"
                     android:textColor="#0d5c7c"
-                    android:textSize="25sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/main_menu_top_margin"
             android:clickable="true"
             android:gravity="center"
             android:orientation="horizontal" >
 
             <LinearLayout
                 android:id="@+id/homeButton4"
-                android:layout_width="280dp"
+                android:layout_width="@dimen/main_menu_button_size"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
                 android:gravity="center"
                 android:orientation="vertical" >
 
                 <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="@dimen/main_menu_image_size"
+                    android:layout_height="@dimen/main_menu_image_size"
                     android:background="@drawable/home_entrainement" />
 
                 <TextView
@@ -130,21 +129,21 @@
                     android:layout_margin="10dp"
                     android:text="@string/home_entrainement"
                     android:textColor="#0d5c7c"
-                    android:textSize="25sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/homeButton5"
-                android:layout_width="280dp"
+                android:layout_width="@dimen/main_menu_button_size"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginLeft="60dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
 
                 <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="@dimen/main_menu_image_size"
+                    android:layout_height="@dimen/main_menu_image_size"
                     android:background="@drawable/home_result" />
 
                 <TextView
@@ -153,21 +152,21 @@
                     android:layout_margin="10dp"
                     android:text="@string/home_resultats"
                     android:textColor="#0d5c7c"
-                    android:textSize="25sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
 
             <LinearLayout
                 android:id="@+id/homeButton6"
-                android:layout_width="280dp"
+                android:layout_width="@dimen/main_menu_button_size"
                 android:layout_height="wrap_content"
-                android:layout_margin="10dp"
+                android:layout_marginLeft="60dp"
                 android:clickable="true"
                 android:gravity="center"
                 android:orientation="vertical" >
 
                 <ImageView
-                    android:layout_width="150dp"
-                    android:layout_height="150dp"
+                    android:layout_width="@dimen/main_menu_image_size"
+                    android:layout_height="@dimen/main_menu_image_size"
                     android:background="@drawable/home_arrow" />
 
                 <TextView
@@ -176,7 +175,7 @@
                     android:layout_margin="10dp"
                     android:text="@string/home_telechargement"
                     android:textColor="#0d5c7c"
-                    android:textSize="25sp" />
+                    android:textSize="16sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

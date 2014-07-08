@@ -409,16 +409,22 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 					try {
 						for (int k = 0; k < answers.size(); k++) {
-							if (answers.get(k).getQuestionId() == currentQuestionId) {
-								ArrayList<String> answersArr = answers.get(k)
-										.getAnswers();
+							if (corrections
+									.get(k)
+									.getQuestionId()
+									.equalsIgnoreCase(
+											String.valueOf(currentQuestionId))) {
+								ArrayList<String> answersArr = corrections.get(
+										k).getAnswersArray();
 
-								String answerText = answersArr.get(i);
-								// editTextsArray.get(k).setText(answerText);
-								// editTextsArray.get(k).setEnabled(false);
+								JSONObject obj = new JSONObject(
+										answersArr.get(i));
 
-								boolean IS_GOOD = !answerText.isEmpty();
-								if (IS_GOOD) {
+								int IS_GOOD = obj.getInt("is_good");
+								String name = obj.getString("name");
+								editTextsArray.get(i).setText(name);
+
+								if (IS_GOOD == 1) {
 									img.setBackgroundResource(R.drawable.correction_true);
 								} else {
 									img.setBackgroundResource(R.drawable.correction_false);

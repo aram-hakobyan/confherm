@@ -85,24 +85,39 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_marginBottom="30dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginLeft="30dp"
         android:text=""
         android:textSize="20sp" />
 
-    <Button
-        android:id="@+id/downloadBtn"
-        android:layout_width="300dp"
+    <RelativeLayout
+        android:id="@+id/downloadBtnLayout"
+        android:layout_width="@dimen/planning_button_width"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:layout_margin="20dp"
         android:background="@color/app_main_color"
-        android:drawableLeft="@drawable/download_icon_white"
-        android:drawablePadding="20dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:text="@string/plannig_popup_donwload"
-        android:textColor="@android:color/white"
-        android:textSize="20sp" />
+        android:gravity="center_horizontal" >
+
+        <ImageView
+            android:id="@+id/imageViewDownload"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="10dp" />
+
+        <TextView
+            android:id="@+id/downloadText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_toRightOf="@+id/imageViewDownload"
+            android:text="@string/plannig_popup_donwload"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+    </RelativeLayout>
 
 </RelativeLayout>

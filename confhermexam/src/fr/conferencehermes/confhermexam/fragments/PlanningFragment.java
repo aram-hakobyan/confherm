@@ -12,7 +12,6 @@ import org.json.JSONObject;
 
 import android.app.Dialog;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -24,6 +23,7 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -237,7 +237,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 
 		TextView timeSlotText = new TextView(getActivity());
 		timeSlotText.setBackgroundColor(getResources().getColor(
-				R.color.app_main_color));
+				R.color.global_normal_color));
 		timeSlotText.setTextColor(Color.WHITE);
 		timeSlotText.setGravity(Gravity.CENTER);
 
@@ -311,10 +311,17 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		TextView city = (TextView) dialog.findViewById(R.id.city);
 		TextView status = (TextView) dialog.findViewById(R.id.status);
 		TextView hour = (TextView) dialog.findViewById(R.id.hour);
-		Button download = (Button) dialog.findViewById(R.id.downloadBtn);
+		RelativeLayout downloadLayout = (RelativeLayout) dialog
+				.findViewById(R.id.downloadBtnLayout);
+		TextView downloadText = (TextView) dialog
+				.findViewById(R.id.downloadText);
+		ImageView downloadImage = (ImageView) dialog
+				.findViewById(R.id.imageViewDownload);
 		Button close = (Button) dialog.findViewById(R.id.buttonClose);
 
-		title.setText(ts.getEvent_name() + "/" + ts.getTest_name());
+		title.setText(ts.getEvent_name());
+		if (!ts.getTest_name().equalsIgnoreCase("null"))
+			title.append("/" + ts.getTest_name());
 		date.setText(new Date(ts.getStart_date() * 1000).toString());
 		room.setText(ts.getRoom());
 		adress.setText(ts.getPlace());
@@ -351,7 +358,8 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 				+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
 				+ String.valueOf(calendar.get(Calendar.MONTH) + 1) + "/"
 				+ String.valueOf(calendar.get(Calendar.YEAR)));
-		hour.setText("De " + startTime + " a " + endTime);
+		hour.setText("De " + startTime + " "
+				+ getResources().getString(R.string.a_letter) + " " + endTime);
 
 		switch (ts.getStatus()) {
 
@@ -366,39 +374,40 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 
 			if (event != null) { // event is downloaded
 				if (event.getLastEditTime() >= ts.getLast_edit_time()) {
-					status.setText("Telechargement: OK");
-					download.setEnabled(true);
-					download.setText("Open exams");
-					download.setCompoundDrawablesWithIntrinsicBounds(
-							getResources().getDrawable(
-									R.drawable.exam_checked_d), null, null,
-							null);
+					status.setText(getResources().getString(
+							R.string.planning_ok));
+					downloadLayout.setEnabled(true);
+					downloadText.setText("OK");
+					downloadImage
+							.setBackgroundResource(R.drawable.planning_checked);
 					eventStatus = 1;
 				} else {
-					status.setText("Telechargement: Need update");
-					download.setEnabled(true);
-					download.setCompoundDrawablesWithIntrinsicBounds(
-							getResources().getDrawable(
-									R.drawable.exam_refresh_d), null, null,
-							null);
+					status.setText(getResources().getString(
+							R.string.planning_need_update));
+					downloadLayout.setEnabled(true);
+					downloadText.setText(getResources().getString(
+							R.string.planning_maintenant));
+					downloadImage
+							.setBackgroundResource(R.drawable.planning_refresh);
 					eventStatus = 2;
 				}
 			} else {
-				status.setText("Telechargement: Not downloaded yet");
-				download.setEnabled(true);
-				download.setCompoundDrawablesWithIntrinsicBounds(getResources()
-						.getDrawable(R.drawable.white_download_d), null, null,
-						null);
+				status.setText(getResources().getString(
+						R.string.planning_avaible));
+				downloadLayout.setEnabled(true);
+				downloadText.setText(getResources().getString(
+						R.string.planning_maintenant));
+				downloadImage
+						.setBackgroundResource(R.drawable.planning_download);
 				eventStatus = 3;
 			}
 
 			break;
 		case 4:
-			status.setText("Telechargement: "
-					+ getResources().getString(R.string.examen_not_avaible));
-			download.setEnabled(false);
-			download.setCompoundDrawablesWithIntrinsicBounds(getResources()
-					.getDrawable(R.drawable.exam_x_d), null, null, null);
+			status.setText(getResources()
+					.getString(R.string.examen_not_avaible));
+			downloadLayout.setEnabled(false);
+			downloadImage.setBackgroundResource(R.drawable.planning_download);
 			eventStatus = 4;
 			break;
 
@@ -406,7 +415,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 			break;
 		}
 
-		download.setOnClickListener(new OnClickListener() {
+		downloadLayout.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				dialog.dismiss();

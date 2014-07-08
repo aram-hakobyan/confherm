@@ -105,7 +105,8 @@ public class DownloadsAdapter extends BaseAdapter {
 				holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
 				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
 			} else if (status == 2) {
-				holder.desc.setText("Mettre à jour");
+				holder.desc.setText(c.getResources().getString(
+						R.string.need_update));
 				holder.btnAction.setBackgroundResource(R.drawable.exam_refresh);
 				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
 			} else if (status == 3) {
@@ -120,6 +121,8 @@ public class DownloadsAdapter extends BaseAdapter {
 			if (progress > 0 && progress < 100) {
 				holder.downloadProgressNumber.setText(String.valueOf(progress)
 						+ "%");
+				holder.desc.setText(c.getResources().getString(
+						R.string.download));
 			} else if (progress == 100) {
 				holder.desc.setText("OK");
 				holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
@@ -128,6 +131,7 @@ public class DownloadsAdapter extends BaseAdapter {
 				holder.downloadProgressNumber.setVisibility(View.INVISIBLE);
 				holder.btnAction.setVisibility(View.VISIBLE);
 				mListItems.get(position).setStatus(1);
+				holder.desc.setText("OK");
 			}
 
 			holder.btnAction.setOnClickListener(new OnClickListener() {
