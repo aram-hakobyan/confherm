@@ -136,6 +136,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 	private int resumPlayingSound = 0;
 	private int resumPlayingVideo = 0;
 	private CounterClass timer;
+	private int currentPosition = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -279,6 +280,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 	}
 
 	private void selectQuestion(Question q, int position) {
+		currentPosition = position;
 		int wantedPosition = position;
 		int firstPosition = listview.getFirstVisiblePosition()
 				- listview.getHeaderViewsCount();
@@ -753,6 +755,9 @@ public class TrainingActivity extends Activity implements OnClickListener {
 			correctionsLayout.addView(img, imageParams);
 		}
 
+		TextView reponse = (TextView) findViewById(R.id.reponse);
+		reponse.setText(getResources().getString(R.string.reponse) + "  "
+				+ corrections.get(currentPosition).getQuestionPoint());
 		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
 		correctionText.setText(corrections.get(currentQuestionId).getText());
 		LinearLayout correctionButtons = (LinearLayout) findViewById(R.id.correctionButtons);

@@ -1,6 +1,9 @@
 package fr.conferencehermes.confhermexam;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 import android.app.AlertDialog;
@@ -92,7 +95,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		Exam exam = db.getExam(examId);
 		long startTime = exam.getStartDate() * 1000;
 		long endTime = exam.getEndDate() * 1000;
-		duration = endTime - startTime;
+		duration = getDuration(startTime, endTime);
 		updateTimer();
 
 		if (db.getExam(examId).getCategoryType().equalsIgnoreCase("2")) {
@@ -129,6 +132,18 @@ public class ExamExercisesActivity extends FragmentActivity implements
 				TIMER_PAUSED = false;
 			}
 		});
+
+	}
+
+	public long getDuration(long start, long end) {
+		Calendar calendar = new GregorianCalendar(
+				TimeZone.getTimeZone("Europe/Paris"));
+		long currentTime = calendar.getTimeInMillis() / 1000;
+
+		long maxDuration = end - start;
+		long mDuration = end - currentTime;
+
+		return mDuration <= maxDuration ? mDuration : maxDuration;
 
 	}
 

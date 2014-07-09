@@ -471,6 +471,7 @@ public class JSONParser {
 					JSONObject obj = corrections.getJSONObject(i);
 					c.setQuestionId(obj.getString("question_id"));
 					c.setText(obj.getString("correction_text"));
+					c.setQuestionPoint(obj.getString("questioon_point"));
 					ArrayList<String> answersArray = new ArrayList<String>();
 					JSONArray answers = obj.getJSONArray("answers");
 					for (int j = 0; j < answers.length(); j++) {
@@ -504,6 +505,7 @@ public class JSONParser {
 					JSONObject obj = corrections.getJSONObject(i);
 					c.setQuestionId(obj.getString("question_id"));
 					c.setText(obj.getString("correction_text"));
+					c.setQuestionPoint(obj.getString("questioon_point"));
 					ArrayList<String> answersArray = new ArrayList<String>();
 					JSONArray answers = obj.getJSONArray("answers");
 					for (int j = 0; j < answers.length(); j++) {
