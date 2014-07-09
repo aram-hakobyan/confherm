@@ -27,7 +27,8 @@ import fr.conferencehermes.confhermexam.util.Constants;
 public class MyProfileFragment extends Fragment {
 
 	private static Profile pData;
-	private TextView pFirsName, pLastName, pUserName, pEmailAdress, pGroups;
+	private TextView pFirsName, pLastName, pUserName, pEmailAdress, pGroups,
+			pInformation;
 	private Button logout;
 	private SharedPreferences.Editor logoutEditor;
 	private SharedPreferences logoutPrefs;
@@ -35,7 +36,6 @@ public class MyProfileFragment extends Fragment {
 	private SharedPreferences profilePreferences;
 	private SharedPreferences groupsShared;
 	private SharedPreferences.Editor groupsEditor;
-
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -58,6 +58,8 @@ public class MyProfileFragment extends Fragment {
 		pLastName = (TextView) pFragment.findViewById(R.id.pLastName);
 		pUserName = (TextView) pFragment.findViewById(R.id.pUsername);
 		pEmailAdress = (TextView) pFragment.findViewById(R.id.pEmail);
+		pInformation = (TextView) pFragment.findViewById(R.id.pInformation);
+
 		pGroups = (TextView) pFragment.findViewById(R.id.pGroups);
 		profilePreferences = getActivity().getSharedPreferences(
 				"fr.conferencehermes.confhermexam.fragments.MYPROFILE",
@@ -84,8 +86,6 @@ public class MyProfileFragment extends Fragment {
 				logoutPrefs = getActivity().getSharedPreferences("logoutPrefs",
 						Context.MODE_PRIVATE);
 
-
-
 				boolean b = logoutPrefs.getBoolean(
 						Constants.LOGOUT_SHAREDPREFS_KEY, false);
 				Log.i("Utils", b + "");
@@ -104,6 +104,7 @@ public class MyProfileFragment extends Fragment {
 				profileEditor.putString("profileLastName", pData.getLastName());
 				profileEditor.putString("profileUsername", pData.getUserName());
 				profileEditor.putString("profileEmail", pData.getEmailAdress());
+				profileEditor.putString("pInformation", pData.getInformation());
 			}
 
 			if (pData == null || pData.getGroups().size() == 0) {
@@ -131,6 +132,7 @@ public class MyProfileFragment extends Fragment {
 		String lastName = profilePreferences.getString("profileLastName", "");
 		String userName = profilePreferences.getString("profileUsername", "");
 		String email = profilePreferences.getString("profileEmail", "");
+		String information = profilePreferences.getString("pInformation", "");
 		Handler h = new Handler(getActivity().getMainLooper());
 		@SuppressWarnings("unchecked")
 		HashMap<String, String> groupsHashmap = (HashMap<String, String>) groupsShared
@@ -148,7 +150,7 @@ public class MyProfileFragment extends Fragment {
 			});
 
 		}
-
+		pInformation.setText(information);
 		pFirsName.setText(name + " : " + firstName);
 		pLastName.setText(lastname + " : " + lastName);
 		pUserName.setText(login + " : " + userName);

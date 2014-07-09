@@ -134,6 +134,7 @@ public class JSONParser {
 
 					}
 
+					pData.setInformation(obj.getString("profile_information"));
 					pData.setEmailAdress(obj.getString("email"));
 					pData.setUserName(obj.getString("username"));
 					pData.setAuthKey(obj.getString("auth_key"));
