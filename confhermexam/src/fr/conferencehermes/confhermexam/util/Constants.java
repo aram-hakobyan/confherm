@@ -8,6 +8,9 @@ public class Constants {
 	public static int RESULTATS_FRAGMENT = 4;
 	public static int TELECHARG_FRAGMENT = 5;
 
+	public static int TYPE_EXAM = 1;
+	public static int TYPE_CONFERENCE = 2;
+
 	/********************************* URLs ***********************************/
 
 	public static String SERVER_URL = "http://ecni.conference-hermes.fr/api/login";
