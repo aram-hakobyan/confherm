@@ -10,6 +10,14 @@ public class Profile {
 	private String email;
 	private String userName;
 	private String authKey;
+	private String information;
+	public String getInformation() {
+	return information;
+}
+
+public void setInformation(String information) {
+	this.information = information;
+}
 
 	public Profile() {
 		setGroups(new HashMap<String, String>());
