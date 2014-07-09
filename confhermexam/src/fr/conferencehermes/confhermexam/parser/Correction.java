@@ -8,6 +8,7 @@ public class Correction {
 	private String text;
 	private ArrayList<String> answersArray;
 	private HashMap<String, String> files;
+	private String questionPoint;
 
 	public Correction() {
 		setAnswersArray(new ArrayList<String>());
@@ -43,6 +44,14 @@ public class Correction {
 
 	public void setFiles(HashMap<String, String> files) {
 		this.files = files;
+	}
+
+	public String getQuestionPoint() {
+		return questionPoint;
+	}
+
+	public void setQuestionPoint(String questionPoint) {
+		this.questionPoint = questionPoint;
 	}
 
 }

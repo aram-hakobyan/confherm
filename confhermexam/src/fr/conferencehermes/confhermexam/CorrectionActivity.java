@@ -80,6 +80,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private TextView examName;
 	Question currentQuestion;
 	ArrayList<Answer> currentQuestionAnswers;
+	int currentPosition = 0;
 	int currentQuestionId = 0;
 	HashMap<String, String> currentQuestionFiles;
 	HashMap<String, String> exerciseFiles;
@@ -196,6 +197,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	}
 
 	private void selectQuestion(Question q, int position) {
+		currentPosition = position;
 		int wantedPosition = position;
 		int firstPosition = listview.getFirstVisiblePosition()
 				- listview.getHeaderViewsCount();
@@ -396,6 +398,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			answerCount = allAnswers.size();
 		}
 
+		TextView reponse = (TextView) findViewById(R.id.reponse);
+		reponse.setText(getResources().getString(R.string.reponse) + "  "
+				+ corrections.get(currentPosition).getQuestionPoint());
+
 		int count = answerCount;
 		if (currentQuestion.getType().equalsIgnoreCase("3")) {
 			try {
@@ -585,6 +591,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
 		correctionText.setText(corrText);
+
 	}
 
 	@Override
