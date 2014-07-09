@@ -6,6 +6,10 @@ import java.util.GregorianCalendar;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,6 +17,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,10 +30,16 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
+
+import fr.conferencehermes.confhermexam.parser.Event;
+
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
+import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.util.DataHolder;
+import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExamExercisesActivity extends FragmentActivity implements
@@ -244,6 +255,23 @@ public class ExamExercisesActivity extends FragmentActivity implements
 				.setCancelable(false)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
+						DatabaseHelper dbHelper = new DatabaseHelper(
+								ExamExercisesActivity.this);
+						ArrayList<Exercise> dbExercises = dbHelper
+								.getAllExercisesByExamId(examId);
+						for (int i = 0; i < dbExercises.size(); i++) {
+							if (dbExercises.get(i).getExerciseIsAlreadyPassed() == 0) {
+								try {
+									sendEmptyAnswers(dbExercises.get(i));
+									Log.d("EMPTY EXERCISE SAVED: ",
+											String.valueOf(dbExercises.get(i)
+													.getId()));
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+							}
+						}
+
 						finish();
 					}
 				})
@@ -321,6 +349,45 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		// show it
 		alertDialog.show();
+	}
+
+	public void sendEmptyAnswers(Exercise exercise) throws JSONException {
+		JSONObject object = new JSONObject();
+		JSONObject data = new JSONObject();
+
+		DatabaseHelper db = new DatabaseHelper(ExamExercisesActivity.this);
+		Event event = db.getEvent(eventId);
+
+		data.put("event_id", eventId);
+		data.put("exam_id", event.getTestId());
+		data.put("exercise_id", exercise.getId());
+		data.put("is_send", 0);
+		data.put("type", exercise.getType());
+
+		JSONArray answers = new JSONArray();
+		data.put("question_answers", answers);
+		object.put("auth_key", Utilities.readString(ExamExercisesActivity.this,
+				"auth_key", ""));
+		object.put("device_id",
+				Utilities.getDeviceId(ExamExercisesActivity.this));
+		object.put("device_time", System.currentTimeMillis() / 1000);
+		object.put("data", data);
+
+		if (Utilities.isNetworkAvailable(ExamExercisesActivity.this)) {
+			ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
+					ExamExercisesActivity.this);
+			transmitter.execute(object);
+			finish();
+		} else {
+			ExerciseAnswer exerciseAnswer = new ExerciseAnswer();
+			exerciseAnswer.setExerciseId(exercise.getId());
+			exerciseAnswer.setExamId(exercise.getExamId());
+			exerciseAnswer.setEventId(eventId);
+			exerciseAnswer.setJsonString(data.toString());
+			db.createExerciseAnswer(exerciseAnswer);
+		}
+
+		db.closeDB();
 
 	}
 

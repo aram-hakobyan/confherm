@@ -25,6 +25,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
+import android.provider.SyncStateContract.Constants;
 import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
@@ -103,6 +104,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 	private boolean onPaused = false;
 	private boolean SEND_DATA = false;
+	private boolean CONFERENCE = false;
 
 	private SparseBooleanArray validAnswers;
 	private ArrayList<QuestionAnswer> questionAnswers;
@@ -168,7 +170,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				// selectQuestion(questions.get(position), position);
+				if (CONFERENCE)
+					selectQuestion(questions.get(position), position);
 			}
 
 		});
@@ -176,23 +179,26 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
 
 		exercise = db.getExercise(exercise_id);
-		// exercise.setExerciseIsAlreadyPassed(1);
-		// db.updateExercise(exercise);
+		exercise.setExerciseIsAlreadyPassed(1);
+		db.updateExercise(exercise);
 		exerciseFiles = db.getExerciseFile(exercise_id);
-		if (exercise.getExerciseType() == 2) {
+		if (exercise.getExerciseType() == fr.conferencehermes.confhermexam.util.Constants.TYPE_CONFERENCE) {
+			Log.d("EXAM TYPE: ", "CONFERENCE");
+			CONFERENCE = true;
 			ennouncer.setVisibility(View.GONE);
+		} else {
+			Log.d("EXAM TYPE: ", "EXAM");
 		}
-		db.close();
 
 		String key = "exercise_passed" + String.valueOf(exercise_id);
 		Utilities.writeBoolean(ExaminationActivity.this, key, true);
 
 		questions = db.getAllQuestionsByExerciseId(exercise_id);
 		adapter = new QuestionsAdapter(ExaminationActivity.this, questions);
-
 		listview.setAdapter(adapter);
 		examName.setText(exercise.getName());
 		teacher.setText("Teacher " + exercise.getTeacher());
+		db.close();
 
 		ViewTreeObserver vto = listview.getViewTreeObserver();
 		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -243,7 +249,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		currentQuestionId = position;
 		currentQuestion = q;
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
-		db.close();
 
 		answersLayout.removeAllViews();
 		correctionsLayout.removeAllViews();
@@ -376,6 +381,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				}
 			}
 		}
+
+		db.close();
 
 	}
 
