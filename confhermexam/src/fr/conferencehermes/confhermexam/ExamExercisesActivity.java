@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
@@ -24,6 +25,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.util.DataHolder;
@@ -46,12 +48,14 @@ public class ExamExercisesActivity extends FragmentActivity implements
 	private long duration = 0;
 	private boolean TIMER_PAUSED = false;
 
+	private boolean onPaused = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_exam_exersice);
-
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		db = new DatabaseHelper(ExamExercisesActivity.this);
 		timerText = (TextView) findViewById(R.id.timerText);
 		timePause = (ImageView) findViewById(R.id.time_pause);
@@ -145,12 +149,6 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 		return mDuration <= maxDuration ? mDuration : maxDuration;
 
-	}
-
-	@Override
-	protected void onResume() {
-		// TODO Auto-generated method stub
-		super.onResume();
 	}
 
 	private void updateTimer() {
@@ -257,6 +255,73 @@ public class ExamExercisesActivity extends FragmentActivity implements
 						});
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		alertDialog.show();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		// ONLY WHEN SCREEN TURNS ON
+		if (!ScreenReceiver.wasScreenOn) {
+			// THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
+
+		} else {
+			// THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT
+			// CHANGED
+			System.out.println("SCREEN TURNED ON");
+		}
+
+		if (onPaused == true) {
+			showAlertDialog();
+		}
+
+	}
+
+	@Override
+	protected void onPause() {
+
+		onPaused = true;
+
+		// WHEN THE SCREEN IS ABOUT TO TURN OFF
+		if (ScreenReceiver.wasScreenOn) {
+			// THIS IS THE CASE WHEN ONPAUSE() IS CALLED BY THE SYSTEM DUE TO A
+			// SCREEN STATE CHANGE
+			System.out.println("SCREEN TURNED OFF");
+		} else {
+			// THIS IS WHEN ONPAUSE() IS CALLED WHEN THE SCREEN STATE HAS NOT
+			// CHANGED
+		}
+		super.onPause();
+	}
+
+	private void showAlertDialog() {
+
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+				ExamExercisesActivity.this);
+
+		// set dialog message
+		alertDialogBuilder
+				.setMessage(getResources().getString(R.string.drop_out_text))
+				.setCancelable(false)
+				.setPositiveButton(
+						getResources().getString(R.string.drop_out_text_ok),
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+
+								Intent intentHome = new Intent(
+										ExamExercisesActivity.this,
+										HomeActivity.class);
+								startActivity(intentHome);
+
+								ExamExercisesActivity.this.finish();
+								onPaused = false;
+							}
+						});
+
+		// create alert dialog
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		// show it
+		alertDialog.show();
+
 	}
 
 }
