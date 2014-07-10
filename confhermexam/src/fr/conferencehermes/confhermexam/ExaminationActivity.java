@@ -25,7 +25,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.SystemClock;
-import android.provider.SyncStateContract.Constants;
 import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
@@ -362,7 +361,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(ExaminationActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				editText.requestFocus();
+				editText.clearFocus();
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
@@ -609,6 +608,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			else
 				showAlertDialogWhenFinishPressed("Attention", getResources()
 						.getString(R.string.finish_alert_text_abandonner));
+
 			break;
 		case R.id.ennouncer:
 			if (exerciseFiles != null)
@@ -1216,6 +1216,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 					public void onClick(DialogInterface dialog, int id) {
 						try {
 							sendAnswers();
+							fr.conferencehermes.confhermexam.util.Constants.calledFromExam = true;
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -1247,6 +1248,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		else
 			showAlertDialogWhenFinishPressed("Attention", getResources()
 					.getString(R.string.finish_alert_text_abandonner));
+
+		fr.conferencehermes.confhermexam.util.Constants.calledFromExam = true;
+		finish();
+
 	}
 
 }
