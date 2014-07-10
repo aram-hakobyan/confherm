@@ -11,6 +11,8 @@ public class Constants {
 	public static int TYPE_EXAM = 1;
 	public static int TYPE_CONFERENCE = 2;
 
+	public static boolean calledFromExam = false;
+
 	/********************************* URLs ***********************************/
 
 	public static String SERVER_URL = "http://ecni.conference-hermes.fr/api/login";

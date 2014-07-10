@@ -256,9 +256,9 @@ public class ExamineFragment extends Fragment {
 		builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				if (!input.getText().toString().trim().isEmpty()
-						&& input.getText().toString().trim()
-								.equalsIgnoreCase(password)) {
+				//if (!input.getText().toString().trim().isEmpty()
+					//	&& input.getText().toString().trim()
+						//		.equalsIgnoreCase(password)) {
 					Intent intent = new Intent(getActivity(),
 							ExamExercisesActivity.class);
 					intent.putExtra("exam_id", id);
@@ -266,7 +266,7 @@ public class ExamineFragment extends Fragment {
 					startActivity(intent);
 					getActivity().finish();
 				}
-			}
+			//}
 		});
 		builder.setNegativeButton("Cancel",
 				new DialogInterface.OnClickListener() {

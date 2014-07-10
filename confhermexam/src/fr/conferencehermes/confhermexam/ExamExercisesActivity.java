@@ -30,14 +30,12 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
-
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
-
 import fr.conferencehermes.confhermexam.parser.Event;
-
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
+import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
@@ -61,6 +59,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 	private boolean onPaused = false;
 
+	// private boolean calledFromExam = false;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -83,8 +83,10 @@ public class ExamExercisesActivity extends FragmentActivity implements
 				String key = "exercise_passed" + String.valueOf(e_id);
 				if (!Utilities.readBoolean(ExamExercisesActivity.this, key,
 						false)) {
-					if (!TIMER_PAUSED)
+					if (!TIMER_PAUSED) {
 						openExercise(e_id);
+						Constants.calledFromExam = true;
+					}
 				} else {
 					Utilities.showAlertDialog(
 							ExamExercisesActivity.this,
@@ -193,6 +195,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 	@Override
 	protected void onStop() {
 		timer.cancel();
+		Log.d("ONSTOP", "ONSTOPCALLED");
+
 		super.onStop();
 	}
 
@@ -291,23 +295,41 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		// ONLY WHEN SCREEN TURNS ON
 		if (!ScreenReceiver.wasScreenOn) {
 			// THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
-
+			// System.out.println("SCREEN TURNED OFF");
 		} else {
 			// THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT
 			// CHANGED
 			System.out.println("SCREEN TURNED ON");
 		}
 
-		if (onPaused == true) {
+		if (onPaused == true && Constants.calledFromExam == false) {
 			showAlertDialog();
+			Constants.calledFromExam = false;
 		}
 
+	}
+
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+
+		onPaused = true;
+
+		if (!hasFocus) {
+			// Log.d("Focus debug", "Lost focus !");
+
+		}
 	}
 
 	@Override
 	protected void onPause() {
 
 		onPaused = true;
+
+		if (Constants.calledFromExam == true) {
+			Constants.calledFromExam = false;
+
+		}
 
 		// WHEN THE SCREEN IS ABOUT TO TURN OFF
 		if (ScreenReceiver.wasScreenOn) {
