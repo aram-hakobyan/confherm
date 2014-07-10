@@ -44,7 +44,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	private SharedPreferences.Editor logoutEditor;
 	private SharedPreferences logoutPrefs;
 	public static Context context;
-	boolean logout ;
+	boolean logout;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -64,11 +65,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 			authKeyEditor = getPreferences(MODE_PRIVATE).edit();
 
-	
-
 			logoutPrefs = getSharedPreferences("logoutPrefs", MODE_PRIVATE);
-		   logout = logoutPrefs.getBoolean(
-					Constants.LOGOUT_SHAREDPREFS_KEY, false);
+			logout = logoutPrefs.getBoolean(Constants.LOGOUT_SHAREDPREFS_KEY,
+					false);
 			Log.i("Utils1111", logout + "");
 			if (logout == false) {
 				loginAction();
@@ -121,8 +120,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		String restoredAuthKey = authKeyPrefs.getString(
 				Constants.AUTHKEY_SHAREDPREFS_KEY, null);
 
-		final String uname =  username.getText().toString().trim();
-		final String pass =  password.getText().toString().trim();
+		final String uname = username.getText().toString().trim();
+		final String pass = password.getText().toString().trim();
 		RequestCreator creator = new RequestCreator();
 		if (restoredAuthKey != null && logout != true) {
 			logonOrAuth = Constants.SERVER_URL_AUTH;
@@ -158,8 +157,8 @@ public class LoginActivity extends Activity implements ActionDelegate {
 					this, "LogView", "LogService", logonOrAuth);
 		} else {
 			Toast.makeText(LoginActivity.this,
-					"Username or Password can not be empty", Toast.LENGTH_LONG)
-					.show();
+					getResources().getString(R.string.login_alert),
+					Toast.LENGTH_LONG).show();
 		}
 
 	}
@@ -214,11 +213,10 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		Utilities.writeString(context, "auth_key", lData.getAuthKey());
 		if (lData != null) {
 			authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
-					lData.getAuthKey()); 
+					lData.getAuthKey());
 		}
 		authKeyEditor.commit();
-		
-		
+
 	}
 
 	@Override

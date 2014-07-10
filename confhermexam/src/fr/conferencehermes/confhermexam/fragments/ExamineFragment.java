@@ -24,6 +24,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
@@ -265,6 +266,9 @@ public class ExamineFragment extends Fragment {
 					intent.putExtra("event_id", eventId);
 					startActivity(intent);
 					getActivity().finish();
+				} else {
+					Toast.makeText(getActivity(), "Wrong password.",
+							Toast.LENGTH_LONG).show();
 				}
 			}
 		});

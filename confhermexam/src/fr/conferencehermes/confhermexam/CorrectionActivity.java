@@ -315,8 +315,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			}
 		}
 
-		if (corrections != null & !corrections.isEmpty() && answers != null
-				&& !answers.isEmpty())
+		if (corrections != null && answers != null)
 			drawCorrections();
 
 	}

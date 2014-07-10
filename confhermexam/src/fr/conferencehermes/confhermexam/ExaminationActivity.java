@@ -179,16 +179,18 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
 
 		exercise = db.getExercise(exercise_id);
-		exercise.setExerciseIsAlreadyPassed(1);
-		db.updateExercise(exercise);
 		exerciseFiles = db.getExerciseFile(exercise_id);
-		if (exercise.getExerciseType() == fr.conferencehermes.confhermexam.util.Constants.TYPE_CONFERENCE) {
+		String type = exercise.getType();
+		if (type.equalsIgnoreCase("2")) {
 			Log.d("EXAM TYPE: ", "CONFERENCE");
 			CONFERENCE = true;
 			ennouncer.setVisibility(View.GONE);
 		} else {
 			Log.d("EXAM TYPE: ", "EXAM");
 		}
+
+		exercise.setExerciseIsAlreadyPassed(1);
+		db.updateExercise(exercise);
 
 		String key = "exercise_passed" + String.valueOf(exercise_id);
 		Utilities.writeBoolean(ExaminationActivity.this, key, true);
@@ -453,7 +455,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			exerciseAnswer.setJsonString(data.toString());
 			db.createExerciseAnswer(exerciseAnswer);
 			showAlertDialog(ExaminationActivity.this, "Attention",
-					"No internet connection. Exam will be submitted after connection.");
+					getResources().getString(R.string.connection_alert));
 		}
 
 		db.closeDB();
