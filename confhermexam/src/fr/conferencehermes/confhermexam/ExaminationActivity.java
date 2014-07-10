@@ -277,6 +277,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				RadioButton newRadioButton = new RadioButton(this);
 				newRadioButton.setText(currentQuestionAnswers.get(i)
 						.getAnswer());
+				newRadioButton.setTextSize(16);
 				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
 						RadioGroup.LayoutParams.WRAP_CONTENT,
@@ -304,6 +305,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
 				TextView text = new TextView(ExaminationActivity.this);
 				text.setText(currentQuestionAnswers.get(i).getAnswer());
+				text.setTextSize(16);
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -361,6 +363,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(ExaminationActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
+				editText.setTextSize(16);
 				editText.clearFocus();
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
@@ -418,6 +421,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	public void sendAnswers() throws JSONException {
+		fr.conferencehermes.confhermexam.util.Constants.calledFromExam = true;
+
 		JSONObject object = new JSONObject();
 		JSONObject data = new JSONObject();
 
@@ -1180,10 +1185,11 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		@Override
 		public void onFinish() {
 			temps1.setText("");
-			/*
-			 * try { sendAnswers(); } catch (JSONException e) { // TODO
-			 * Auto-generated catch block e.printStackTrace(); }
-			 */
+			try {
+				sendAnswers();
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
 		}
 
 		@Override
@@ -1216,7 +1222,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 					public void onClick(DialogInterface dialog, int id) {
 						try {
 							sendAnswers();
-							fr.conferencehermes.confhermexam.util.Constants.calledFromExam = true;
 						} catch (JSONException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -1248,9 +1253,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		else
 			showAlertDialogWhenFinishPressed("Attention", getResources()
 					.getString(R.string.finish_alert_text_abandonner));
-
-		fr.conferencehermes.confhermexam.util.Constants.calledFromExam = true;
-		finish();
 
 	}
 

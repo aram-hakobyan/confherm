@@ -243,6 +243,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				RadioButton newRadioButton = new RadioButton(this);
 				newRadioButton.setText(currentQuestionAnswers.get(i)
 						.getAnswer());
+				newRadioButton.setTextSize(16);
 				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
 						RadioGroup.LayoutParams.WRAP_CONTENT,
@@ -266,6 +267,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				TextView text = new TextView(CorrectionActivity.this);
 				text.setText(currentQuestionAnswers.get(i).getAnswer());
 				text.setGravity(Gravity.CENTER_VERTICAL);
+				text.setTextSize(16);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.WRAP_CONTENT,
 						LinearLayout.LayoutParams.WRAP_CONTENT);
@@ -302,6 +304,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
 				editText.setEnabled(false);
+				editText.setTextSize(16);
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 

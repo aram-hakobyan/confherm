@@ -109,20 +109,24 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		}
 
 		DataHolder.getInstance().setMillisUntilFinished(0);
-		Exam exam = db.getExam(examId);
-		long startTime = exam.getStartDate() * 1000;
-		long endTime = exam.getEndDate() * 1000;
-		duration = getDuration(startTime, endTime);
-		updateTimer();
+		try {
+			Exam exam = db.getExam(examId);
+			long startTime = exam.getStartDate() * 1000;
+			long endTime = exam.getEndDate() * 1000;
+			duration = getDuration(startTime, endTime);
+			updateTimer();
 
-		if (db.getExam(examId).getCategoryType().equalsIgnoreCase("2")) {
-			timePause.setVisibility(View.GONE);
-			timePlay.setVisibility(View.GONE);
+			if (db.getExam(examId).getCategoryType().equalsIgnoreCase("2")) {
+				timePause.setVisibility(View.GONE);
+				timePlay.setVisibility(View.GONE);
+			}
+
+			exam.setIsAlreadyPassed(1);
+			db.updateExam(exam);
+			db.close();
+		} catch (Exception e) {		
+			e.printStackTrace();
 		}
-
-		exam.setIsAlreadyPassed(1);
-		db.updateExam(exam);
-		db.close();
 
 		adapter = new ArrayAdapter<String>(ExamExercisesActivity.this,
 				R.layout.item, R.id.tvText, data);

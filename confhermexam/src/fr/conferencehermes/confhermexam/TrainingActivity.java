@@ -317,6 +317,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 			for (int i = answersCount - 1; i >= 0; i--) {
 				RadioButton newRadioButton = new RadioButton(this);
 				newRadioButton.setText(q.getAnswers().get(i).getAnswer());
+				newRadioButton.setTextSize(16);
 				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
 						RadioGroup.LayoutParams.WRAP_CONTENT,
@@ -346,6 +347,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				checkBox.setGravity(Gravity.CENTER_VERTICAL);
 				TextView text = new TextView(TrainingActivity.this);
 				text.setText(q.getAnswers().get(i).getAnswer());
+				text.setTextSize(16);
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
 						LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -404,6 +406,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(TrainingActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
+				editText.setTextSize(16);
 
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);

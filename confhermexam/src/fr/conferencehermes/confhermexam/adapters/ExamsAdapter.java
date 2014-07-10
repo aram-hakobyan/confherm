@@ -128,7 +128,7 @@ public class ExamsAdapter extends BaseAdapter {
 		Calendar calendar = new GregorianCalendar(
 				TimeZone.getTimeZone("Europe/Paris"));
 		long currentTime = calendar.getTimeInMillis() / 1000;
-		return e.getStartDate() < currentTime && e.getEndDate() > currentTime;
+		return true;//e.getStartDate() < currentTime && e.getEndDate() > currentTime;
 
 	}
 

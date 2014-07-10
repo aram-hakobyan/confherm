@@ -56,15 +56,20 @@ public class ExamineFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View fragment = inflater.inflate(R.layout.activity_examine, container,
 				false);
+		progressBarExamin = (ProgressBar) fragment
+				.findViewById(R.id.progressBarExamin);
+		listview = (ListView) fragment.findViewById(R.id.listViewExamine);
 
+		return fragment;
+	}
+
+	@Override
+	public void onResume() {
 		aq = new AQuery(getActivity());
 		db = new DatabaseHelper(getActivity());
 		dbExams = db.getAllExams();
 		validExams = new ArrayList<Exam>();
 
-		progressBarExamin = (ProgressBar) fragment
-				.findViewById(R.id.progressBarExamin);
-		listview = (ListView) fragment.findViewById(R.id.listViewExamine);
 		listview.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -84,7 +89,7 @@ public class ExamineFragment extends Fragment {
 				if (password != null) { // exam is downloaded
 					if (clickedExam.getStatus() == 1) {
 						if (canStartExam(clickedExam)) {
-							if (clickedExam.getIsAlreadyPassed() >= 0) {
+							if (clickedExam.getIsAlreadyPassed() == 0) {
 								if (password.isEmpty()) {
 
 									Intent intent = new Intent(getActivity(),
@@ -94,7 +99,6 @@ public class ExamineFragment extends Fragment {
 									intent.putExtra("event_id",
 											clickedExam.getEventId());
 									startActivity(intent);
-									getActivity().finish();
 								} else {
 									showPasswordAlert(clickedExam.getId(),
 											clickedExam.getEventId(), password);
@@ -178,11 +182,6 @@ public class ExamineFragment extends Fragment {
 			setupAdapterData();
 		}
 
-		return fragment;
-	}
-
-	@Override
-	public void onResume() {
 		super.onResume();
 	}
 
@@ -264,8 +263,7 @@ public class ExamineFragment extends Fragment {
 							ExamExercisesActivity.class);
 					intent.putExtra("exam_id", id);
 					intent.putExtra("event_id", eventId);
-					startActivity(intent);
-					getActivity().finish();
+					startActivity(intent);					
 				} else {
 					Toast.makeText(getActivity(), "Wrong password.",
 							Toast.LENGTH_LONG).show();
