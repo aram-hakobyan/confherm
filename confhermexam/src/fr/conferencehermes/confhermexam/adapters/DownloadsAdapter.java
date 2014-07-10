@@ -73,6 +73,7 @@ public class DownloadsAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(final int position, View view, ViewGroup viewGroup) {
+		System.out.println("getView " + position + " " + view);
 		final ViewHolder holder;
 
 		if (view == null) {
@@ -131,7 +132,6 @@ public class DownloadsAdapter extends BaseAdapter {
 				holder.downloadProgressNumber.setVisibility(View.INVISIBLE);
 				holder.btnAction.setVisibility(View.VISIBLE);
 				mListItems.get(position).setStatus(1);
-				holder.desc.setText("OK");
 			}
 
 			holder.btnAction.setOnClickListener(new OnClickListener() {
@@ -155,10 +155,8 @@ public class DownloadsAdapter extends BaseAdapter {
 				public void onClick(View v) {
 					int status = mListItems.get(position).getStatus();
 					if (status == 1 || status == 2) {
-						// showDialog(position);
-
 						AlertDialog.Builder b = new AlertDialog.Builder(c)
-								.setTitle("Remove file?")
+								.setTitle("Attention")
 								.setMessage(
 										c.getResources().getString(
 												R.string.delete_event_alert))
@@ -289,35 +287,6 @@ public class DownloadsAdapter extends BaseAdapter {
 				}
 			}
 		}
-	}
-
-	private void showDialog(final int pos) {
-		AlertDialog.Builder b = new AlertDialog.Builder(c)
-				.setTitle("Remove file?")
-				.setMessage(
-						c.getResources().getString(R.string.delete_event_alert))
-
-				.setPositiveButton("Yes",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int whichButton) {
-								removeFile(mListItems.get(pos).getRemoveUrl());
-								DatabaseHelper db = new DatabaseHelper(c);
-								db.deleteEvent(mListItems.get(pos).getEventId());
-								db.close();
-							}
-						})
-				.setNegativeButton("Cancel",
-						new DialogInterface.OnClickListener() {
-							public void onClick(DialogInterface dialog,
-									int whichButton) {
-								dialog.dismiss();
-							}
-						});
-
-		AlertDialog alertDialog = b.create();
-		alertDialog.setCancelable(true);
-		alertDialog.show();
 	}
 
 	private void removeFile(String url) {

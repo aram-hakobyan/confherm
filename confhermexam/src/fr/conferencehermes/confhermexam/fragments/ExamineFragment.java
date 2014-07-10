@@ -83,7 +83,7 @@ public class ExamineFragment extends Fragment {
 				if (password != null) { // exam is downloaded
 					if (clickedExam.getStatus() == 1) {
 						if (canStartExam(clickedExam)) {
-							if (clickedExam.getIsAlreadyPassed() == 0) {
+							if (clickedExam.getIsAlreadyPassed() >= 0) {
 								if (password.isEmpty()) {
 
 									Intent intent = new Intent(getActivity(),
@@ -113,7 +113,7 @@ public class ExamineFragment extends Fragment {
 						}
 					} else if (clickedExam.getStatus() == 2) {
 						Utilities.showAlertDialog(getActivity(), "Attention",
-								"Need update");
+								getResources().getString(R.string.need_update));
 					}
 
 				} else {

@@ -1074,6 +1074,12 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
 
+								try {
+									sendAnswers();
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+
 								Intent intentHome = new Intent(
 										ExaminationActivity.this,
 										HomeActivity.class);
@@ -1229,6 +1235,16 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	protected void onStop() {
 		timer.cancel();
 		super.onStop();
+	}
+
+	@Override
+	public void onBackPressed() {
+		if (SEND_DATA)
+			showAlertDialogWhenFinishPressed("Attention", getResources()
+					.getString(R.string.finish_alert_text));
+		else
+			showAlertDialogWhenFinishPressed("Attention", getResources()
+					.getString(R.string.finish_alert_text_abandonner));
 	}
 
 }

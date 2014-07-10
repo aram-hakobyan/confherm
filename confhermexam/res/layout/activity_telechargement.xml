@@ -17,8 +17,7 @@
         android:text="Attention : le téléchargement de données lourdes peut occasionner des frais auprès de votre opérateur téléphonique.
 Nous vous conseillons de vous connecter en WIFI pour télécharger vos épreuves" />
 
-    <ListView
-        android:id="@+id/listViewDownloads"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_centerHorizontal="true"
@@ -26,10 +25,17 @@ Nous vous conseillons de vous connecter en WIFI pour télécharger vos épreuves
         android:layout_marginLeft="100dp"
         android:layout_marginRight="100dp"
         android:layout_marginTop="80dp"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="@dimen/listview_divider_height"
-        android:visibility="gone" >
-    </ListView>
+        android:orientation="vertical" >
+
+        <ListView
+            android:id="@+id/listViewDownloads"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="@dimen/listview_divider_height"
+            android:visibility="gone" >
+        </ListView>
+    </LinearLayout>
 
     <ProgressBar
         android:id="@+id/progressBarTelecharge"
