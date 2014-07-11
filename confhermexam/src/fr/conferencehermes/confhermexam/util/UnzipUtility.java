@@ -104,6 +104,7 @@ public class UnzipUtility {
 					for (int k = 0; k < questions.size(); k++) {
 						db.createQuestion(questions.get(k));
 						db.createQuestionFile(questions.get(k));
+						db.createCorrectionFile(questions.get(k));
 
 						ArrayList<Answer> answers = questions.get(k)
 								.getAnswers();

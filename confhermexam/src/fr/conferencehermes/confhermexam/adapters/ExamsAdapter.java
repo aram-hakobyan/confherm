@@ -7,20 +7,14 @@ import java.util.TimeZone;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.R;
-import fr.conferencehermes.confhermexam.fragments.DownloadsFragment;
 import fr.conferencehermes.confhermexam.parser.Exam;
-import fr.conferencehermes.confhermexam.parser.TimeSlot;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class ExamsAdapter extends BaseAdapter {
@@ -92,7 +86,7 @@ public class ExamsAdapter extends BaseAdapter {
 					+ String.valueOf(calendar.get(Calendar.DAY_OF_MONTH)) + "/"
 					+ String.valueOf(calendar.get(Calendar.MONTH) + 1) + "/"
 					+ String.valueOf(calendar.get(Calendar.YEAR)) + " "
-					+ "at" + " "
+					+ c.getResources().getString(R.string.a_letter) + " "
 					+ startTimeString);
 
 			int status = exam.getStatus();
@@ -128,7 +122,7 @@ public class ExamsAdapter extends BaseAdapter {
 		Calendar calendar = new GregorianCalendar(
 				TimeZone.getTimeZone("Europe/Paris"));
 		long currentTime = calendar.getTimeInMillis() / 1000;
-		return true;//e.getStartDate() < currentTime && e.getEndDate() > currentTime;
+		return e.getStartDate() < currentTime && e.getEndDate() > currentTime;
 
 	}
 

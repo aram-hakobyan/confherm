@@ -124,7 +124,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			exam.setIsAlreadyPassed(1);
 			db.updateExam(exam);
 			db.close();
-		} catch (Exception e) {		
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
@@ -360,12 +360,6 @@ public class ExamExercisesActivity extends FragmentActivity implements
 						getResources().getString(R.string.drop_out_text_ok),
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog, int id) {
-
-								Intent intentHome = new Intent(
-										ExamExercisesActivity.this,
-										HomeActivity.class);
-								startActivity(intentHome);
-
 								ExamExercisesActivity.this.finish();
 								onPaused = false;
 							}

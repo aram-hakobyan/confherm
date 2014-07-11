@@ -1008,6 +1008,9 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
 
+		if (files.isEmpty())
+			return;
+
 		Button button1 = (Button) dialog.findViewById(R.id.button1);
 		Button button2 = (Button) dialog.findViewById(R.id.button2);
 		Button button3 = (Button) dialog.findViewById(R.id.button3);

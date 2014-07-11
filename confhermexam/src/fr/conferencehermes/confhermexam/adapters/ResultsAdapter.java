@@ -4,19 +4,17 @@ import java.util.ArrayList;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 import fr.conferencehermes.confhermexam.CorrectionExercisesActivity;
 import fr.conferencehermes.confhermexam.NotesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
-import fr.conferencehermes.confhermexam.parser.Exam;
+import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Result;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
@@ -50,9 +48,8 @@ public class ResultsAdapter extends BaseAdapter {
 	}
 
 	@Override
-	public View getView(int position, View view, ViewGroup viewGroup) {
+	public View getView(final int position, View view, ViewGroup viewGroup) {
 		ViewHolder holder;
-		final int itemID = (int) mListItems.get(position).getExamId();
 
 		if (view == null) {
 			holder = new ViewHolder();
@@ -60,36 +57,6 @@ public class ResultsAdapter extends BaseAdapter {
 			holder.name = (TextView) view.findViewById(R.id.examNameResultat);
 			holder.desc = (TextView) view.findViewById(R.id.examCorrection);
 			holder.status = (TextView) view.findViewById(R.id.examStats);
-			holder.status.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent intent = new Intent(c, NotesActivity.class);
-					intent.putExtra("exam_id", itemID);
-					c.startActivity(intent);
-				}
-			});
-
-			holder.desc.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-
-					try {
-						db = new DatabaseHelper(c);
-						if (db.getEvent(itemID).getId() != 0) {
-							Intent intent = new Intent(c,
-									CorrectionExercisesActivity.class);
-							intent.putExtra("exam_id", itemID);
-							c.startActivity(intent);
-						} else {
-							Utilities.showAlertDialog(c, "Attention",
-									"Exam not downloaded.");
-						}
-
-					} finally {
-						db.closeDB();
-					}
-				}
-			});
 
 			view.setTag(holder);
 		} else {
@@ -104,6 +71,53 @@ public class ResultsAdapter extends BaseAdapter {
 				holder.status.setText("Note & Stats");
 			}
 		}
+
+		holder.status.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int itemID = (int) mListItems.get(position).getExamId();
+				Intent intent = new Intent(c, NotesActivity.class);
+				intent.putExtra("exam_id", itemID);
+				c.startActivity(intent);
+			}
+		});
+
+		holder.desc.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+
+				try {
+					db = new DatabaseHelper(c);
+					ArrayList<Event> events = db.getAllEvents();
+					Event event = null;
+					int itemID = (int) mListItems.get(position).getExamId();
+					for (int i = 0; i < events.size(); i++) {
+						if (events.get(i).getId() == itemID) {
+							event = events.get(i);
+							break;
+						}
+					}
+
+					if (event != null) {
+						if (event.getId() != 0) {
+							Intent intent = new Intent(c,
+									CorrectionExercisesActivity.class);
+							intent.putExtra("exam_id", itemID);
+							c.startActivity(intent);
+						} else {
+							Utilities.showAlertDialog(c, "Attention",
+									"Exam not downloaded.");
+						}
+					} else {
+						Utilities.showAlertDialog(c, "Attention",
+								"Exam not downloaded.");
+					}
+
+				} finally {
+					db.closeDB();
+				}
+			}
+		});
 
 		return view;
 

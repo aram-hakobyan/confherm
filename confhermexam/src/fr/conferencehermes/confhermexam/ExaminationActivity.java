@@ -113,6 +113,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private int resumPlayingSound = 0;
 	private int resumPlayingVideo = 0;
 	private CounterClass timer;
+	private int maxPosition = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +170,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				if (CONFERENCE)
+				if (questionAnswers.get(position) != null
+						|| position == maxPosition)
 					selectQuestion(questions.get(position), position);
 			}
 
@@ -246,6 +248,9 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			}
 		}
 
+		if (position > maxPosition)
+			maxPosition = position;
+
 		DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
 		currentQuestionId = position;
 		currentQuestion = q;
@@ -294,6 +299,13 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				mRadioGroup.check(v.getId());
 			}
 
+			if (!CONFERENCE)
+				if (questionAnswers.get(position) != null) {
+					for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
+						mRadioGroup.getChildAt(i).setEnabled(false);
+					}
+				}
+
 		} else // Multichoice answer
 		if (q.getType().equalsIgnoreCase("1")) {
 			ArrayList<String> answers = null;
@@ -333,6 +345,18 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 					}
 				});
+
+				if (!CONFERENCE)
+					if (questionAnswers.get(position) != null) {
+						for (int k = 0; k < answersLayout.getChildCount(); k++) {
+							LinearLayout layout = (LinearLayout) answersLayout
+									.getChildAt(k);
+							for (int i1 = 0; i1 < layout.getChildCount(); i1++) {
+								layout.getChildAt(i1).setEnabled(false);
+							}
+						}
+					}
+
 			}
 
 			if (questionAnswers.get(currentQuestionId) != null) {
@@ -384,6 +408,13 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 					editTextsArray.get(c).setText(answers.get(c));
 				}
 			}
+
+			if (!CONFERENCE)
+				if (questionAnswers.get(position) != null) {
+					for (int c = 0; c < editTextsArray.size(); c++) {
+						editTextsArray.get(c).setEnabled(false);
+					}
+				}
 		}
 
 		db.close();
@@ -580,7 +611,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.validerBtn:
 			try {
-				// if (isValidAnswer())
 				{
 					saveValidation();
 					saveQuestionAnswers();
@@ -596,11 +626,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						selectQuestion(questions.get(currentQuestionId),
 								currentQuestionId);
 					}
-				} /*
-				 * else Toast.makeText(ExaminationActivity.this,
-				 * "Please select at least one answer.",
-				 * Toast.LENGTH_SHORT).show();
-				 */
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}
@@ -1087,10 +1113,11 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 									e.printStackTrace();
 								}
 
-								Intent intentHome = new Intent(
+								Intent intent = new Intent(
 										ExaminationActivity.this,
-										HomeActivity.class);
-								startActivity(intentHome);
+										MyFragmentActivity.class);
+								intent.putExtra("PAGE_ID", 2);
+								startActivity(intent);
 
 								ExaminationActivity.this.finish();
 								onPaused = false;

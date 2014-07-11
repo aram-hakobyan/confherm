@@ -16,7 +16,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -83,6 +82,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	int currentPosition = 0;
 	int currentQuestionId = 0;
 	HashMap<String, String> currentQuestionFiles;
+	HashMap<String, String> currentQuestionCorrectionFiles;
 	HashMap<String, String> exerciseFiles;
 	AQuery aq;
 	JSONArray answersArray;
@@ -215,6 +215,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		currentQuestionId = q.getId();
 		currentQuestion = q;
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
+		currentQuestionCorrectionFiles = db.getCorrectionFile(currentQuestion
+				.getId());
 
 		answersLayout.removeAllViews();
 		correctionsLayout.removeAllViews();
@@ -350,6 +352,36 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			btnVideo.setBackgroundResource(R.drawable.ic_video);
 			btnVideo.setClickable(true);
 			btnVideo.setAlpha(1f);
+		}
+	}
+
+	private void setCorrectionFileIcons(HashMap<String, String> files) {
+		if (files.get("image").isEmpty()) {
+			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera_gray);
+			btnImageCorrection.setClickable(false);
+			btnImageCorrection.setAlpha(0.5f);
+		} else {
+			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera);
+			btnImageCorrection.setClickable(true);
+			btnImageCorrection.setAlpha(1f);
+		}
+		if (files.get("sound").isEmpty()) {
+			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound_gray);
+			btnAudioCorrection.setClickable(false);
+			btnAudioCorrection.setAlpha(0.5f);
+		} else {
+			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound);
+			btnAudioCorrection.setClickable(true);
+			btnAudioCorrection.setAlpha(1f);
+		}
+		if (files.get("video").isEmpty()) {
+			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video_gray);
+			btnVideoCorrection.setClickable(false);
+			btnVideoCorrection.setAlpha(0.5f);
+		} else {
+			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video);
+			btnVideoCorrection.setClickable(true);
+			btnVideoCorrection.setAlpha(1f);
 		}
 	}
 
@@ -594,6 +626,21 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		TextView correctionText = (TextView) findViewById(R.id.correctionAnswer);
 		correctionText.setText(corrText);
 
+		btnImageCorrection = (Button) findViewById(R.id.btnImageCorrection);
+		btnAudioCorrection = (Button) findViewById(R.id.btnAudioCorrection);
+		btnVideoCorrection = (Button) findViewById(R.id.btnVideoCorrection);
+		btnImageCorrection.setOnClickListener(this);
+		btnAudioCorrection.setOnClickListener(this);
+		btnVideoCorrection.setOnClickListener(this);
+
+		try {
+			if (currentQuestionCorrectionFiles != null)
+				if (!currentQuestionCorrectionFiles.isEmpty())
+					setCorrectionFileIcons(currentQuestionCorrectionFiles);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 	}
 
 	@Override
@@ -618,6 +665,18 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			if (currentQuestionFiles != null)
 				openDialog(currentQuestionFiles, 3);
 			break;
+		case R.id.btnImageCorrection:
+			if (currentQuestionCorrectionFiles != null)
+				openDialog(currentQuestionCorrectionFiles, 1);
+			break;
+		case R.id.btnAudioCorrection:
+			if (currentQuestionCorrectionFiles != null)
+				openDialog(currentQuestionCorrectionFiles, 2);
+			break;
+		case R.id.btnVideoCorrection:
+			if (currentQuestionCorrectionFiles != null)
+				openDialog(currentQuestionCorrectionFiles, 3);
+			break;
 
 		default:
 			break;
@@ -631,6 +690,9 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		dialog = new Dialog(CorrectionActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
+
+		if (files.isEmpty())
+			return;
 
 		Button button1 = (Button) dialog.findViewById(R.id.button1);
 		Button button2 = (Button) dialog.findViewById(R.id.button2);

@@ -32,6 +32,7 @@ import com.androidquery.callback.AjaxStatus;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
+import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.service.DownloadService;
 import fr.conferencehermes.confhermexam.util.Constants;
@@ -171,8 +172,18 @@ public class DownloadsAdapter extends BaseAdapter {
 														.getRemoveUrl());
 												DatabaseHelper db = new DatabaseHelper(
 														c);
-												db.deleteEvent(mListItems.get(
-														position).getEventId());
+												int eventId = mListItems.get(
+														position).getEventId();
+												db.deleteEvent(eventId);
+												ArrayList<Exam> exams = db
+														.getAllExams();
+												for (int i = 0; i < exams
+														.size(); i++) {
+													if (exams.get(i)
+															.getEventId() == eventId)
+														db.deleteExam(exams
+																.get(i).getId());
+												}
 												db.close();
 
 												holder.desc

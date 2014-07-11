@@ -31,6 +31,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String TABLE_EXERCISE_FILES = "ExerciseFiles";
 	private static final String TABLE_EXERCISES = "Exercises";
 	private static final String TABLE_QUESTION_FILES = "QuestionFiles";
+	private static final String TABLE_CORRECTION_FILES = "CorrectionFiles";
 	private static final String TABLE_QUESTIONS = "Questions";
 	private static final String TABLE_USERS = "Users";
 	private static final String TABLE_ANSWERS = "Answers";
@@ -77,6 +78,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_QUESTION_FILES_IMAGE = "image";
 	private static final String KEY_QUESTION_FILES_AUDIO = "audio";
 	private static final String KEY_QUESTION_FILES_VIDEO = "video";
+
+	// CORRECTION_FILES column names
+	private static final String KEY_CORRECTION_FILES_ID = "questionId";
+	private static final String KEY_CORRECTION_FILES_IMAGE = "image";
+	private static final String KEY_CORRECTION_FILES_AUDIO = "audio";
+	private static final String KEY_CORRECTION_FILES_VIDEO = "video";
 
 	// QUESTIONS column names
 	private static final String KEY_QUESTION_ID = "questionId";
@@ -145,6 +152,13 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ KEY_QUESTION_FILES_AUDIO + " TEXT," + KEY_QUESTION_FILES_VIDEO
 			+ " TEXT" + ")";
 
+	// CorrectionFiles table create statement
+	private static final String CREATE_TABLE_CORRECTION_FILES = "CREATE TABLE "
+			+ TABLE_CORRECTION_FILES + "(" + KEY_CORRECTION_FILES_ID
+			+ " INTEGER PRIMARY KEY," + KEY_CORRECTION_FILES_IMAGE + " TEXT,"
+			+ KEY_CORRECTION_FILES_AUDIO + " TEXT,"
+			+ KEY_CORRECTION_FILES_VIDEO + " TEXT" + ")";
+
 	// Question table create statement
 	private static final String CREATE_TABLE_QUESTION = "CREATE TABLE "
 			+ TABLE_QUESTIONS + "(" + KEY_QUESTION_ID + " INTEGER PRIMARY KEY,"
@@ -184,6 +198,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(CREATE_TABLE_EXERCISE);
 		db.execSQL(CREATE_TABLE_EXERCISE_FILES);
 		db.execSQL(CREATE_TABLE_QUESTION);
+		db.execSQL(CREATE_TABLE_CORRECTION_FILES);
 		db.execSQL(CREATE_TABLE_QUESTION_FILES);
 		db.execSQL(CREATE_TABLE_USER);
 		db.execSQL(CREATE_TABLE_ANSWERS);
@@ -198,6 +213,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE_FILES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTION_FILES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_CORRECTION_FILES);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_QUESTIONS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANSWERS);
@@ -765,6 +781,112 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void deleteQuestionFiles(long question_id) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_QUESTION_FILES, KEY_QUESTION_FILES_ID + " = ?",
+				new String[] { String.valueOf(question_id) });
+	}
+
+	/*
+	 * Creating a correction file
+	 */
+	public long createCorrectionFile(Question q) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_CORRECTION_FILES_ID, q.getId());
+		values.put(KEY_CORRECTION_FILES_AUDIO, q.getCorrectionFiles().get("sound"));
+		values.put(KEY_CORRECTION_FILES_IMAGE, q.getCorrectionFiles().get("image"));
+		values.put(KEY_CORRECTION_FILES_VIDEO, q.getCorrectionFiles().get("video"));
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_CORRECTION_FILES, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single correction files by question id
+	 */
+	public HashMap<String, String> getCorrectionFile(long question_id) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_CORRECTION_FILES
+				+ " WHERE " + KEY_CORRECTION_FILES_ID + " = " + question_id;
+		HashMap<String, String> qFiles = new HashMap<String, String>();
+
+		Cursor c = db.rawQuery(selectQuery, null);
+		if (c != null && c.moveToFirst()) {
+			qFiles.put("image",
+					c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_IMAGE)));
+			qFiles.put("sound",
+					c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_AUDIO)));
+			qFiles.put("video",
+					c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_VIDEO)));
+		}
+
+		return qFiles;
+	}
+
+	/*
+	 * getting all correction files
+	 */
+	public ArrayList<HashMap<String, String>> getAllCorrectionFiles() {
+		ArrayList<HashMap<String, String>> questionFiles = new ArrayList<HashMap<String, String>>();
+		String selectQuery = "SELECT  * FROM " + TABLE_CORRECTION_FILES;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (c != null && c.moveToFirst()) {
+			do {
+				HashMap<String, String> qFiles = new HashMap<String, String>();
+				qFiles.put("image",
+						c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_IMAGE)));
+				qFiles.put("sound",
+						c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_AUDIO)));
+				qFiles.put("video",
+						c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_VIDEO)));
+
+				questionFiles.add(qFiles);
+			} while (c.moveToNext());
+			c.close();
+		}
+
+		return questionFiles;
+	}
+
+	/*
+	 * Updating a correction file
+	 */
+	public int updateCorrectionFiles(Question q) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_CORRECTION_FILES_ID, q.getId());
+		values.put(KEY_CORRECTION_FILES_AUDIO, q.getCorrectionFiles().get("sound"));
+		values.put(KEY_CORRECTION_FILES_IMAGE, q.getCorrectionFiles().get("image"));
+		values.put(KEY_CORRECTION_FILES_VIDEO, q.getCorrectionFiles().get("video"));
+
+		// updating row
+		return db.update(TABLE_CORRECTION_FILES, values, KEY_CORRECTION_FILES_ID
+				+ " = ?", new String[] { String.valueOf(q.getId()) });
+	}
+
+	/*
+	 * Deleting a correction file
+	 */
+	public void deleteCorrectionFiles(long question_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_CORRECTION_FILES, KEY_CORRECTION_FILES_ID + " = ?",
 				new String[] { String.valueOf(question_id) });
 	}
 
