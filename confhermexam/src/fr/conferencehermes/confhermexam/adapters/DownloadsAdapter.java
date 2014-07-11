@@ -187,7 +187,10 @@ public class DownloadsAdapter extends BaseAdapter {
 												db.close();
 
 												holder.desc
-														.setText("Telecharger");
+														.setText(c
+																.getResources()
+																.getString(
+																		R.string.telecharger));
 												holder.btnAction
 														.setBackgroundResource(R.drawable.exam_download);
 												holder.btnRemove
