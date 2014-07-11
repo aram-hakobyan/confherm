@@ -68,7 +68,7 @@
 
     <string name="my_profile_name">Nom</string>
     <string name="my_profile_lastname">Prénom</string>
-    <string name="my_profile_login">Login</string>
+    <string name="my_profile_login">Identifiant</string>
     <string name="my_profile_groups">Mes groupes</string>
     <string name="my_profile_logout">CHANGER DE COMPTE</string>
     <string name="my_profile_email">Email</string>
@@ -96,7 +96,7 @@
     <string name="download">Téléchargement</string>
 
     <!-- Note & Stats -->
-    <string name="notes_stats_target">Ma note</string>
+    <string name="notes_stats_target">Me situer</string>
     <string name="notes_stats_moyenne">Moyenne</string>
     <string name="notes_stats_medianne">Medianne</string>
     <string name="notes_stats_rang">RANG</string>

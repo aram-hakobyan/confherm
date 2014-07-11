@@ -151,10 +151,10 @@ public class MyProfileFragment extends Fragment {
 
 		}
 		pInformation.setText(information);
-		pFirsName.setText(name + " : " + firstName);
-		pLastName.setText(lastname + " : " + lastName);
-		pUserName.setText(login + " : " + userName);
-		pEmailAdress.setText(emails + " : " + email);
+		pFirsName.setText(name + "  " + firstName);
+		pLastName.setText(lastname + "  " + lastName);
+		pUserName.setText(login + "  " + userName);
+		pEmailAdress.setText(emails + "  " + email);
 
 		return pFragment;
 	}
