@@ -36,7 +36,6 @@ import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.service.DownloadService;
 import fr.conferencehermes.confhermexam.util.Constants;
-import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class DownloadsAdapter extends BaseAdapter {
@@ -44,7 +43,6 @@ public class DownloadsAdapter extends BaseAdapter {
 	private LayoutInflater mLayoutInflater;
 	private Context c;
 	private AQuery aq;
-	int donwloadPercent = 0;
 	int eventId = -1;
 
 	public DownloadsAdapter(Context context,
@@ -64,17 +62,17 @@ public class DownloadsAdapter extends BaseAdapter {
 
 	@Override
 	public Object getItem(int i) {
-		return null;
+		return mListItems.get(i);
 	}
 
 	@Override
 	public long getItemId(int i) {
-		return 0;
+		return i;
 	}
 
 	@Override
 	public View getView(final int position, View view, ViewGroup viewGroup) {
-		System.out.println("getView " + position + " " + view);
+
 		final ViewHolder holder;
 
 		if (view == null) {
@@ -95,127 +93,131 @@ public class DownloadsAdapter extends BaseAdapter {
 		}
 
 		String stringItem = (String) mListItems.get(position).getName();
-		if (stringItem != null) {
+		if (stringItem != null)
 			if (holder.name != null) {
 				holder.name.setText(stringItem);
 
 			}
 
-			int status = mListItems.get(position).getStatus();
-			if (status == 1) {
-				holder.desc.setText("OK");
-				holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
-				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
-			} else if (status == 2) {
-				holder.desc.setText(c.getResources().getString(
-						R.string.need_update));
-				holder.btnAction.setBackgroundResource(R.drawable.exam_refresh);
-				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
-			} else if (status == 3) {
-				holder.desc.setText("Disponible");
-				holder.btnAction
-						.setBackgroundResource(R.drawable.exam_download);
-				holder.btnRemove
-						.setBackgroundResource(R.drawable.exam_delete_disabled);
-			}
+		int progress = mListItems.get(position).getProgress();
+		int status = mListItems.get(position).getStatus();
 
-			int progress = DataHolder.getInstance().getDownloadPercents()[position];
-			if (progress > 0 && progress < 100) {
-				holder.downloadProgressNumber.setText(String.valueOf(progress)
-						+ "%");
-				holder.desc.setText(c.getResources().getString(
-						R.string.download));
-			} else if (progress == 100) {
-				holder.desc.setText("OK");
-				holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
-				holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
-				holder.progressBar.setVisibility(View.INVISIBLE);
-				holder.downloadProgressNumber.setVisibility(View.INVISIBLE);
-				holder.btnAction.setVisibility(View.VISIBLE);
-				mListItems.get(position).setStatus(1);
-			}
-
-			holder.btnAction.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					int status = mListItems.get(position).getStatus();
-					if (status == 2 || status == 3) {
-						downloadFile(mListItems.get(position).getDownloadUrl(),
-								mListItems.get(position).getName(), position);
-						holder.progressBar.setVisibility(View.VISIBLE);
-						holder.btnAction.setVisibility(View.INVISIBLE);
-						holder.downloadProgressNumber
-								.setVisibility(View.VISIBLE);
-					}
-
-				}
-			});
-
-			holder.btnRemove.setOnClickListener(new OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					int status = mListItems.get(position).getStatus();
-					if (status == 1 || status == 2) {
-						AlertDialog.Builder b = new AlertDialog.Builder(c)
-								.setTitle("Attention")
-								.setMessage(
-										c.getResources().getString(
-												R.string.delete_event_alert))
-
-								.setPositiveButton("Yes",
-										new DialogInterface.OnClickListener() {
-											public void onClick(
-													DialogInterface dialog,
-													int whichButton) {
-												removeFile(mListItems.get(
-														position)
-														.getRemoveUrl());
-												DatabaseHelper db = new DatabaseHelper(
-														c);
-												int eventId = mListItems.get(
-														position).getEventId();
-												db.deleteEvent(eventId);
-												ArrayList<Exam> exams = db
-														.getAllExams();
-												for (int i = 0; i < exams
-														.size(); i++) {
-													if (exams.get(i)
-															.getEventId() == eventId)
-														db.deleteExam(exams
-																.get(i).getId());
-												}
-												db.close();
-
-												holder.desc
-														.setText(c
-																.getResources()
-																.getString(
-																		R.string.telecharger));
-												holder.btnAction
-														.setBackgroundResource(R.drawable.exam_download);
-												holder.btnRemove
-														.setBackgroundResource(R.drawable.exam_delete_disabled);
-												mListItems.get(position)
-														.setStatus(3);
-											}
-										})
-								.setNegativeButton("Cancel",
-										new DialogInterface.OnClickListener() {
-											public void onClick(
-													DialogInterface dialog,
-													int whichButton) {
-												dialog.dismiss();
-											}
-										});
-
-						AlertDialog alertDialog = b.create();
-						alertDialog.setCancelable(true);
-						alertDialog.show();
-					}
-
-				}
-			});
+		if (status == 1) {
+			holder.desc.setText("OK");
+			holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
+			holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
+		} else if (status == 2) {
+			holder.desc.setText(c.getResources()
+					.getString(R.string.need_update));
+			holder.btnAction.setBackgroundResource(R.drawable.exam_refresh);
+			holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
+		} else if (status == 3) {
+			holder.desc.setText("Disponible");
+			holder.btnAction.setBackgroundResource(R.drawable.exam_download);
+			holder.btnRemove
+					.setBackgroundResource(R.drawable.exam_delete_disabled);
 		}
+
+		if (mListItems.get(position).isDownloading()) {
+			holder.downloadProgressNumber.setVisibility(View.VISIBLE);
+			holder.progressBar.setVisibility(View.VISIBLE);
+			holder.btnAction.setVisibility(View.INVISIBLE);
+		} else {
+			holder.downloadProgressNumber.setVisibility(View.INVISIBLE);
+			holder.progressBar.setVisibility(View.INVISIBLE);
+			holder.btnAction.setVisibility(View.VISIBLE);
+		}
+
+		if (progress > 0 && progress < 100) {
+			holder.downloadProgressNumber.setText(String.valueOf(progress)
+					+ "%");
+			holder.desc.setText(c.getResources().getString(R.string.download));
+		} else if (progress == 100) {
+			holder.desc.setText("OK");
+			holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
+			holder.btnRemove.setBackgroundResource(R.drawable.exam_delete);
+			holder.progressBar.setVisibility(View.INVISIBLE);
+			holder.downloadProgressNumber.setVisibility(View.INVISIBLE);
+			holder.btnAction.setVisibility(View.VISIBLE);
+			mListItems.get(position).setStatus(1);
+		}
+
+		holder.btnAction.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int status = mListItems.get(position).getStatus();
+				if (status == 2 || status == 3) {
+					downloadFile(mListItems.get(position).getDownloadUrl(),
+							mListItems.get(position).getName(), position);
+					holder.progressBar.setVisibility(View.VISIBLE);
+					holder.btnAction.setVisibility(View.INVISIBLE);
+					holder.downloadProgressNumber.setVisibility(View.VISIBLE);
+				}
+
+			}
+		});
+
+		holder.btnRemove.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				int status = mListItems.get(position).getStatus();
+				if (status == 1 || status == 2) {
+					AlertDialog.Builder b = new AlertDialog.Builder(c)
+							.setTitle("Attention")
+							.setMessage(
+									c.getResources().getString(
+											R.string.delete_event_alert))
+
+							.setPositiveButton("Yes",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int whichButton) {
+											removeFile(mListItems.get(position)
+													.getRemoveUrl(), position);
+											DatabaseHelper db = new DatabaseHelper(
+													c);
+											int eventId = mListItems.get(
+													position).getEventId();
+											db.deleteEvent(eventId);
+											ArrayList<Exam> exams = db
+													.getAllExams();
+											for (int i = 0; i < exams.size(); i++) {
+												if (exams.get(i).getEventId() == eventId)
+													db.deleteExam(exams.get(i)
+															.getId());
+											}
+											db.close();
+
+											holder.desc
+													.setText(c
+															.getResources()
+															.getString(
+																	R.string.telecharger));
+											holder.btnAction
+													.setBackgroundResource(R.drawable.exam_download);
+											holder.btnRemove
+													.setBackgroundResource(R.drawable.exam_delete_disabled);
+											mListItems.get(position).setStatus(
+													3);
+										}
+									})
+							.setNegativeButton("Cancel",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int whichButton) {
+											dialog.dismiss();
+										}
+									});
+
+					AlertDialog alertDialog = b.create();
+					alertDialog.setCancelable(true);
+					alertDialog.show();
+				}
+
+			}
+		});
 
 		if (position % 2 == 0) {
 			view.setBackgroundColor(Color.parseColor("#f5f5f5"));
@@ -225,6 +227,7 @@ public class DownloadsAdapter extends BaseAdapter {
 
 		if (eventId != -1) {
 			if (mListItems.get(position).getEventId() == eventId) {
+				eventId = -1;
 				downloadFile(mListItems.get(position).getDownloadUrl(),
 						mListItems.get(position).getName(), position);
 				holder.progressBar.setVisibility(View.VISIBLE);
@@ -257,9 +260,6 @@ public class DownloadsAdapter extends BaseAdapter {
 
 				try {
 					if (json.has("data") && json.get("data") != null) {
-						// downloadZip(json.getString("data"));
-						// DownloadTask downloadTask = new DownloadTask(c);
-						// downloadTask.execute(json.getString("data"), title);
 						Intent intent = new Intent(c, DownloadService.class);
 						intent.putExtra("url", json.getString("data"));
 						intent.putExtra("title", title);
@@ -288,22 +288,23 @@ public class DownloadsAdapter extends BaseAdapter {
 			super.onReceiveResult(resultCode, resultData);
 			if (resultCode == DownloadService.UPDATE_PROGRESS) {
 				int progress = resultData.getInt("progress");
-				donwloadPercent = progress;
 				int pos = resultData.getInt("position");
 
-				DataHolder.getInstance().getDownloadPercents()[pos] = progress;
-				notifyDataSetChanged();
+				mListItems.get(pos).setDownloading(true);
+				mListItems.get(pos).setProgress(progress);
 
 				Log.d(String.valueOf(pos) + " DOWNLOADED: ",
 						String.valueOf(progress));
 				if (progress == 100) {
-					// DownloadsAdapter.this.get
+					DownloadsAdapter.this.mListItems.get(pos).setStatus(1);
 				}
+
+				notifyDataSetChanged();
 			}
 		}
 	}
 
-	private void removeFile(String url) {
+	private void removeFile(String url, final int position) {
 		AQuery aq = new AQuery(c);
 
 		Map<String, Object> params = new HashMap<String, Object>();
@@ -317,6 +318,9 @@ public class DownloadsAdapter extends BaseAdapter {
 				try {
 					if (json != null)
 						if (json.has("status") && json.getInt("status") == 200) {
+							mListItems.get(position).setStatus(3);
+							mListItems.get(position).setProgress(0);
+							mListItems.get(position).setDownloading(false);
 							notifyDataSetChanged();
 						}
 

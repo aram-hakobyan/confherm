@@ -7,6 +7,8 @@ public class DownloadInstance {
 	private String downloadUrl;
 	private String removeUrl;
 	private long lastEditTime;
+	private int progress = 0;
+	private boolean downloading = false;
 
 	public int getEventId() {
 		return eventId;
@@ -54,6 +56,22 @@ public class DownloadInstance {
 
 	public void setLastEditTime(long lastEditTime) {
 		this.lastEditTime = lastEditTime;
+	}
+
+	public int getProgress() {
+		return progress;
+	}
+
+	public void setProgress(int progress) {
+		this.progress = progress;
+	}
+
+	public boolean isDownloading() {
+		return downloading;
+	}
+
+	public void setDownloading(boolean downloading) {
+		this.downloading = downloading;
 	}
 
 }

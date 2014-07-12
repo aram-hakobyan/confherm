@@ -106,6 +106,7 @@ public class DownloadService extends IntentService {
 			try {
 				Bundle resultData = new Bundle();
 				resultData.putInt("progress", 100);
+				resultData.putInt("position", position);
 				receiver.send(UPDATE_PROGRESS, resultData);
 			} catch (Exception e) {
 				e.printStackTrace();

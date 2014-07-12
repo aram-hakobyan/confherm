@@ -419,6 +419,11 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 
+				if (i == 0) {
+					editText.setFocusableInTouchMode(true);
+					editText.requestFocus();
+				}
+
 			}
 			if (questionAnswers.get(currentQuestionId) != null) {
 				ArrayList<String> answers = questionAnswers.get(

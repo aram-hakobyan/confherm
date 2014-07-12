@@ -72,6 +72,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EXERCISE_TYPE = "type";
 	private static final String KEY_EXERCISE_CREATED_BY = "createdBy";
 	private static final String KEY_EXERCISE_EXAM_ID = "examId";
+	private static final String KEY_EXERCISE_TEXT = "text";
 
 	// QUESTION_FILES column names
 	private static final String KEY_QUESTION_FILES_ID = "questionId";
@@ -142,8 +143,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ TABLE_EXERCISES + "(" + KEY_EXERCISE_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_EXERCISE_NAME + " TEXT," + KEY_EXERCISE_TYPE + " TEXT,"
 			+ KEY_EXERCISE_IS_ALREADY_PASSED + " INTEGER,"
-			+ KEY_EXERCISE_CREATED_BY + " TEXT," + KEY_EXERCISE_EXAM_ID
-			+ " INTEGER" + ")";
+			+ KEY_EXERCISE_CREATED_BY + " TEXT," + KEY_EXERCISE_TEXT + " TEXT,"
+			+ KEY_EXERCISE_EXAM_ID + " INTEGER" + ")";
 
 	// QuestionFiles table create statement
 	private static final String CREATE_TABLE_QUESTION_FILES = "CREATE TABLE "
@@ -792,9 +793,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_CORRECTION_FILES_ID, q.getId());
-		values.put(KEY_CORRECTION_FILES_AUDIO, q.getCorrectionFiles().get("sound"));
-		values.put(KEY_CORRECTION_FILES_IMAGE, q.getCorrectionFiles().get("image"));
-		values.put(KEY_CORRECTION_FILES_VIDEO, q.getCorrectionFiles().get("video"));
+		values.put(KEY_CORRECTION_FILES_AUDIO,
+				q.getCorrectionFiles().get("sound"));
+		values.put(KEY_CORRECTION_FILES_IMAGE,
+				q.getCorrectionFiles().get("image"));
+		values.put(KEY_CORRECTION_FILES_VIDEO,
+				q.getCorrectionFiles().get("video"));
 
 		// insert row
 		db.beginTransaction();
@@ -849,12 +853,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		if (c != null && c.moveToFirst()) {
 			do {
 				HashMap<String, String> qFiles = new HashMap<String, String>();
-				qFiles.put("image",
-						c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_IMAGE)));
-				qFiles.put("sound",
-						c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_AUDIO)));
-				qFiles.put("video",
-						c.getString(c.getColumnIndex(KEY_CORRECTION_FILES_VIDEO)));
+				qFiles.put("image", c.getString(c
+						.getColumnIndex(KEY_CORRECTION_FILES_IMAGE)));
+				qFiles.put("sound", c.getString(c
+						.getColumnIndex(KEY_CORRECTION_FILES_AUDIO)));
+				qFiles.put("video", c.getString(c
+						.getColumnIndex(KEY_CORRECTION_FILES_VIDEO)));
 
 				questionFiles.add(qFiles);
 			} while (c.moveToNext());
@@ -872,13 +876,17 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_CORRECTION_FILES_ID, q.getId());
-		values.put(KEY_CORRECTION_FILES_AUDIO, q.getCorrectionFiles().get("sound"));
-		values.put(KEY_CORRECTION_FILES_IMAGE, q.getCorrectionFiles().get("image"));
-		values.put(KEY_CORRECTION_FILES_VIDEO, q.getCorrectionFiles().get("video"));
+		values.put(KEY_CORRECTION_FILES_AUDIO,
+				q.getCorrectionFiles().get("sound"));
+		values.put(KEY_CORRECTION_FILES_IMAGE,
+				q.getCorrectionFiles().get("image"));
+		values.put(KEY_CORRECTION_FILES_VIDEO,
+				q.getCorrectionFiles().get("video"));
 
 		// updating row
-		return db.update(TABLE_CORRECTION_FILES, values, KEY_CORRECTION_FILES_ID
-				+ " = ?", new String[] { String.valueOf(q.getId()) });
+		return db.update(TABLE_CORRECTION_FILES, values,
+				KEY_CORRECTION_FILES_ID + " = ?",
+				new String[] { String.valueOf(q.getId()) });
 	}
 
 	/*
@@ -901,6 +909,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXERCISE_EXAM_ID, exercise.getExamId());
 		values.put(KEY_EXERCISE_IS_ALREADY_PASSED,
 				exercise.getExerciseIsAlreadyPassed());
+		values.put(KEY_EXERCISE_TEXT, exercise.getText());
 
 		// insert row
 		db.beginTransaction();
@@ -935,6 +944,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 					.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
 			exercise.setExerciseIsAlreadyPassed(c.getInt(c
 					.getColumnIndex(KEY_EXERCISE_IS_ALREADY_PASSED)));
+			exercise.setText(c.getString(c.getColumnIndex(KEY_EXERCISE_TEXT)));
 		}
 		return exercise;
 	}
@@ -962,6 +972,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 						.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
 				exercise.setExerciseIsAlreadyPassed(c.getInt(c
 						.getColumnIndex(KEY_EXERCISE_IS_ALREADY_PASSED)));
+				exercise.setText(c.getString(c
+						.getColumnIndex(KEY_EXERCISE_TEXT)));
 
 				exercises.add(exercise);
 			} while (c.moveToNext());
@@ -985,6 +997,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXERCISE_EXAM_ID, exercise.getExamId());
 		values.put(KEY_EXERCISE_IS_ALREADY_PASSED,
 				exercise.getExerciseIsAlreadyPassed());
+		values.put(KEY_EXERCISE_TEXT, exercise.getText());
 
 		// updating row
 		return db.update(TABLE_EXERCISES, values, KEY_EXERCISE_ID + " = ?",
@@ -1024,6 +1037,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 							.getColumnIndex(KEY_EXERCISE_CREATED_BY)));
 					exercise.setExerciseIsAlreadyPassed(c.getInt(c
 							.getColumnIndex(KEY_EXERCISE_IS_ALREADY_PASSED)));
+					exercise.setText(c.getString(c
+							.getColumnIndex(KEY_EXERCISE_TEXT)));
 					exercises.add(exercise);
 				}
 

@@ -400,6 +400,11 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 
+				if (i == 0) {
+					editText.setFocusableInTouchMode(true);
+					editText.requestFocus();
+				}
+
 			}
 			if (questionAnswers.get(currentQuestionId) != null) {
 				ArrayList<String> answers = questionAnswers.get(
@@ -643,19 +648,35 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			break;
 		case R.id.ennouncer:
 			if (exerciseFiles != null)
-				openDialog(exerciseFiles, 0);
+				try {
+					openDialog(exerciseFiles, 0);
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
 			break;
 		case R.id.btnImage:
 			if (currentQuestionFiles != null)
-				openDialog(currentQuestionFiles, 1);
+				try {
+					openDialog(currentQuestionFiles, 1);
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
 			break;
 		case R.id.btnAudio:
 			if (currentQuestionFiles != null)
-				openDialog(currentQuestionFiles, 2);
+				try {
+					openDialog(currentQuestionFiles, 2);
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
 			break;
 		case R.id.btnVideo:
 			if (currentQuestionFiles != null)
-				openDialog(currentQuestionFiles, 3);
+				try {
+					openDialog(currentQuestionFiles, 3);
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				}
 			break;
 
 		default:
@@ -692,7 +713,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 	private Dialog dialog = null;
 
-	public void openDialog(HashMap<String, String> files, int from) {
+	public void openDialog(HashMap<String, String> files, int from)
+			throws NullPointerException {
 		dialog = new Dialog(ExaminationActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
