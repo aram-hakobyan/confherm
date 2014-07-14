@@ -93,7 +93,7 @@ public class ExercisesActivity extends FragmentActivity implements
 										R.id.tvText, data);
 								gvMain = (GridView) findViewById(R.id.gvMain);
 								gvMain.setAdapter(adapter);
-								updateTimer();
+								updateTimer(exercises.get(0).getDuration());
 
 							}
 						} catch (JSONException e) {
@@ -105,10 +105,18 @@ public class ExercisesActivity extends FragmentActivity implements
 
 	}
 
-	private void updateTimer() {
+	@Override
+	protected void onResume() {
+		if (exercises != null)
+			if (!exercises.isEmpty())
+				updateTimer(DataHolder.getInstance().getMillisUntilFinished());
+		super.onResume();
+	}
+
+	private void updateTimer(long mills) {
 		// Utilities.writeLong(ExercisesActivity.this, "millisUntilFinished",
 		// 0);
-		timer = new CounterClass(exercises.get(0).getDuration(), 1000);
+		timer = new CounterClass(mills, 1000);
 		timer.start();
 	}
 
@@ -129,8 +137,14 @@ public class ExercisesActivity extends FragmentActivity implements
 	}
 
 	@Override
-	protected void onStop() {
+	protected void onPause() {
 		timer.cancel();
+		super.onPause();
+	}
+
+	@Override
+	protected void onStop() {
+
 		super.onStop();
 	}
 
@@ -148,6 +162,7 @@ public class ExercisesActivity extends FragmentActivity implements
 		@Override
 		public void onFinish() {
 			timerText.setText("");
+			finish();
 		}
 
 		@Override

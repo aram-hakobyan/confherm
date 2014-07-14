@@ -137,6 +137,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 	private int resumPlayingVideo = 0;
 	private CounterClass timer;
 	private int currentPosition = 0;
+	private ScreenReceiver mReceiver;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -154,7 +155,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		// INITIALIZE RECEIVER
 		IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
 		filter.addAction(Intent.ACTION_SCREEN_OFF);
-		BroadcastReceiver mReceiver = new ScreenReceiver();
+		mReceiver = new ScreenReceiver();
 		registerReceiver(mReceiver, filter);
 
 		editTextsArray = new ArrayList<EditText>();
@@ -1443,7 +1444,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 	protected void onDestroy() {
 		mediaPlayer.stop();
 		mediaPlayer.release();
-
+		unregisterReceiver(mReceiver);
 		super.onDestroy();
 	}
 

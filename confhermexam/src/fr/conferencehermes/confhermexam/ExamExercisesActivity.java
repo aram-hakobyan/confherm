@@ -114,7 +114,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			long startTime = exam.getStartDate() * 1000;
 			long endTime = exam.getEndDate() * 1000;
 			duration = getDuration(startTime, endTime);
-			updateTimer();
+			updateTimer(duration);
 
 			if (db.getExam(examId).getCategoryType().equalsIgnoreCase("2")) {
 				timePause.setVisibility(View.GONE);
@@ -168,8 +168,8 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 	}
 
-	private void updateTimer() {
-		timer = new CounterClass(duration, 1000);
+	private void updateTimer(long mills) {
+		timer = new CounterClass(mills, 1000);
 		timer.start();
 	}
 
@@ -196,21 +196,6 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 	}
 
-	@Override
-	protected void onStop() {
-		timer.cancel();
-		Log.d("ONSTOP", "ONSTOPCALLED");
-
-		super.onStop();
-	}
-
-	@Override
-	protected void onStart() {
-		if (timer != null)
-			timer.start();
-		super.onStart();
-	}
-
 	public class CounterClass extends CountDownTimer {
 		public CounterClass(long millisInFuture, long countDownInterval) {
 			super(millisInFuture, countDownInterval);
@@ -219,6 +204,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		@Override
 		public void onFinish() {
 			timerText.setText("");
+			showAlertDialog();
 		}
 
 		@Override
@@ -295,7 +281,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 	@Override
 	protected void onResume() {
-		super.onResume();
+
 		// ONLY WHEN SCREEN TURNS ON
 		if (!ScreenReceiver.wasScreenOn) {
 			// THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
@@ -311,6 +297,9 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			Constants.calledFromExam = false;
 		}
 
+		if (DataHolder.getInstance().getMillisUntilFinished() != 0)
+			updateTimer(DataHolder.getInstance().getMillisUntilFinished());
+		super.onResume();
 	}
 
 	@Override
@@ -327,7 +316,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 	@Override
 	protected void onPause() {
-
+		timer.cancel();
 		onPaused = true;
 
 		if (Constants.calledFromExam == true) {

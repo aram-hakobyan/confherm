@@ -488,7 +488,8 @@ public class JSONParser {
 		return score;
 	}
 
-	public static ArrayList<Correction> parseResultCorrections(JSONObject json) {
+	public static ArrayList<Correction> parseResultCorrections(JSONObject json,
+			String directory) {
 		ArrayList<Correction> correctionsList = new ArrayList<Correction>();
 
 		try {
@@ -511,6 +512,43 @@ public class JSONParser {
 					for (int j = 0; j < answers.length(); j++) {
 						answersArray.add(String.valueOf(answers.get(j)));
 					}
+
+					HashMap<String, String> qFilesCorrection = new HashMap<String, String>();
+					JSONObject correctionFiles = (JSONObject) obj
+							.getJSONObject("question_correction_files");
+					JSONArray imgArrayCorrection = (JSONArray) correctionFiles
+							.getJSONArray("image");
+					if (imgArrayCorrection.length() != 0) {
+						JSONObject imgObjCorrection = (JSONObject) imgArrayCorrection
+								.get(0);
+						qFilesCorrection.put("image", imgObjCorrection
+								.getString("file") != null ? directory
+								+ imgObjCorrection.getString("file") : "");
+					} else
+						qFilesCorrection.put("image", "");
+					JSONArray soundArrayCorrection = (JSONArray) correctionFiles
+							.getJSONArray("sound");
+					if (soundArrayCorrection.length() != 0) {
+						JSONObject soundObjCorrection = (JSONObject) soundArrayCorrection
+								.get(0);
+						qFilesCorrection.put("sound", soundObjCorrection
+								.getString("file") != null ? directory
+								+ soundObjCorrection.getString("file") : "");
+					} else
+						qFilesCorrection.put("sound", "");
+					JSONArray videoArrayCorrection = (JSONArray) correctionFiles
+							.getJSONArray("video");
+					if (videoArrayCorrection.length() != 0) {
+						JSONObject videoObjCorrection = (JSONObject) videoArrayCorrection
+								.get(0);
+						qFilesCorrection.put("video", videoObjCorrection
+								.getString("file") != null ? directory
+								+ videoObjCorrection.getString("file") : "");
+					} else
+						qFilesCorrection.put("video", "");
+
+					c.setFiles(qFilesCorrection);
+
 					c.setAnswersArray(answersArray);
 					correctionsList.add(c);
 				}

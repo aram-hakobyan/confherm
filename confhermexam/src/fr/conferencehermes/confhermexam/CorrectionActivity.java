@@ -58,10 +58,12 @@ import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.CorrectionAnswer;
+import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class CorrectionActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
@@ -215,8 +217,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		currentQuestionId = q.getId();
 		currentQuestion = q;
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
-		currentQuestionCorrectionFiles = db.getCorrectionFile(currentQuestion
-				.getId());
+		currentQuestionCorrectionFiles = corrections.get(position).getFiles();
 
 		answersLayout.removeAllViews();
 		correctionsLayout.removeAllViews();
@@ -390,6 +391,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
 		params.put("exercise_id", exercise_id);
 		params.put("event_id", event_id);
+		DatabaseHelper db = new DatabaseHelper(CorrectionActivity.this);
+		Event event = db.getEvent(event_id);
+		db.close();
+		final String dir = Utilities.readString(CorrectionActivity.this,
+				"directory:" + event.getName(), "");
 
 		aq.ajax(Constants.EXAM_EXERCISE_CORRECTIONS_URL, params,
 				JSONObject.class, new AjaxCallback<JSONObject>() {
@@ -401,7 +407,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						try {
 							if (json.has("data") && json.get("data") != null) {
 								corrections = JSONParser
-										.parseResultCorrections(json);
+										.parseResultCorrections(json, dir);
 								answers = JSONParser
 										.parseCorrectionAnswers(json);
 								selectQuestion(questions.get(0), 0);

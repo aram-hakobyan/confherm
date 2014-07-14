@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 import fr.conferencehermes.confhermexam.connection.BaseNetworkManager;
 import fr.conferencehermes.confhermexam.connection.NetworkReachability;
@@ -98,6 +99,12 @@ public class LoginActivity extends Activity implements ActionDelegate {
 			}
 
 		}
+
+		SharedPreferences profilePreferences = getSharedPreferences(
+				"fr.conferencehermes.confhermexam.fragments.MYPROFILE",
+				Context.MODE_PRIVATE);
+		String information = profilePreferences.getString("pInformation", "");
+		((TextView) findViewById(R.id.loginInfoText)).setText(information);
 	}
 
 	@Override

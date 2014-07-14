@@ -80,6 +80,8 @@ public class UnzipUtility {
 			JSONObject json = getJsonFromTextFile(fileUrl, destDirectory);
 			event = ExamJsonParser.parseExamData(json,
 					(destDirectory + File.separator));
+			Utilities.writeString(context, "directory:" + event.getName(),
+					destDirectory + File.separator);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -104,7 +106,6 @@ public class UnzipUtility {
 					for (int k = 0; k < questions.size(); k++) {
 						db.createQuestion(questions.get(k));
 						db.createQuestionFile(questions.get(k));
-						db.createCorrectionFile(questions.get(k));
 
 						ArrayList<Answer> answers = questions.get(k)
 								.getAnswers();

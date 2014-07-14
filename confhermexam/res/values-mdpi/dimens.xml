@@ -13,5 +13,6 @@
     <dimen name="main_menu_button_size">150dp</dimen>
     <dimen name="planning_button_width">320dp</dimen>
     <dimen name="planning_button_margin">5dp</dimen>
+    <dimen name="header_logo_width">150dp</dimen>
 
 </resources>

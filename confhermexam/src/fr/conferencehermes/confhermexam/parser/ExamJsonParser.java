@@ -172,42 +172,6 @@ public class ExamJsonParser {
 
 			q.setFiles(qFiles);
 
-			HashMap<String, String> qFilesCorrection = new HashMap<String, String>();
-			JSONObject correctionFiles = (JSONObject) qObj
-					.getJSONObject("question_correction_files");
-			JSONArray imgArrayCorrection = (JSONArray) correctionFiles
-					.getJSONArray("image");
-			if (imgArrayCorrection.length() != 0) {
-				JSONObject imgObjCorrection = (JSONObject) imgArrayCorrection
-						.get(0);
-				qFilesCorrection.put("image",
-						imgObjCorrection.getString("file") != null ? directory
-								+ imgObjCorrection.getString("file") : "");
-			} else
-				qFilesCorrection.put("image", "");
-			JSONArray soundArrayCorrection = (JSONArray) files
-					.getJSONArray("sound");
-			if (soundArrayCorrection.length() != 0) {
-				JSONObject soundObjCorrection = (JSONObject) soundArrayCorrection
-						.get(0);
-				qFilesCorrection.put("sound", soundObjCorrection
-						.getString("file") != null ? directory
-						+ soundObjCorrection.getString("file") : "");
-			} else
-				qFilesCorrection.put("sound", "");
-			JSONArray videoArrayCorrection = (JSONArray) files
-					.getJSONArray("video");
-			if (videoArrayCorrection.length() != 0) {
-				JSONObject videoObjCorrection = (JSONObject) videoArrayCorrection
-						.get(0);
-				qFilesCorrection.put("video", videoObjCorrection
-						.getString("file") != null ? directory
-						+ videoObjCorrection.getString("file") : "");
-			} else
-				qFilesCorrection.put("video", "");
-
-			q.setCorrectionFiles(qFilesCorrection);
-
 			JSONArray answers = (JSONArray) qObj.getJSONArray("answers");
 			ArrayList<Answer> answersArrayList = new ArrayList<Answer>();
 			for (int i = 0; i < answers.length(); i++) {
