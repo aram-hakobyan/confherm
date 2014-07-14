@@ -182,9 +182,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
 		String type = exercise.getType();
-		if (type.equalsIgnoreCase("2")) {
-			Log.d("EXAM TYPE: ", "CONFERENCE");
-			CONFERENCE = true;
+		CONFERENCE = getIntent().getBooleanExtra("conference", false);
+		if (CONFERENCE) {
 			ennouncer.setVisibility(View.GONE);
 		} else {
 			Log.d("EXAM TYPE: ", "EXAM");

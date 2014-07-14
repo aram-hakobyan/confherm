@@ -54,6 +54,7 @@
     <string name="login_username_text">Votre Identifiant Hermes</string>
     <string name="login_password_text">Votre Mot de passe Hermes</string>
     <string name="login_button_text">CONNEXION</string>
+    <string name="wrong_login_data">N\'existe pas un tel utilisateur</string>
 
     <!-- Home -->
 
@@ -95,6 +96,7 @@
     <string name="examen_not_avaible">Non disponible</string>
     <string name="need_update">Mettre à jour</string>
     <string name="download">Téléchargement</string>
+    <string name="wrong_password">Incorrect mot de passe.</string>
 
     <!-- Note & Stats -->
     <string name="notes_stats_target">Me situer</string>

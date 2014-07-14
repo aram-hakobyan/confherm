@@ -265,7 +265,8 @@ public class ExamineFragment extends Fragment {
 					intent.putExtra("event_id", eventId);
 					startActivity(intent);
 				} else {
-					Toast.makeText(getActivity(), "Wrong password.",
+					Toast.makeText(getActivity(),
+							getResources().getString(R.string.wrong_password),
 							Toast.LENGTH_LONG).show();
 				}
 			}

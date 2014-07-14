@@ -115,8 +115,6 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		// String information = profilePreferences.getString("pInformation",
 		// "");
 
-		
-	
 	}
 
 	@Override
@@ -216,8 +214,9 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	@Override
 	public void didFailRequestProcessing(String Message) {
 
-		Toast.makeText(getApplicationContext(), Message, Toast.LENGTH_SHORT)
-				.show();
+		Toast.makeText(getApplicationContext(),
+				getResources().getString(R.string.wrong_login_data),
+				Toast.LENGTH_SHORT).show();
 
 	}
 
@@ -266,16 +265,12 @@ public class LoginActivity extends Activity implements ActionDelegate {
 										// Profile uProf = new Profile();
 										loginInfoText = JSONParser
 												.parseLoginInfo(json);
-										Log.i("********"
-												+ "********"
-												+ "********"
-												+ "********"
-												+ "********"
-												+ "********"
-												+ "v"
-												+ "v"
-												+ "", loginInfoText);
-										((TextView) findViewById(R.id.loginInfoText)).setText(loginInfoText);
+										Log.i("********" + "********"
+												+ "********" + "********"
+												+ "********" + "********" + "v"
+												+ "v" + "", loginInfoText);
+										((TextView) findViewById(R.id.loginInfoText))
+												.setText(loginInfoText);
 									}
 								}
 							} catch (JSONException e) {

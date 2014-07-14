@@ -31,7 +31,6 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
-import fr.conferencehermes.confhermexam.R.string;
 import fr.conferencehermes.confhermexam.adapters.ExerciseAdapter;
 import fr.conferencehermes.confhermexam.adapters.NotesAdapter;
 import fr.conferencehermes.confhermexam.connection.NetworkReachability;
@@ -89,7 +88,7 @@ public class NotesActivity extends Activity {
 
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
-	
+
 		listviewEx.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
@@ -232,7 +231,17 @@ public class NotesActivity extends Activity {
 											adapterEx = new ExerciseAdapter(
 													NotesActivity.this, listEx);
 											listviewEx.setAdapter(adapterEx);
-											
+
+											for (int i = 0; i < listviewEx
+													.getChildCount(); i++) {
+												listviewEx
+														.getChildAt(i)
+														.setBackgroundColor(
+																getResources()
+																		.getColor(
+																				R.color.excercise_normal_color));
+											}
+
 											teacherName
 													.setText(ExamExercise.created_by);
 											examName.setText(ExamExercise.exam_name);

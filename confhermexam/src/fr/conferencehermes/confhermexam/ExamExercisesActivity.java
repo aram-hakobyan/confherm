@@ -58,6 +58,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 	private boolean TIMER_PAUSED = false;
 
 	private boolean onPaused = false;
+	private boolean CONFERENCE = false;
 
 	// private boolean calledFromExam = false;
 
@@ -117,8 +118,11 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			updateTimer(duration);
 
 			if (db.getExam(examId).getCategoryType().equalsIgnoreCase("2")) {
+				CONFERENCE = false;
 				timePause.setVisibility(View.GONE);
 				timePlay.setVisibility(View.GONE);
+			} else {
+				CONFERENCE = true;
 			}
 
 			exam.setIsAlreadyPassed(1);
@@ -187,6 +191,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 		intent.putExtra("exercise_id", id);
 		intent.putExtra("exam_id", examId);
 		intent.putExtra("event_id", eventId);
+		intent.putExtra("conference", CONFERENCE);
 		startActivity(intent);
 	}
 
