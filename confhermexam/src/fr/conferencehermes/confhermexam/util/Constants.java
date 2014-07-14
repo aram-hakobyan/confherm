@@ -19,6 +19,7 @@ public class Constants {
 	public static String SERVER_URL_AUTH = "http://ecni.conference-hermes.fr/api/authenticate";
 	public static String EXERCISE_RESULT_URL = "http://ecni.conference-hermes.fr/api/exerciseresult";
 	public static String RESULT_LIST_URL = "http://ecni.conference-hermes.fr/api/resultlist";
+	public static String LOGIN_INFO_URL = "http://ecni.conference-hermes.fr/api/login_page_info";
 	public static String TRAINING_URL = "http://ecni.conference-hermes.fr/api/training";
 	public static String TRAINING_EXERCISE_URL = "http://ecni.conference-hermes.fr/api/traningexercise";
 	public static String TRAINING_LIST_URL = "http://ecni.conference-hermes.fr/api/traininglist";

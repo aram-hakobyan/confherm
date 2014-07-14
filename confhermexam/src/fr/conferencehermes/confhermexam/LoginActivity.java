@@ -6,6 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.NameValuePair;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
 
 import android.app.Activity;
 import android.content.Context;
@@ -23,11 +29,13 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import fr.conferencehermes.confhermexam.adapters.ResultsAdapter;
 import fr.conferencehermes.confhermexam.connection.BaseNetworkManager;
 import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.connectionhelper.ActionDelegate;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestCreator;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestHelper;
+import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Profile;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.Utilities;
@@ -46,6 +54,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	private SharedPreferences logoutPrefs;
 	public static Context context;
 	boolean logout;
+	private String loginInfoText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +65,7 @@ public class LoginActivity extends Activity implements ActionDelegate {
 		ViewTracker.getInstance().setCurrentContext(this);
 		ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
 		context = LoginActivity.this;
-
+		requestLoginInfoText();
 		username = (EditText) findViewById(R.id.loginRow);
 		password = (EditText) findViewById(R.id.passwordRow);
 		loginContentLayout = (LinearLayout) findViewById(R.id.loginContentLayout);
@@ -100,11 +109,14 @@ public class LoginActivity extends Activity implements ActionDelegate {
 
 		}
 
-		SharedPreferences profilePreferences = getSharedPreferences(
-				"fr.conferencehermes.confhermexam.fragments.MYPROFILE",
-				Context.MODE_PRIVATE);
-		String information = profilePreferences.getString("pInformation", "");
-		((TextView) findViewById(R.id.loginInfoText)).setText(information);
+		// SharedPreferences profilePreferences = getSharedPreferences(
+		// "fr.conferencehermes.confhermexam.fragments.MYPROFILE",
+		// Context.MODE_PRIVATE);
+		// String information = profilePreferences.getString("pInformation",
+		// "");
+
+		
+	
 	}
 
 	@Override
@@ -230,6 +242,55 @@ public class LoginActivity extends Activity implements ActionDelegate {
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		setIntent(intent);
+	}
+
+	public void requestLoginInfoText() {
+
+		AQuery aq = new AQuery(LoginActivity.this);
+
+		HashMap<String, Object> params = new HashMap<String, Object>();
+
+		if (Utilities.isNetworkAvailable(LoginActivity.this)) {
+			aq.ajax(Constants.LOGIN_INFO_URL, params, JSONObject.class,
+					new AjaxCallback<JSONObject>() {
+						@Override
+						public void callback(String url, JSONObject json,
+								AjaxStatus status) {
+
+							try {
+								if (json.has(Constants.KEY_STATUS)
+										&& json.get(Constants.KEY_STATUS) != null) {
+									if (json.getInt("status") == 200) {
+										// pData =
+										// JSONParser.parseProfileData(json);
+										// Profile uProf = new Profile();
+										loginInfoText = JSONParser
+												.parseLoginInfo(json);
+										Log.i("********"
+												+ "********"
+												+ "********"
+												+ "********"
+												+ "********"
+												+ "********"
+												+ "v"
+												+ "v"
+												+ "", loginInfoText);
+										((TextView) findViewById(R.id.loginInfoText)).setText(loginInfoText);
+									}
+								}
+							} catch (JSONException e) {
+								e.printStackTrace();
+
+							}
+						}
+					});
+		} else {
+
+			Toast.makeText(getApplicationContext(),
+					getResources().getString(R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
+
+		}
 	}
 
 }

@@ -20,7 +20,7 @@ public class JSONParser {
 		try {
 			if (pData != null) {
 				JSONObject jsonObj = new JSONObject(pData);
-				JSONObject data = jsonObj.getJSONObject("data");
+				JSONObject data = jsonObj.getJSONObject(Constants.KEY_DATA);
 
 				USER_ID = data.getString("user_id");
 				AUTH_KEY = data.getString("auth_key");
@@ -29,6 +29,21 @@ public class JSONParser {
 			e.printStackTrace();
 		}
 
+	}
+
+	public static String parseLoginInfo(JSONObject json) {
+		String loginInfo = null;
+		try {
+			if (json != null) {
+				JSONObject data = json.getJSONObject(Constants.KEY_DATA);
+				loginInfo = data.getString("text");
+			}
+
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+
+		return loginInfo;
 	}
 
 	public static ArrayList<Training> parseTrainings(JSONObject json) {
