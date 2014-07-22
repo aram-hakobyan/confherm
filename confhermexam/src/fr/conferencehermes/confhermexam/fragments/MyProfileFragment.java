@@ -1,8 +1,6 @@
 package fr.conferencehermes.confhermexam.fragments;
 
 import java.util.HashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +15,6 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 import fr.conferencehermes.confhermexam.LoginActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.connection.NetworkReachability;

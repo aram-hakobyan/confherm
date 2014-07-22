@@ -15,5 +15,6 @@
     <dimen name="planning_button_width">380dp</dimen>
     <dimen name="planning_button_margin">20dp</dimen>
     <dimen name="header_logo_width">150dp</dimen>
+    <dimen name="profile_text_size">20sp</dimen>
 
 </resources>
