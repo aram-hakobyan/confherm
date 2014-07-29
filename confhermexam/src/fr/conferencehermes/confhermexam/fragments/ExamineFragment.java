@@ -67,7 +67,13 @@ public class ExamineFragment extends Fragment {
 	public void onResume() {
 		aq = new AQuery(getActivity());
 		db = new DatabaseHelper(getActivity());
-		dbExams = db.getAllExams();
+		try {
+			dbExams = db.getAllExams();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+			super.onResume();
+			return;
+		}
 		validExams = new ArrayList<Exam>();
 
 		listview.setOnItemClickListener(new OnItemClickListener() {

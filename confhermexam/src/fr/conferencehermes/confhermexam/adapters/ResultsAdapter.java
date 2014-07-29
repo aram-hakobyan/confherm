@@ -88,7 +88,16 @@ public class ResultsAdapter extends BaseAdapter {
 
 				try {
 					db = new DatabaseHelper(c);
-					ArrayList<Event> events = db.getAllEvents();
+					ArrayList<Event> events = null;
+					try {
+						events = db.getAllEvents();
+					} catch (Exception e) {
+						e.printStackTrace();
+						return;
+					}
+					if (events == null)
+						return;
+
 					Event event = null;
 					int itemID = (int) mListItems.get(position).getExamId();
 					for (int i = 0; i < events.size(); i++) {

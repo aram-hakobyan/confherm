@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.InputType;
 import android.util.Log;
+import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -63,6 +64,7 @@ import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class CorrectionActivity extends Activity implements OnClickListener {
@@ -99,6 +101,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private int resumPlayingVideo = 0;
 	private ArrayList<Correction> corrections;
 	private ArrayList<CorrectionAnswer> answers;
+	private boolean CONFERENCE = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -158,8 +161,19 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			ennouncer.setVisibility(View.GONE);
 		}
 		questions = db.getAllQuestionsByExerciseId(exercise_id);
-		System.out
-				.println("DB ALL QUESTIONS***********" + db.getAllQuestions());
+		int qCount = exercise.getQuestions().size();
+		SparseBooleanArray selectedQuestions = new SparseBooleanArray(qCount);
+		for (int i = 0; i < selectedQuestions.size(); i++) {
+			selectedQuestions.put(i, false);
+		}
+		DataHolder.getInstance().setSelectedQuestions(selectedQuestions);
+		if (exercise.getType().equalsIgnoreCase("2"))
+			CONFERENCE = true;
+		else
+			CONFERENCE = false;
+		if (CONFERENCE) {
+			ennouncer.setVisibility(View.GONE);
+		}
 
 		adapter = new QuestionsAdapter(CorrectionActivity.this, questions);
 		listview.setAdapter(adapter);
@@ -200,24 +214,15 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 	private void selectQuestion(Question q, int position) {
 		currentPosition = position;
-		int wantedPosition = position;
-		int firstPosition = listview.getFirstVisiblePosition()
-				- listview.getHeaderViewsCount();
-		int wantedChild = wantedPosition - firstPosition;
-		if (wantedChild >= 0 && wantedChild < listview.getChildCount()) {
-			listview.getChildAt(wantedChild).setBackgroundColor(
-					getResources().getColor(R.color.app_main_color_dark));
-			for (int i = 0; i < listview.getChildCount(); i++) {
-				if (i != wantedChild)
-					listview.getChildAt(i).setBackgroundColor(
-							getResources().getColor(R.color.app_main_color));
-			}
-		}
+		DataHolder.getInstance().getSelectedQuestions().put(position, true);
+		adapter.notifyDataSetChanged();
 
 		currentQuestionId = q.getId();
 		currentQuestion = q;
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
-		currentQuestionCorrectionFiles = corrections.get(position).getFiles();
+		if (position < corrections.size())
+			currentQuestionCorrectionFiles = corrections.get(position)
+					.getFiles();
 
 		answersLayout.removeAllViews();
 		correctionsLayout.removeAllViews();
@@ -1095,6 +1100,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	protected void onDestroy() {
 		mediaPlayer.stop();
 		mediaPlayer.release();
+		db.close();
 		super.onDestroy();
 	}
 

@@ -2,7 +2,6 @@ package fr.conferencehermes.confhermexam.db;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 import android.content.ContentValues;
 import android.content.Context;

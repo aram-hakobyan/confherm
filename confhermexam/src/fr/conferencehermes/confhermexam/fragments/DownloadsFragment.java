@@ -50,7 +50,12 @@ public class DownloadsFragment extends Fragment {
 				container, false);
 		aq = new AQuery(getActivity());
 		db = new DatabaseHelper(getActivity());
-		dbEvents = db.getAllEvents();
+		try {
+			dbEvents = db.getAllEvents();
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		progressBarTelecharge = (ProgressBar) fragment
 				.findViewById(R.id.progressBarTelecharge);

@@ -57,7 +57,7 @@ public class ResultatFragment extends Fragment {
 						@Override
 						public void callback(String url, JSONObject json,
 								AjaxStatus status) {
-							
+
 							try {
 								if (json.has(Constants.KEY_STATUS)
 										&& json.get(Constants.KEY_STATUS) != null) {
@@ -71,14 +71,25 @@ public class ResultatFragment extends Fragment {
 											adapter = new ResultsAdapter(
 													getActivity(), rList);
 											listview.setAdapter(adapter);
-											progressBar
-													.setVisibility(View.GONE);
+										} else {
+											Toast.makeText(
+													getActivity(),
+													"Currently not available for any of event",
+													Toast.LENGTH_LONG).show();
 										}
+
+										progressBar.setVisibility(View.GONE);
 									}
 								}
 							} catch (JSONException e) {
 								e.printStackTrace();
-
+							} catch (NullPointerException e) {
+								e.printStackTrace();
+								progressBar.setVisibility(View.GONE);
+								Toast.makeText(
+										getActivity(),
+										"Currently not available for any of event",
+										Toast.LENGTH_LONG).show();
 							}
 						}
 					});
@@ -87,8 +98,8 @@ public class ResultatFragment extends Fragment {
 			Toast.makeText(
 					getActivity().getApplicationContext(),
 					getActivity().getResources().getString(
-							R.string.no_internet_connection), Toast.LENGTH_SHORT)
-					.show();
+							R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
 
 		}
 		return fragment;

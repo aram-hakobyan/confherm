@@ -87,7 +87,7 @@ public class ExamJsonParser {
 		exercise.setExamId(examId);
 		exercise.setName(data.getString("name"));
 		exercise.setType(data.getString("type"));
-		// exercise.setExerciseType(data.getInt("exercise_type"));
+		//exercise.setExerciseType(data.getInt("type"));
 		exercise.setText(data.getString("text"));
 		exercise.setTeacher(data.getString("created_by"));
 

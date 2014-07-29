@@ -90,10 +90,20 @@ public class UnzipUtility {
 
 		if (event != null) {
 			db = new DatabaseHelper(context);
+			try {
+				db.deleteEvent(event.getId());
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			db.createEvent(event);
 
 			ArrayList<Exam> exams = event.getExams();
 			for (int i = 0; i < exams.size(); i++) {
+				try {
+					db.deleteExam(exams.get(i).getId());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 				db.createExam(exams.get(i));
 
 				ArrayList<Exercise> exercises = exams.get(i).getExercises();

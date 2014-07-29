@@ -103,6 +103,15 @@ public class DownloadService extends IntentService {
 				e.printStackTrace();
 			}
 
+			String zipFilePath = path;
+			String destDirectory = path + " zipped";
+			UnzipUtility unzipper = new UnzipUtility();
+			try {
+				unzipper.unzip(zipFilePath, destDirectory, DownloadService.this);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+
 			try {
 				Bundle resultData = new Bundle();
 				resultData.putInt("progress", 100);
@@ -113,14 +122,6 @@ public class DownloadService extends IntentService {
 			}
 
 			mWakeLock.release();
-			String zipFilePath = path;
-			String destDirectory = path + " zipped";
-			UnzipUtility unzipper = new UnzipUtility();
-			try {
-				unzipper.unzip(zipFilePath, destDirectory, DownloadService.this);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
 
 			return "OK";
 		}
