@@ -114,6 +114,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private int resumPlayingVideo = 0;
 	private CounterClass timer;
 	private int maxPosition = 0;
+	private boolean DIALOG_IS_OPEN = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -189,6 +190,13 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			Log.d("EXAM TYPE: ", "EXAM");
 		}
 
+		int qCount = exercise.getQuestions().size();
+		SparseBooleanArray selectedQuestions = new SparseBooleanArray(qCount);
+		for (int i = 0; i < selectedQuestions.size(); i++) {
+			selectedQuestions.put(i, false);
+		}
+		DataHolder.getInstance().setSelectedQuestions(selectedQuestions);
+
 		exercise.setExerciseIsAlreadyPassed(1);
 		db.updateExercise(exercise);
 
@@ -235,17 +243,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	private void selectQuestion(Question q, int position) {
-		int wantedPosition = position;
-		int firstPosition = listview.getFirstVisiblePosition()
-				- listview.getHeaderViewsCount();
-		int wantedChild = wantedPosition - firstPosition;
-		if (wantedChild >= 0 && wantedChild < listview.getChildCount()) {
-			listview.getChildAt(wantedChild).setBackgroundColor(
-					getResources().getColor(R.color.app_main_color_dark));
-			for (int i = 0; i < listview.getChildCount(); i++) {
-
-			}
-		}
+		DataHolder.getInstance().getSelectedQuestions().put(position, true);
+		adapter.notifyDataSetChanged();
 
 		if (position > maxPosition)
 			maxPosition = position;
@@ -646,7 +645,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 			break;
 		case R.id.ennouncer:
-			if (exerciseFiles != null)
+			if (exerciseFiles != null && !DIALOG_IS_OPEN)
 				try {
 					openDialog(exerciseFiles, 0);
 				} catch (NullPointerException e) {
@@ -654,7 +653,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				}
 			break;
 		case R.id.btnImage:
-			if (currentQuestionFiles != null)
+			if (currentQuestionFiles != null && !DIALOG_IS_OPEN)
 				try {
 					openDialog(currentQuestionFiles, 1);
 				} catch (NullPointerException e) {
@@ -662,7 +661,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				}
 			break;
 		case R.id.btnAudio:
-			if (currentQuestionFiles != null)
+			if (currentQuestionFiles != null && !DIALOG_IS_OPEN)
 				try {
 					openDialog(currentQuestionFiles, 2);
 				} catch (NullPointerException e) {
@@ -670,7 +669,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				}
 			break;
 		case R.id.btnVideo:
-			if (currentQuestionFiles != null)
+			if (currentQuestionFiles != null && !DIALOG_IS_OPEN)
 				try {
 					openDialog(currentQuestionFiles, 3);
 				} catch (NullPointerException e) {
@@ -714,6 +713,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 	public void openDialog(HashMap<String, String> files, int from)
 			throws NullPointerException {
+		DIALOG_IS_OPEN = true;
 		dialog = new Dialog(ExaminationActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
@@ -1092,6 +1092,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
+				} finally {
+					DIALOG_IS_OPEN = false;
 				}
 			}
 		});

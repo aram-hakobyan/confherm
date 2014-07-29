@@ -31,7 +31,6 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnDismissListener;
@@ -41,8 +40,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnPreparedListener;
-import android.media.MediaPlayer.OnVideoSizeChangedListener;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -138,6 +135,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 	private CounterClass timer;
 	private int currentPosition = 0;
 	private ScreenReceiver mReceiver;
+	private boolean DIALOG_IS_OPEN = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -227,6 +225,15 @@ public class TrainingActivity extends Activity implements OnClickListener {
 										TrainingActivity.this, exercise
 												.getQuestions());
 
+								int qCount = exercise.getQuestions().size();
+								SparseBooleanArray selectedQuestions = new SparseBooleanArray(
+										qCount);
+								for (int i = 0; i < selectedQuestions.size(); i++) {
+									selectedQuestions.put(i, false);
+								}
+								DataHolder.getInstance().setSelectedQuestions(
+										selectedQuestions);
+
 								listview.setAdapter(adapter);
 								examName.setText(exercise.getName());
 								teacher.setText("Teacher "
@@ -282,21 +289,8 @@ public class TrainingActivity extends Activity implements OnClickListener {
 
 	private void selectQuestion(Question q, int position) {
 		currentPosition = position;
-		int wantedPosition = position;
-		int firstPosition = listview.getFirstVisiblePosition()
-				- listview.getHeaderViewsCount();
-		int wantedChild = wantedPosition - firstPosition;
-		if (wantedChild >= 0 && wantedChild < listview.getChildCount()) {
-			for (int i = 0; i < listview.getChildCount(); i++) {
-				if (i == wantedChild)
-					listview.getChildAt(i).setBackgroundColor(
-							getResources()
-									.getColor(R.color.app_main_color_dark));
-				// else
-				// listview.getChildAt(i).setBackgroundColor(
-				// getResources().getColor(R.color.app_main_color));
-			}
-		}
+		DataHolder.getInstance().getSelectedQuestions().put(position, true);
+		adapter.notifyDataSetChanged();
 
 		currentQuestionId = position;
 		currentQuestion = q;
@@ -916,31 +910,31 @@ public class TrainingActivity extends Activity implements OnClickListener {
 			}
 			break;
 		case R.id.ennouncer:
-			if (exercise != null)
+			if (exercise != null && !DIALOG_IS_OPEN)
 				openDialog(exercise.getFiles(), 0);
 			break;
 		case R.id.btnImage:
-			if (currentQuestion != null)
+			if (currentQuestion != null && !DIALOG_IS_OPEN)
 				openDialog(currentQuestion.getFiles(), 1);
 			break;
 		case R.id.btnAudio:
-			if (currentQuestion != null)
+			if (currentQuestion != null && !DIALOG_IS_OPEN)
 				openDialog(currentQuestion.getFiles(), 2);
 			break;
 		case R.id.btnVideo:
-			if (currentQuestion != null)
+			if (currentQuestion != null && !DIALOG_IS_OPEN)
 				openDialog(currentQuestion.getFiles(), 3);
 			break;
 		case R.id.btnImageCorrection:
-			if (currentQuestion != null)
+			if (currentQuestion != null && !DIALOG_IS_OPEN)
 				openDialog(currentQuestion.getCorrectionFiles(), 1);
 			break;
 		case R.id.btnAudioCorrection:
-			if (currentQuestion != null)
+			if (currentQuestion != null && !DIALOG_IS_OPEN)
 				openDialog(currentQuestion.getCorrectionFiles(), 2);
 			break;
 		case R.id.btnVideoCorrection:
-			if (currentQuestion != null)
+			if (currentQuestion != null && !DIALOG_IS_OPEN)
 				openDialog(currentQuestion.getCorrectionFiles(), 3);
 			break;
 
@@ -1013,6 +1007,8 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		dialog = new Dialog(TrainingActivity.this);
 		dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
 		dialog.setContentView(R.layout.new_dialog);
+
+		DIALOG_IS_OPEN = true;
 
 		if (files.isEmpty())
 			return;
@@ -1425,6 +1421,8 @@ public class TrainingActivity extends Activity implements OnClickListener {
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
+				} finally {
+					DIALOG_IS_OPEN = false;
 				}
 			}
 		});

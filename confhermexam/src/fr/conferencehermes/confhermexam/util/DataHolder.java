@@ -2,6 +2,7 @@ package fr.conferencehermes.confhermexam.util;
 
 import java.util.ArrayList;
 
+import android.util.SparseBooleanArray;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.DownloadInstance;
 import fr.conferencehermes.confhermexam.parser.Exam;
@@ -20,6 +21,7 @@ public class DataHolder {
 	private ArrayList<Correction> corrections;
 	private long millisUntilFinished;
 	private int[] downloadPercents;
+	private SparseBooleanArray selectedQuestions;
 
 	private DataHolder() {
 		setExams(new ArrayList<Exam>());
@@ -28,7 +30,7 @@ public class DataHolder {
 		setTrainingExercises(new ArrayList<TrainingExercise>());
 		setDownloads(new ArrayList<DownloadInstance>());
 		setCorrections(new ArrayList<Correction>());
-
+		setSelectedQuestions(new SparseBooleanArray());
 	}
 
 	public static DataHolder getInstance() {
@@ -102,6 +104,14 @@ public class DataHolder {
 
 	public void setDownloadPercents(int[] downloadPercents) {
 		this.downloadPercents = downloadPercents;
+	}
+
+	public SparseBooleanArray getSelectedQuestions() {
+		return selectedQuestions;
+	}
+
+	public void setSelectedQuestions(SparseBooleanArray selectedQuestions) {
+		this.selectedQuestions = selectedQuestions;
 	}
 
 }
