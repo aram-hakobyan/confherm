@@ -14,7 +14,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -88,6 +90,20 @@ public class NotesActivity extends Activity {
 
 		listviewNt = (ListView) findViewById(R.id.notesListView);
 		listviewEx = (ListView) findViewById(R.id.exercizesListViewNotes);
+
+		ViewTreeObserver vto = listviewEx.getViewTreeObserver();
+		vto.addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+			@SuppressWarnings("deprecation")
+			@Override
+			public void onGlobalLayout() {
+				for (int i = 0; i < listviewEx.getChildCount(); i++) {
+					listviewEx.getChildAt(i).setBackgroundColor(
+							getResources().getColor(R.color.app_main_color));
+				}
+				listviewEx.getViewTreeObserver().removeGlobalOnLayoutListener(
+						this);
+			}
+		});
 
 		listviewEx.setOnItemClickListener(new OnItemClickListener() {
 			@Override

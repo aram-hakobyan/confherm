@@ -111,6 +111,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 			startTime;
 	Question currentQuestion;
 	int currentQuestionId = 0;
+	int padding = 10;
 
 	AQuery aq;
 	JSONArray answersArray;
@@ -315,8 +316,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				newRadioButton.setTextSize(16);
 				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
-						RadioGroup.LayoutParams.WRAP_CONTENT,
-						RadioGroup.LayoutParams.WRAP_CONTENT);
+						RadioGroup.LayoutParams.WRAP_CONTENT, 50);
 				mRadioGroup.addView(newRadioButton, 0, layoutParams);
 
 			}
@@ -345,12 +345,10 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				text.setTextSize(16);
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						LinearLayout.LayoutParams.WRAP_CONTENT,
-						LinearLayout.LayoutParams.WRAP_CONTENT);
-				layoutParams.setMargins(0, -5, 0, 0);
-				checkBoxLayout.addView(checkBox);
+						LinearLayout.LayoutParams.WRAP_CONTENT, 50);
+				checkBoxLayout.addView(checkBox, layoutParams);
 				checkBoxLayout.addView(text, layoutParams);
-				answersLayout.addView(checkBoxLayout);
+				answersLayout.addView(checkBoxLayout, layoutParams);
 
 				checkBox.setTag(q.getAnswers().get(i).getId());
 				checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -407,10 +405,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						LinearLayout.LayoutParams.MATCH_PARENT,
-						LinearLayout.LayoutParams.WRAP_CONTENT);
-				if (i != 0)
-					layoutParams.setMargins(0, 10, 0, 0);
+						LinearLayout.LayoutParams.MATCH_PARENT, 50);
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 
@@ -666,7 +661,6 @@ public class TrainingActivity extends Activity implements OnClickListener {
 
 		for (int j = 0; j < answerCount; j++) {
 			ImageView img = new ImageView(TrainingActivity.this);
-
 			LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
 					30, 30);
 
@@ -675,7 +669,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 					mRadioGroup.getChildAt(i).setEnabled(false);
 				}
 
-				imageParams.setMargins(0, 7, 0, 0);
+				imageParams.setMargins(padding, padding, padding, padding);
 				int userAnswerIDs = questionAnswers.get(currentQuestionId)
 						.getSingleAnswerPosition();
 
@@ -700,7 +694,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 					}
 				}
 
-				imageParams.setMargins(0, 5, 0, 0);
+				imageParams.setMargins(padding, padding, padding, padding);
 
 				ArrayList<Integer> userAnswerIDs = questionAnswers.get(
 						currentQuestionId).getMultiAnswerPositions();
@@ -729,7 +723,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				}
 
 			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-				imageParams.setMargins(0, 20, 0, 0);
+				imageParams.setMargins(padding, padding, padding, padding);
 
 				try {
 					JSONObject corObj = new JSONObject(corrections
@@ -774,6 +768,28 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		btnVideoCorrection.setOnClickListener(this);
 
 		setCorrectionFileIcons(currentQuestion.getCorrectionFiles());
+
+		try {
+			if (currentQuestion.getCorrectionFiles() != null
+					&& !currentQuestion.getCorrectionFiles().isEmpty()) {
+				setCorrectionFileIcons(currentQuestion.getCorrectionFiles());
+			} else {
+				btnImageCorrection.setAlpha(0.5f);
+				btnAudioCorrection.setAlpha(0.5f);
+				btnVideoCorrection.setAlpha(0.5f);
+				btnImageCorrection.setEnabled(false);
+				btnAudioCorrection.setEnabled(false);
+				btnVideoCorrection.setEnabled(false);
+				btnImageCorrection
+						.setBackgroundResource(R.drawable.ic_camera_gray);
+				btnAudioCorrection
+						.setBackgroundResource(R.drawable.ic_sound_gray);
+				btnVideoCorrection
+						.setBackgroundResource(R.drawable.ic_video_gray);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 

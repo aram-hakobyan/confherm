@@ -284,8 +284,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				newRadioButton.setTextSize(16);
 				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
-						RadioGroup.LayoutParams.WRAP_CONTENT,
-						RadioGroup.LayoutParams.WRAP_CONTENT);
+						RadioGroup.LayoutParams.WRAP_CONTENT, 50);
 				mRadioGroup.addView(newRadioButton, 0, layoutParams);
 
 			}
@@ -319,12 +318,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				text.setTextSize(16);
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						LinearLayout.LayoutParams.WRAP_CONTENT,
-						LinearLayout.LayoutParams.WRAP_CONTENT);
-				layoutParams.setMargins(0, -5, 0, 0);
-				checkBoxLayout.addView(checkBox);
+						LinearLayout.LayoutParams.WRAP_CONTENT, 50);
+				checkBoxLayout.addView(checkBox, layoutParams);
 				checkBoxLayout.addView(text, layoutParams);
-				answersLayout.addView(checkBoxLayout);
+				answersLayout.addView(checkBoxLayout, layoutParams);
 
 				checkBox.setTag(currentQuestionAnswers.get(i).getId());
 				checkBox.setOnCheckedChangeListener(new OnCheckedChangeListener() {
@@ -392,10 +389,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						LinearLayout.LayoutParams.MATCH_PARENT,
-						LinearLayout.LayoutParams.WRAP_CONTENT);
-				if (i != 0)
-					layoutParams.setMargins(0, 10, 0, 0);
+						LinearLayout.LayoutParams.MATCH_PARENT, 50);
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 

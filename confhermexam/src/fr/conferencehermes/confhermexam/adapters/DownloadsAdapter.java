@@ -129,9 +129,7 @@ public class DownloadsAdapter extends BaseAdapter {
 		}
 
 		if (progress > 0 && progress < 100) {
-			holder.downloadProgressNumber.setText(String.valueOf(progress)
-					+ "%");
-			holder.desc.setText(c.getResources().getString(R.string.download));
+			holder.desc.setText(String.valueOf(progress) + "%");
 		} else if (progress == 100) {
 			holder.desc.setText("OK");
 			holder.btnAction.setBackgroundResource(R.drawable.exam_checked);
