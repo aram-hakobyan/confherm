@@ -96,6 +96,8 @@ public class MyProfileFragment extends Fragment {
 			profileEditor = profilePreferences.edit();
 
 			if (pData != null) {
+				profileEditor.clear();
+				profileEditor.commit();
 				profileEditor.putString("profileFirstName",
 						pData.getFirstName());
 				profileEditor.putString("profileLastName", pData.getLastName());
@@ -108,8 +110,12 @@ public class MyProfileFragment extends Fragment {
 				pGroups.setText(groups + "no groups available");
 			} else {
 				HashMap<String, String> groupsHashmap = pData.getGroups();
-
 				groupsEditor = groupsShared.edit();
+				if (groupsEditor != null) {
+					groupsEditor.clear();
+					groupsEditor.commit();
+				}
+		
 				for (String s : groupsHashmap.keySet()) {
 					groupsEditor.putString(s, groupsHashmap.get(s));
 				}
