@@ -446,6 +446,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		TextView reponse = (TextView) findViewById(R.id.reponse);
 		reponse.setText(getResources().getString(R.string.reponse) + "  "
 				+ corrections.get(currentPosition).getQuestionPoint());
+		int imgSize = getResources().getDimensionPixelSize(
+				R.dimen.correction_image_size);
 
 		int count = answerCount;
 		if (currentQuestion.getType().equalsIgnoreCase("3")) {
@@ -455,11 +457,14 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				for (int i = 0; i < count; i++) {
 					ImageView img = new ImageView(CorrectionActivity.this);
 					LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-							30, 30);
-					imageParams.setMargins(0, 20, 0, 0);
+							imgSize, imgSize);
+					imageParams.setMargins(
+							0,
+							getResources().getDimensionPixelSize(
+									R.dimen.correction_image_margin1), 0, 0);
 
 					try {
-						for (int k = 0; k < answers.size(); k++) {
+						for (int k = 0; k < corrections.size(); k++) {
 							if (corrections
 									.get(k)
 									.getQuestionId()
@@ -502,14 +507,17 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						.getId());
 				ImageView img = new ImageView(CorrectionActivity.this);
 				LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-						30, 30);
+						imgSize, imgSize);
 
 				if (currentQuestion.getType().equalsIgnoreCase("2")) {
 					for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
 						mRadioGroup.getChildAt(i).setEnabled(false);
 					}
 
-					imageParams.setMargins(0, 7, 0, 0);
+					imageParams.setMargins(
+							0,
+							getResources().getDimensionPixelSize(
+									R.dimen.correction_image_margin2), 0, 0);
 
 					String userAnswerId = "";
 					for (int i = 0; i < answers.size(); i++) {
@@ -555,7 +563,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						}
 					}
 
-					imageParams.setMargins(0, 5, 0, 0);
+					imageParams.setMargins(
+							0,
+							getResources().getDimensionPixelSize(
+									R.dimen.correction_image_margin3), 0, 0);
 
 					// User's answers
 					ArrayList<String> userAnswerIds = new ArrayList<String>();
