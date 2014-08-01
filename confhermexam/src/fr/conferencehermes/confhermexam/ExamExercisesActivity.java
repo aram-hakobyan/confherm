@@ -261,10 +261,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 						for (int i = 0; i < dbExercises.size(); i++) {
 							if (dbExercises.get(i).getExerciseIsAlreadyPassed() == 0) {
 								try {
-									sendEmptyAnswers(dbExercises.get(i));
-									Log.d("EMPTY EXERCISE SAVED: ",
-											String.valueOf(dbExercises.get(i)
-													.getId()));
+									sendEmptyAnswers(dbExercises.get(i));									
 								} catch (JSONException e) {
 									e.printStackTrace();
 								}

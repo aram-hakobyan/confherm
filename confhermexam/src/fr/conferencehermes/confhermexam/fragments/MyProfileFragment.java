@@ -23,146 +23,132 @@ import fr.conferencehermes.confhermexam.util.Constants;
 
 public class MyProfileFragment extends Fragment {
 
-	private static Profile pData;
-	private TextView pFirsName, pLastName, pUserName, pEmailAdress, pGroups,
-			pInformation;
-	private Button logout;
-	private SharedPreferences.Editor logoutEditor;
-	private SharedPreferences logoutPrefs;
-	private SharedPreferences.Editor profileEditor;
-	private SharedPreferences profilePreferences;
-	private SharedPreferences groupsShared;
-	private SharedPreferences.Editor groupsEditor;
+  private static Profile pData;
+  private TextView pFirsName, pLastName, pUserName, pEmailAdress, pGroups, pInformation;
+  private Button logout;
+  private SharedPreferences.Editor logoutEditor;
+  private SharedPreferences logoutPrefs;
+  private SharedPreferences.Editor profileEditor;
+  private SharedPreferences profilePreferences;
+  private SharedPreferences groupsShared;
+  private SharedPreferences.Editor groupsEditor;
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-			Bundle savedInstanceState) {
-		View pFragment = inflater.inflate(R.layout.activity_my_profile,
-				container, false);
+  @Override
+  public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    View pFragment = inflater.inflate(R.layout.activity_my_profile, container, false);
 
-		String groups = getActivity().getResources().getString(
-				R.string.my_profile_groups);
-		String name = getActivity().getResources().getString(
-				R.string.my_profile_name);
-		String lastname = getActivity().getResources().getString(
-				R.string.my_profile_lastname);
-		String login = getActivity().getResources().getString(
-				R.string.my_profile_login);
-		String emails = getActivity().getResources().getString(
-				R.string.my_profile_email);
+    String groups = getActivity().getResources().getString(R.string.my_profile_groups);
+    String name = getActivity().getResources().getString(R.string.my_profile_name);
+    String lastname = getActivity().getResources().getString(R.string.my_profile_lastname);
+    String login = getActivity().getResources().getString(R.string.my_profile_login);
+    String emails = getActivity().getResources().getString(R.string.my_profile_email);
 
-		pFirsName = (TextView) pFragment.findViewById(R.id.pFirsName);
-		pLastName = (TextView) pFragment.findViewById(R.id.pLastName);
-		pUserName = (TextView) pFragment.findViewById(R.id.pUsername);
-		pEmailAdress = (TextView) pFragment.findViewById(R.id.pEmail);
-		pInformation = (TextView) pFragment.findViewById(R.id.pInformation);
+    pFirsName = (TextView) pFragment.findViewById(R.id.pFirsName);
+    pLastName = (TextView) pFragment.findViewById(R.id.pLastName);
+    pUserName = (TextView) pFragment.findViewById(R.id.pUsername);
+    pEmailAdress = (TextView) pFragment.findViewById(R.id.pEmail);
+    pInformation = (TextView) pFragment.findViewById(R.id.pInformation);
 
-		pGroups = (TextView) pFragment.findViewById(R.id.pGroups);
-		profilePreferences = getActivity().getSharedPreferences(
-				"fr.conferencehermes.confhermexam.fragments.MYPROFILE",
-				Context.MODE_PRIVATE);
+    pGroups = (TextView) pFragment.findViewById(R.id.pGroups);
+    profilePreferences =
+        getActivity().getSharedPreferences("fr.conferencehermes.confhermexam.fragments.MYPROFILE",
+            Context.MODE_PRIVATE);
 
-		groupsShared = getActivity().getSharedPreferences(
-				"fr.conferencehermes.confhermexam.fragments.MYPROFILE_GROUPS",
-				Context.MODE_PRIVATE);
+    groupsShared =
+        getActivity().getSharedPreferences(
+            "fr.conferencehermes.confhermexam.fragments.MYPROFILE_GROUPS", Context.MODE_PRIVATE);
 
-		logout = (Button) pFragment.findViewById(R.id.logout);
+    logout = (Button) pFragment.findViewById(R.id.logout);
 
-		logout.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent i = new Intent(getActivity(), LoginActivity.class);
-				i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-						| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+    logout.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Intent i = new Intent(getActivity(), LoginActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-				logoutEditor = getActivity().getSharedPreferences(
-						"logoutPrefs", Context.MODE_PRIVATE).edit();
-				logoutEditor.putBoolean(Constants.LOGOUT_SHAREDPREFS_KEY, true);
-				logoutEditor.commit();
+        logoutEditor =
+            getActivity().getSharedPreferences("logoutPrefs", Context.MODE_PRIVATE).edit();
+        logoutEditor.putBoolean(Constants.LOGOUT_SHAREDPREFS_KEY, true);
+        logoutEditor.commit();
 
-				logoutPrefs = getActivity().getSharedPreferences("logoutPrefs",
-						Context.MODE_PRIVATE);
+        logoutPrefs = getActivity().getSharedPreferences("logoutPrefs", Context.MODE_PRIVATE);
 
-				boolean b = logoutPrefs.getBoolean(
-						Constants.LOGOUT_SHAREDPREFS_KEY, false);
-				Log.i("Utils", b + "");
-				startActivity(i);
+        boolean b = logoutPrefs.getBoolean(Constants.LOGOUT_SHAREDPREFS_KEY, false);
+        startActivity(i);
 
-				getActivity().finish();
-			}
-		});
-		if (NetworkReachability.isReachable()) {
+        getActivity().finish();
+      }
+    });
+    if (NetworkReachability.isReachable()) {
 
-			profileEditor = profilePreferences.edit();
+      profileEditor = profilePreferences.edit();
 
-			if (pData != null) {
-				profileEditor.clear();
-				profileEditor.commit();
-				profileEditor.putString("profileFirstName",
-						pData.getFirstName());
-				profileEditor.putString("profileLastName", pData.getLastName());
-				profileEditor.putString("profileUsername", pData.getUserName());
-				profileEditor.putString("profileEmail", pData.getEmailAdress());
-				profileEditor.putString("pInformation", pData.getInformation());
-			}
+      if (pData != null) {
+        profileEditor.clear();
+        profileEditor.commit();
+        profileEditor.putString("profileFirstName", pData.getFirstName());
+        profileEditor.putString("profileLastName", pData.getLastName());
+        profileEditor.putString("profileUsername", pData.getUserName());
+        profileEditor.putString("profileEmail", pData.getEmailAdress());
+        profileEditor.putString("pInformation", pData.getInformation());
+      }
 
-			if (pData == null || pData.getGroups().size() == 0) {
-				pGroups.setText(groups + "no groups available");
-			} else {
-				HashMap<String, String> groupsHashmap = pData.getGroups();
-				groupsEditor = groupsShared.edit();
-				if (groupsEditor != null) {
-					groupsEditor.clear();
-					groupsEditor.commit();
-				}
-		
-				for (String s : groupsHashmap.keySet()) {
-					groupsEditor.putString(s, groupsHashmap.get(s));
-				}
-				groupsEditor.commit();
-			}
-			profileEditor.commit();
+      if (pData == null || pData.getGroups().size() == 0) {
+        pGroups.setText(groups + "no groups available");
+      } else {
+        HashMap<String, String> groupsHashmap = pData.getGroups();
+        groupsEditor = groupsShared.edit();
+        if (groupsEditor != null) {
+          groupsEditor.clear();
+          groupsEditor.commit();
+        }
 
-		} else {
+        for (String s : groupsHashmap.keySet()) {
+          groupsEditor.putString(s, groupsHashmap.get(s));
+        }
+        groupsEditor.commit();
+      }
+      profileEditor.commit();
 
-			/*
-			 * Toast.makeText(getActivity().getApplicationContext(),
-			 * "Check your internet connection", Toast.LENGTH_SHORT) .show();
-			 */
+    } else {
 
-		}
-		String firstName = profilePreferences.getString("profileFirstName", "");
-		String lastName = profilePreferences.getString("profileLastName", "");
-		String userName = profilePreferences.getString("profileUsername", "");
-		String email = profilePreferences.getString("profileEmail", "");
-		String information = profilePreferences.getString("pInformation", "");
-		Handler h = new Handler(getActivity().getMainLooper());
-		@SuppressWarnings("unchecked")
-		HashMap<String, String> groupsHashmap = (HashMap<String, String>) groupsShared
-				.getAll();
-		pGroups.setText(groups + " : ");
-		for (String s : groupsHashmap.keySet()) {
-			final String group = groupsHashmap.get(s);
+      /*
+       * Toast.makeText(getActivity().getApplicationContext(), "Check your internet connection",
+       * Toast.LENGTH_SHORT) .show();
+       */
 
-			h.post(new Runnable() {
+    }
+    String firstName = profilePreferences.getString("profileFirstName", "");
+    String lastName = profilePreferences.getString("profileLastName", "");
+    String userName = profilePreferences.getString("profileUsername", "");
+    String email = profilePreferences.getString("profileEmail", "");
+    String information = profilePreferences.getString("pInformation", "");
+    Handler h = new Handler(getActivity().getMainLooper());
+    @SuppressWarnings("unchecked")
+    HashMap<String, String> groupsHashmap = (HashMap<String, String>) groupsShared.getAll();
+    pGroups.setText(groups + " : ");
+    for (String s : groupsHashmap.keySet()) {
+      final String group = groupsHashmap.get(s);
 
-				@Override
-				public void run() {
-					pGroups.append("\n" + group.toString());
-				}
-			});
+      h.post(new Runnable() {
 
-		}
-		pInformation.setText(information);
-		pFirsName.setText(name + "  " + firstName);
-		pLastName.setText(lastname + "  " + lastName);
-		pUserName.setText(login + "  " + userName);
-		pEmailAdress.setText(emails + "  " + email);
+        @Override
+        public void run() {
+          pGroups.append("\n" + group.toString());
+        }
+      });
 
-		return pFragment;
-	}
+    }
+    pInformation.setText(information);
+    pFirsName.setText(name + "  " + firstName);
+    pLastName.setText(lastname + "  " + lastName);
+    pUserName.setText(login + "  " + userName);
+    pEmailAdress.setText(emails + "  " + email);
 
-	public static void setProfileData(Profile profileData) {
-		pData = profileData;
-	}
+    return pFragment;
+  }
+
+  public static void setProfileData(Profile profileData) {
+    pData = profileData;
+  }
 }

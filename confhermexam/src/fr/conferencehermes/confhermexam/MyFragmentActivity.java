@@ -30,258 +30,246 @@ import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
-public class MyFragmentActivity extends FragmentActivity implements
-		OnClickListener {
+public class MyFragmentActivity extends FragmentActivity implements OnClickListener {
 
-	private DatabaseHelper db;
+  private DatabaseHelper db;
 
-	private ImageView profile, planning, examen, training, resultat, download;
-	int dSelector = R.drawable.top_buttons_selector;
-	int cWhite = Color.parseColor("#ffffff");
+  private ImageView profile, planning, examen, training, resultat, download;
+  int dSelector = R.drawable.top_buttons_selector;
+  int cWhite = Color.parseColor("#ffffff");
 
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_my_fragment);
+  @SuppressWarnings("deprecation")
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    requestWindowFeature(Window.FEATURE_NO_TITLE);
+    setContentView(R.layout.activity_my_fragment);
 
-		profile = (ImageView) findViewById(R.id.headerBtnProfil);
-		planning = (ImageView) findViewById(R.id.headerBtnPlanning);
-		examen = (ImageView) findViewById(R.id.headerBtnExamen);
-		training = (ImageView) findViewById(R.id.headerBtnEntrainment);
-		resultat = (ImageView) findViewById(R.id.headerBtnResultats);
-		download = (ImageView) findViewById(R.id.headerBtnTelecharg);
+    profile = (ImageView) findViewById(R.id.headerBtnProfil);
+    planning = (ImageView) findViewById(R.id.headerBtnPlanning);
+    examen = (ImageView) findViewById(R.id.headerBtnExamen);
+    training = (ImageView) findViewById(R.id.headerBtnEntrainment);
+    resultat = (ImageView) findViewById(R.id.headerBtnResultats);
+    download = (ImageView) findViewById(R.id.headerBtnTelecharg);
 
-		profile.setOnClickListener(this);
-		planning.setOnClickListener(this);
-		examen.setOnClickListener(this);
-		training.setOnClickListener(this);
-		resultat.setOnClickListener(this);
-		download.setOnClickListener(this);
+    profile.setOnClickListener(this);
+    planning.setOnClickListener(this);
+    examen.setOnClickListener(this);
+    training.setOnClickListener(this);
+    resultat.setOnClickListener(this);
+    download.setOnClickListener(this);
 
-		int PAGE_ID = getIntent().getIntExtra("PAGE_ID", 0);
-		Fragment fr = null;
-		switch (PAGE_ID) {
-		case 0:
-			fr = new MyProfileFragment();
+    int PAGE_ID = getIntent().getIntExtra("PAGE_ID", 0);
+    Fragment fr = null;
+    switch (PAGE_ID) {
+      case 0:
+        fr = new MyProfileFragment();
 
-			break;
-		case 1:
-			fr = new PlanningFragment();
+        break;
+      case 1:
+        fr = new PlanningFragment();
 
-			break;
-		case 2:
-			fr = new ExamineFragment();
+        break;
+      case 2:
+        fr = new ExamineFragment();
 
-			break;
-		case 3:
-			fr = new TrainingsFragment();
+        break;
+      case 3:
+        fr = new TrainingsFragment();
 
-			break;
-		case 4:
-			fr = new ResultatFragment();
+        break;
+      case 4:
+        fr = new ResultatFragment();
 
-			break;
-		case 5:
-			fr = new DownloadsFragment();
+        break;
+      case 5:
+        fr = new DownloadsFragment();
 
-			break;
+        break;
 
-		default:
-			break;
-		}
+      default:
+        break;
+    }
 
-		profile.setOnTouchListener(new OnTouchListener() {
+    profile.setOnTouchListener(new OnTouchListener() {
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
 
-				profile.setBackgroundDrawable(getResources().getDrawable(
-						dSelector));
-				planning.setBackgroundColor(cWhite);
-				examen.setBackgroundColor(cWhite);
-				download.setBackgroundColor(cWhite);
-				resultat.setBackgroundColor(cWhite);
-				training.setBackgroundColor(cWhite);
+        profile.setBackgroundDrawable(getResources().getDrawable(dSelector));
+        planning.setBackgroundColor(cWhite);
+        examen.setBackgroundColor(cWhite);
+        download.setBackgroundColor(cWhite);
+        resultat.setBackgroundColor(cWhite);
+        training.setBackgroundColor(cWhite);
 
-				return false;
-			}
-		});
+        return false;
+      }
+    });
 
-		
-		planning.setOnTouchListener(new OnTouchListener() {
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+    planning.setOnTouchListener(new OnTouchListener() {
 
-				planning.setBackgroundDrawable(getResources().getDrawable(
-						dSelector));
-				profile.setBackgroundColor(cWhite);
-				examen.setBackgroundColor(cWhite);
-				download.setBackgroundColor(cWhite);
-				resultat.setBackgroundColor(cWhite);
-				training.setBackgroundColor(cWhite);
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
 
-				return false;
-			}
-		});
-		
-		examen.setOnTouchListener(new OnTouchListener() {
+        planning.setBackgroundDrawable(getResources().getDrawable(dSelector));
+        profile.setBackgroundColor(cWhite);
+        examen.setBackgroundColor(cWhite);
+        download.setBackgroundColor(cWhite);
+        resultat.setBackgroundColor(cWhite);
+        training.setBackgroundColor(cWhite);
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+        return false;
+      }
+    });
 
-				examen.setBackgroundDrawable(getResources().getDrawable(
-						dSelector));
-				profile.setBackgroundColor(cWhite);
-				planning.setBackgroundColor(cWhite);
-				download.setBackgroundColor(cWhite);
-				resultat.setBackgroundColor(cWhite);
-				training.setBackgroundColor(cWhite);
+    examen.setOnTouchListener(new OnTouchListener() {
 
-				return false;
-			}
-		});
-		
-		download.setOnTouchListener(new OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+        examen.setBackgroundDrawable(getResources().getDrawable(dSelector));
+        profile.setBackgroundColor(cWhite);
+        planning.setBackgroundColor(cWhite);
+        download.setBackgroundColor(cWhite);
+        resultat.setBackgroundColor(cWhite);
+        training.setBackgroundColor(cWhite);
 
-				download.setBackgroundDrawable(getResources().getDrawable(
-						dSelector));
-				profile.setBackgroundColor(cWhite);
-				planning.setBackgroundColor(cWhite);
-				examen.setBackgroundColor(cWhite);
-				resultat.setBackgroundColor(cWhite);
-				training.setBackgroundColor(cWhite);
+        return false;
+      }
+    });
 
-				return false;
-			}
-		});
-		
-		resultat.setOnTouchListener(new OnTouchListener() {
+    download.setOnTouchListener(new OnTouchListener() {
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
 
-				resultat.setBackgroundDrawable(getResources().getDrawable(
-						dSelector));
-				profile.setBackgroundColor(cWhite);
-				planning.setBackgroundColor(cWhite);
-				examen.setBackgroundColor(cWhite);
-				download.setBackgroundColor(cWhite);
-				training.setBackgroundColor(cWhite);
+        download.setBackgroundDrawable(getResources().getDrawable(dSelector));
+        profile.setBackgroundColor(cWhite);
+        planning.setBackgroundColor(cWhite);
+        examen.setBackgroundColor(cWhite);
+        resultat.setBackgroundColor(cWhite);
+        training.setBackgroundColor(cWhite);
 
-				return false;
-			}
-		});
-		
-		training.setOnTouchListener(new OnTouchListener() {
+        return false;
+      }
+    });
 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
+    resultat.setOnTouchListener(new OnTouchListener() {
 
-				training.setBackgroundDrawable(getResources().getDrawable(
-						dSelector));
-				profile.setBackgroundColor(cWhite);
-				planning.setBackgroundColor(cWhite);
-				examen.setBackgroundColor(cWhite);
-				download.setBackgroundColor(cWhite);
-				resultat.setBackgroundColor(cWhite);
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
 
-				return false;
-			}
-		});
-		
-		
-		
-		if (fr != null) {
-			FragmentManager fm = getSupportFragmentManager();
-			FragmentTransaction fragmentTransaction = fm.beginTransaction();
-			fragmentTransaction.replace(R.id.fragmentContainer, fr);
-			fragmentTransaction.commit();
-		}
+        resultat.setBackgroundDrawable(getResources().getDrawable(dSelector));
+        profile.setBackgroundColor(cWhite);
+        planning.setBackgroundColor(cWhite);
+        examen.setBackgroundColor(cWhite);
+        download.setBackgroundColor(cWhite);
+        training.setBackgroundColor(cWhite);
 
-		db = new DatabaseHelper(MyFragmentActivity.this);
+        return false;
+      }
+    });
 
-	}
+    training.setOnTouchListener(new OnTouchListener() {
 
-	@Override
-	protected void onResume() {
-		if (Utilities.isNetworkAvailable(MyFragmentActivity.this)) {
-			ArrayList<ExerciseAnswer> exerciseAnswers = db
-					.getAllExerciseAnswers();
-			if (!exerciseAnswers.isEmpty()) {
-				try {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
 
-					for (int i = 0; i < exerciseAnswers.size(); i++) {
-						String jsonstring = exerciseAnswers.get(i)
-								.getJsonString();
-						System.out.println("jsonstring " + jsonstring);
-						JSONObject object = new JSONObject(jsonstring);
-						ExamJsonTransmitter transmitter = new ExamJsonTransmitter(
-								MyFragmentActivity.this);
-						transmitter.execute(object);
+        training.setBackgroundDrawable(getResources().getDrawable(dSelector));
+        profile.setBackgroundColor(cWhite);
+        planning.setBackgroundColor(cWhite);
+        examen.setBackgroundColor(cWhite);
+        download.setBackgroundColor(cWhite);
+        resultat.setBackgroundColor(cWhite);
 
-						db.deleteExerciseAnswer(exerciseAnswers.get(i)
-								.getExerciseId());
+        return false;
+      }
+    });
 
-					}
-				} catch (JSONException e) {
-					e.printStackTrace();
-				} finally {
-					db.close();
-				}
 
-			}
-		}
 
-		super.onResume();
-	}
+    if (fr != null) {
+      FragmentManager fm = getSupportFragmentManager();
+      FragmentTransaction fragmentTransaction = fm.beginTransaction();
+      fragmentTransaction.replace(R.id.fragmentContainer, fr);
+      fragmentTransaction.commit();
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
-		return false;
-	}
+    db = new DatabaseHelper(MyFragmentActivity.this);
 
-	@Override
-	public void onClick(View v) {
-		switch (v.getId()) {
-		case R.id.headerBtnProfil:
-			Utilities.selectFrag(this, Constants.PROFILE_FRAGMENT);
-			break;
-		case R.id.headerBtnPlanning:
-			Utilities.selectFrag(this, Constants.PLANNING_FRAGMENT);
-			break;
-		case R.id.headerBtnExamen:
-			Utilities.selectFrag(this, Constants.EXAMINE_FRAGMENT);
-			break;
-		case R.id.headerBtnEntrainment:
-			Utilities.selectFrag(this, Constants.ENTRAINMENT_FRAGMENT);
-			break;
-		case R.id.headerBtnResultats:
-			Utilities.selectFrag(this, Constants.RESULTATS_FRAGMENT);
-			break;
-		case R.id.headerBtnTelecharg:
-			Utilities.selectFrag(this, Constants.TELECHARG_FRAGMENT);
-			break;
+  }
 
-		default:
-			break;
-		}
+  @Override
+  protected void onResume() {
+    if (Utilities.isNetworkAvailable(MyFragmentActivity.this)) {
+      ArrayList<ExerciseAnswer> exerciseAnswers = db.getAllExerciseAnswers();
+      if (!exerciseAnswers.isEmpty()) {
+        try {
 
-	}
+          for (int i = 0; i < exerciseAnswers.size(); i++) {
+            String jsonstring = exerciseAnswers.get(i).getJsonString();
+            JSONObject object = new JSONObject(jsonstring);
+            ExamJsonTransmitter transmitter = new ExamJsonTransmitter(MyFragmentActivity.this);
+            transmitter.execute(object);
 
-	@Override
-	public void onBackPressed() {
-		finish();
-	}
+            db.deleteExerciseAnswer(exerciseAnswers.get(i).getExerciseId());
 
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-	}
+          }
+        } catch (JSONException e) {
+          e.printStackTrace();
+        } finally {
+          db.close();
+        }
+
+      }
+    }
+
+    super.onResume();
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.main, menu);
+    return false;
+  }
+
+  @Override
+  public void onClick(View v) {
+    switch (v.getId()) {
+      case R.id.headerBtnProfil:
+        Utilities.selectFrag(this, Constants.PROFILE_FRAGMENT);
+        break;
+      case R.id.headerBtnPlanning:
+        Utilities.selectFrag(this, Constants.PLANNING_FRAGMENT);
+        break;
+      case R.id.headerBtnExamen:
+        Utilities.selectFrag(this, Constants.EXAMINE_FRAGMENT);
+        break;
+      case R.id.headerBtnEntrainment:
+        Utilities.selectFrag(this, Constants.ENTRAINMENT_FRAGMENT);
+        break;
+      case R.id.headerBtnResultats:
+        Utilities.selectFrag(this, Constants.RESULTATS_FRAGMENT);
+        break;
+      case R.id.headerBtnTelecharg:
+        Utilities.selectFrag(this, Constants.TELECHARG_FRAGMENT);
+        break;
+
+      default:
+        break;
+    }
+
+  }
+
+  @Override
+  public void onBackPressed() {
+    finish();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+  }
 }
