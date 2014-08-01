@@ -10,11 +10,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver;
+import android.view.View.OnClickListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -193,6 +194,8 @@ public class NotesActivity extends Activity {
               }
 
               if (wantedChild < 0 || wantedChild >= listviewNt.getChildCount()) {
+                Log.w("TAG",
+                    "Unable to get view for desired position, because it's not being displayed on screen.");
                 return;
               }
             }
@@ -218,42 +221,43 @@ public class NotesActivity extends Activity {
             public void callback(String url, JSONObject json, AjaxStatus status) {
               if (json.toString() == null)
 
-                try {
-                  if (json.has(Constants.KEY_STATUS) && json.get(Constants.KEY_STATUS) != null) {
-                    if (json.getInt("status") == 200) {
-                      // pData =
-                      listEx = JSONParser.parseExamExercise(json);
+                System.out.println(json.toString());
+              try {
+                if (json.has(Constants.KEY_STATUS) && json.get(Constants.KEY_STATUS) != null) {
+                  if (json.getInt("status") == 200) {
+                    // pData =
+                    listEx = JSONParser.parseExamExercise(json);
 
-                      if (listEx.size() != 0) {
-                        adapterEx = new ExerciseAdapter(NotesActivity.this, listEx);
-                        listviewEx.setAdapter(adapterEx);
+                    if (listEx.size() != 0) {
+                      adapterEx = new ExerciseAdapter(NotesActivity.this, listEx);
+                      listviewEx.setAdapter(adapterEx);
 
-                        for (int i = 0; i < listviewEx.getChildCount(); i++) {
-                          listviewEx.getChildAt(i).setBackgroundColor(
-                              getResources().getColor(R.color.excercise_normal_color));
-                        }
-
-                        teacherName.setText(ExamExercise.created_by);
-                        examName.setText(ExamExercise.exam_name);
-
-                      } else {
-
-                        Toast.makeText(NotesActivity.this.getApplicationContext(), "no any result",
-                            Toast.LENGTH_SHORT).show();
+                      for (int i = 0; i < listviewEx.getChildCount(); i++) {
+                        listviewEx.getChildAt(i).setBackgroundColor(
+                            getResources().getColor(R.color.excercise_normal_color));
                       }
+
+                      teacherName.setText(ExamExercise.created_by);
+                      examName.setText(ExamExercise.exam_name);
 
                     } else {
 
-                      Toast.makeText(NotesActivity.this.getApplicationContext(),
-                          json.getInt("status"), Toast.LENGTH_SHORT).show();
-
+                      Toast.makeText(NotesActivity.this.getApplicationContext(), "no any result",
+                          Toast.LENGTH_SHORT).show();
                     }
 
+                  } else {
+
+                    Toast.makeText(NotesActivity.this.getApplicationContext(),
+                        json.getInt("status"), Toast.LENGTH_SHORT).show();
+
                   }
-                } catch (JSONException e) {
-                  e.printStackTrace();
 
                 }
+              } catch (JSONException e) {
+                e.printStackTrace();
+
+              }
             };
           });
     } else {
@@ -323,45 +327,48 @@ public class NotesActivity extends Activity {
     paramsNotes.put(Constants.KEY_GROUPS, paramGroups);
 
 
+
     aqNotes.ajax(Constants.EXERCISE_RESULT_URL, paramsNotes, JSONObject.class,
         new AjaxCallback<JSONObject>() {
           @Override
           public void callback(String url, JSONObject json, AjaxStatus status) {
             if (json.toString() == null)
 
-              try {
-                if (json.has(Constants.KEY_STATUS) && json.get(Constants.KEY_STATUS) != null) {
-                  if (json.getInt("status") == 200) {
-                    ArrayList<NotesResult> listNt;
-                    listNt = JSONParser.parseExerciseResult(json);
+              System.out.println(json.toString());
+            try {
+              if (json.has(Constants.KEY_STATUS) && json.get(Constants.KEY_STATUS) != null) {
+                if (json.getInt("status") == 200) {
+                  // pData =
+                  ArrayList<NotesResult> listNt;
+                  listNt = JSONParser.parseExerciseResult(json);
 
-                    if (listNt.size() != 0) {
-                      adapterNt = new NotesAdapter(context, listNt);
-                      listviewNt.setAdapter(adapterNt);
+                  if (listNt.size() != 0) {
+                    adapterNt = new NotesAdapter(context, listNt);
+                    listviewNt.setAdapter(adapterNt);
 
-                      medianScore.setText(getResources().getString(R.string.notes_stats_medianne)
-                          + " : " + String.valueOf(NotesResult.median_score));
-                      moyenneScore.setText(getResources().getString(R.string.notes_stats_moyenne)
-                          + " : " + String.valueOf(NotesResult.moyenne_score) + " | ");
-                      progressBarNotes.setVisibility(View.GONE);
-                      listviewNt.setVisibility(View.VISIBLE);
-                    } else {
-
-                      Toast.makeText(context.getApplicationContext(), "no any result",
-                          Toast.LENGTH_SHORT).show();
-                    }
-
+                    medianScore.setText(getResources().getString(R.string.notes_stats_medianne)
+                        + " : " + String.valueOf(NotesResult.median_score));
+                    moyenneScore.setText(getResources().getString(R.string.notes_stats_moyenne)
+                        + " : " + String.valueOf(NotesResult.moyenne_score) + " | ");
+                    progressBarNotes.setVisibility(View.GONE);
+                    listviewNt.setVisibility(View.VISIBLE);
                   } else {
 
-                    Toast.makeText(context.getApplicationContext(), json.getInt("status"),
+                    Toast.makeText(context.getApplicationContext(), "no any result",
                         Toast.LENGTH_SHORT).show();
-
                   }
-                }
-              } catch (JSONException e) {
-                e.printStackTrace();
 
+                } else {
+
+                  Toast.makeText(context.getApplicationContext(), json.getInt("status"),
+                      Toast.LENGTH_SHORT).show();
+
+                }
               }
+            } catch (JSONException e) {
+              e.printStackTrace();
+
+            }
           };
         });
 
