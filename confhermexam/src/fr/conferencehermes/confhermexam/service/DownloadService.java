@@ -20,110 +20,105 @@ import android.os.ResultReceiver;
 import fr.conferencehermes.confhermexam.util.UnzipUtility;
 
 public class DownloadService extends IntentService {
-	public static final int UPDATE_PROGRESS = 8344;
-	private String path;
-	private Intent mIntent;
-	Handler mMainThreadHandler = null;
-	private int position;
+  public static final int UPDATE_PROGRESS = 8344;
+  private String path;
+  private Intent mIntent;
+  Handler mMainThreadHandler = null;
+  private int position;
 
-	public DownloadService() {
-		super("DownloadService");
-		mMainThreadHandler = new Handler();
-	}
+  public DownloadService() {
+    super("DownloadService");
+    mMainThreadHandler = new Handler();
+  }
 
-	@Override
-	protected void onHandleIntent(Intent intent) {
-		mIntent = intent;
-		String urlToDownload = intent.getStringExtra("url");
-		String title = intent.getStringExtra("title");
-		position = intent.getIntExtra("position", 0);
-		DownloaderTask downloadTask = new DownloaderTask();
-		downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR,
-				urlToDownload, title);
-	}
+  @Override
+  protected void onHandleIntent(Intent intent) {
+    mIntent = intent;
+    String urlToDownload = intent.getStringExtra("url");
+    String title = intent.getStringExtra("title");
+    position = intent.getIntExtra("position", 0);
+    DownloaderTask downloadTask = new DownloaderTask();
+    downloadTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, urlToDownload, title);
+  }
 
-	private class DownloaderTask extends AsyncTask<String, Integer, String> {
-		private PowerManager.WakeLock mWakeLock;
+  private class DownloaderTask extends AsyncTask<String, Integer, String> {
+    private PowerManager.WakeLock mWakeLock;
 
-		private String urlToDownload;
-		private String title;
+    private String urlToDownload;
+    private String title;
 
-		@Override
-		protected void onPreExecute() {
-			PowerManager pm = (PowerManager) DownloadService.this
-					.getSystemService(DownloadService.POWER_SERVICE);
-			mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-					getClass().getName());
-			mWakeLock.acquire();
-			super.onPreExecute();
-		}
+    @Override
+    protected void onPreExecute() {
+      PowerManager pm =
+          (PowerManager) DownloadService.this.getSystemService(DownloadService.POWER_SERVICE);
+      mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, getClass().getName());
+      mWakeLock.acquire();
+      super.onPreExecute();
+    }
 
-		@Override
-		protected String doInBackground(String... params) {
-			ResultReceiver receiver = (ResultReceiver) mIntent
-					.getParcelableExtra("receiver");
-			try {
-				urlToDownload = params[0];
-				title = params[1];
-				URL url = new URL(urlToDownload);
-				URLConnection connection = url.openConnection();
-				connection.connect();
+    @Override
+    protected String doInBackground(String... params) {
+      ResultReceiver receiver = (ResultReceiver) mIntent.getParcelableExtra("receiver");
+      try {
+        urlToDownload = params[0];
+        title = params[1];
+        URL url = new URL(urlToDownload);
+        URLConnection connection = url.openConnection();
+        connection.connect();
 
-				int fileLength = connection.getContentLength();
-				path = Environment.getExternalStorageDirectory()
-						.getAbsolutePath();
+        int fileLength = connection.getContentLength();
+        path = Environment.getExternalStorageDirectory().getAbsolutePath();
 
-				path += "/temp/android/data/";
+        path += "/temp/.android/.data/";
 
-				File mFolder = new File(path);
-				if (!mFolder.exists()) {
-					mFolder.mkdirs();
-				}
-				path += title;
-				InputStream input = new BufferedInputStream(url.openStream());
-				OutputStream output = new FileOutputStream(path);
+        File mFolder = new File(path);
+        if (!mFolder.exists()) {
+          mFolder.mkdirs();
+        }
+        path += title;
+        InputStream input = new BufferedInputStream(url.openStream());
+        OutputStream output = new FileOutputStream(path);
 
-				byte data[] = new byte[1024];
-				long total = 0;
-				int count;
-				while ((count = input.read(data)) != -1) {
-					total += count;
-					Bundle resultData = new Bundle();
-					resultData.putInt("progress",
-							(int) (total * 100 / fileLength));
-					resultData.putInt("position", position);
-					receiver.send(UPDATE_PROGRESS, resultData);
-					output.write(data, 0, count);
-				}
+        byte data[] = new byte[1024];
+        long total = 0;
+        int count;
+        while ((count = input.read(data)) != -1) {
+          total += count;
+          Bundle resultData = new Bundle();
+          resultData.putInt("progress", (int) (total * 100 / fileLength));
+          resultData.putInt("position", position);
+          receiver.send(UPDATE_PROGRESS, resultData);
+          output.write(data, 0, count);
+        }
 
-				output.flush();
-				output.close();
-				input.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+        output.flush();
+        output.close();
+        input.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
 
-			String zipFilePath = path;
-			String destDirectory = path + " zipped";
-			UnzipUtility unzipper = new UnzipUtility();
-			try {
-				unzipper.unzip(zipFilePath, destDirectory, DownloadService.this);
-			} catch (Exception ex) {
-				ex.printStackTrace();
-			}
+      String zipFilePath = path;
+      String destDirectory = path + " zipped";
+      UnzipUtility unzipper = new UnzipUtility();
+      try {
+        unzipper.unzip(zipFilePath, destDirectory, DownloadService.this);
+      } catch (Exception ex) {
+        ex.printStackTrace();
+      }
 
-			try {
-				Bundle resultData = new Bundle();
-				resultData.putInt("progress", 100);
-				resultData.putInt("position", position);
-				receiver.send(UPDATE_PROGRESS, resultData);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+      try {
+        Bundle resultData = new Bundle();
+        resultData.putInt("progress", 100);
+        resultData.putInt("position", position);
+        receiver.send(UPDATE_PROGRESS, resultData);
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
 
-			mWakeLock.release();
+      mWakeLock.release();
 
-			return "OK";
-		}
-	}
+      return "OK";
+    }
+  }
 }
