@@ -209,13 +209,16 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
         try {
 
           for (int i = 0; i < exerciseAnswers.size(); i++) {
-            String jsonstring = exerciseAnswers.get(i).getJsonString();
-            JSONObject object = new JSONObject(jsonstring);
-            ExamJsonTransmitter transmitter = new ExamJsonTransmitter(MyFragmentActivity.this);
-            transmitter.execute(object);
+            ExerciseAnswer ea = exerciseAnswers.get(i);
+            if (ea.getIsSent() == 0) {
+              String jsonstring = exerciseAnswers.get(i).getJsonString();
+              JSONObject object = new JSONObject(jsonstring);
+              ExamJsonTransmitter transmitter = new ExamJsonTransmitter(MyFragmentActivity.this);
+              transmitter.execute(object);
 
-            db.deleteExerciseAnswer(exerciseAnswers.get(i).getExerciseId());
-
+              ea.setIsSent(1);
+              db.updateExerciseAnswer(ea);
+            }
           }
         } catch (JSONException e) {
           e.printStackTrace();
