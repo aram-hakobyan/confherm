@@ -27,6 +27,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
 import android.text.InputType;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
@@ -113,6 +114,11 @@ public class ExaminationActivity extends Activity implements OnClickListener {
   private CounterClass timer;
   private int maxPosition = 0;
   private boolean DIALOG_IS_OPEN = false;
+  private long pauseTime = 0;
+  private boolean isActive = false;
+  private ArrayList<ExerciseAnswer> exerciseAnswers;
+  private ExerciseAnswer currentExerciseAnswer;
+
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -149,6 +155,10 @@ public class ExaminationActivity extends Activity implements OnClickListener {
     ennouncer.setOnClickListener(this);
     valider.setOnClickListener(this);
 
+    DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
+
+
+
     timer = new CounterClass(DataHolder.getInstance().getMillisUntilFinished(), 1000);
     timer.start();
 
@@ -172,7 +182,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
     });
 
-    DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
+
 
     exercise = db.getExercise(exercise_id);
     exerciseFiles = db.getExerciseFile(exercise_id);
@@ -223,6 +233,25 @@ public class ExaminationActivity extends Activity implements OnClickListener {
       }
     });
 
+    isActive = getIntent().getBooleanExtra("isActive", false);
+    if (isActive) {
+      valider.setEnabled(false);
+      valider.setAlpha(0.5f);
+
+      exerciseAnswers = db.getAllExerciseAnswers();
+      int n = exerciseAnswers.size();
+      for (int i = 0; i < n; i++) {
+        if (exerciseAnswers.get(i).getExerciseId() == exercise_id) {
+          {
+            currentExerciseAnswer = exerciseAnswers.get(i);
+            break;
+          }
+        }
+      }
+    }
+
+
+
     if (!questions.isEmpty()) {
       for (int i = 0; i < questions.size(); i++) {
         questionAnswers.add(null);
@@ -261,6 +290,18 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
     currentQuestionAnswers = db.getAllAnswersByQuestionId(currentQuestion.getId());
     int answersCount = currentQuestionAnswers.size();
+    JSONObject answersJson = null;
+
+    System.out.println(currentExerciseAnswer);
+    if (currentExerciseAnswer != null)
+      try {
+        JSONObject obj = new JSONObject(currentExerciseAnswer.getJsonString());
+        JSONArray arr = obj.getJSONArray("question_answers");
+        if (arr.length() > position)
+          answersJson = (JSONObject) arr.get(position);
+      } catch (JSONException e1) {
+        e1.printStackTrace();
+      }
 
     // Single choice answer
     if (q.getType().equalsIgnoreCase("2")) {
@@ -269,10 +310,22 @@ public class ExaminationActivity extends Activity implements OnClickListener {
       for (int i = answersCount - 1; i >= 0; i--) {
         RadioButton newRadioButton = new RadioButton(this);
         newRadioButton.setText(currentQuestionAnswers.get(i).getAnswer());
+
+        try {
+          if (answersJson != null
+              && currentQuestionAnswers.get(i).getId() == answersJson.getJSONArray("answers")
+                  .getInt(0))
+            newRadioButton.setChecked(true);
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+
         newRadioButton.setTextSize(16);
         newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams layoutParams =
-            new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, 50);
+            new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(0, 0, 0, 5);
         mRadioGroup.addView(newRadioButton, 0, layoutParams);
 
       }
@@ -284,12 +337,11 @@ public class ExaminationActivity extends Activity implements OnClickListener {
         mRadioGroup.check(v.getId());
       }
 
-      if (!CONFERENCE)
-        if (questionAnswers.get(position) != null) {
-          for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
-            mRadioGroup.getChildAt(i).setEnabled(false);
-          }
+      if (isActive) {
+        for (int i = 0; i < mRadioGroup.getChildCount(); i++) {
+          mRadioGroup.getChildAt(i).setEnabled(false);
         }
+      }
 
     } else // Multichoice answer
     if (q.getType().equalsIgnoreCase("1")) {
@@ -300,12 +352,29 @@ public class ExaminationActivity extends Activity implements OnClickListener {
         checkBoxLayout.setOrientation(LinearLayout.HORIZONTAL);
         final CheckBox checkBox = new CheckBox(ExaminationActivity.this);
         checkBox.setGravity(Gravity.CENTER_VERTICAL);
+
+        try {
+          if (answersJson != null)
+            for (int j = 0; j < answersJson.getJSONArray("answers").length(); j++) {
+              if (currentQuestionAnswers.get(i).getId() == answersJson.getJSONArray("answers")
+                  .getInt(j)) {
+                checkBox.setChecked(true);
+                break;
+              }
+            }
+
+        } catch (JSONException e) {
+          e.printStackTrace();
+        }
+
         TextView text = new TextView(ExaminationActivity.this);
         text.setText(currentQuestionAnswers.get(i).getAnswer());
         text.setTextSize(16);
         text.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams layoutParams =
-            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 50);
+            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(0, 0, 0, 5);
         checkBoxLayout.addView(checkBox, layoutParams);
         checkBoxLayout.addView(text, layoutParams);
         answersLayout.addView(checkBoxLayout, layoutParams);
@@ -328,15 +397,14 @@ public class ExaminationActivity extends Activity implements OnClickListener {
           }
         });
 
-        if (!CONFERENCE)
-          if (questionAnswers.get(position) != null) {
-            for (int k = 0; k < answersLayout.getChildCount(); k++) {
-              LinearLayout layout = (LinearLayout) answersLayout.getChildAt(k);
-              for (int i1 = 0; i1 < layout.getChildCount(); i1++) {
-                layout.getChildAt(i1).setEnabled(false);
-              }
+        if (isActive) {
+          for (int k = 0; k < answersLayout.getChildCount(); k++) {
+            LinearLayout layout = (LinearLayout) answersLayout.getChildAt(k);
+            for (int i1 = 0; i1 < layout.getChildCount(); i1++) {
+              layout.getChildAt(i1).setEnabled(false);
             }
           }
+        }
 
       }
 
@@ -390,16 +458,14 @@ public class ExaminationActivity extends Activity implements OnClickListener {
         }
       }
 
-      if (!CONFERENCE)
-        if (questionAnswers.get(position) != null) {
-          for (int c = 0; c < editTextsArray.size(); c++) {
-            editTextsArray.get(c).setEnabled(false);
-          }
+      if (isActive) {
+        for (int c = 0; c < editTextsArray.size(); c++) {
+          editTextsArray.get(c).setEnabled(false);
         }
+      }
     }
 
     db.close();
-
   }
 
   private void setFileIcons(HashMap<String, String> files) {
@@ -435,6 +501,9 @@ public class ExaminationActivity extends Activity implements OnClickListener {
   public void sendAnswers() throws JSONException {
     fr.conferencehermes.confhermexam.util.Constants.calledFromExam = true;
 
+    if (isActive)
+      return;
+
     JSONObject object = new JSONObject();
     JSONObject data = new JSONObject();
 
@@ -457,19 +526,36 @@ public class ExaminationActivity extends Activity implements OnClickListener {
     Utilities.writeBoolean(ExaminationActivity.this, String.valueOf("exercise" + exercise_id),
         false);
 
+    ExerciseAnswer exerciseAnswer = new ExerciseAnswer();
+    exerciseAnswer.setExerciseId(exercise.getId());
+    exerciseAnswer.setExamId(exam_id);
+    exerciseAnswer.setEventId(event_id);
+    exerciseAnswer.setJsonString(data.toString());
+
+    int IS_SENT = 0;
+
     if (Utilities.isNetworkAvailable(ExaminationActivity.this)) {
       ExamJsonTransmitter transmitter = new ExamJsonTransmitter(ExaminationActivity.this);
       transmitter.execute(object);
-      finish();
-    } else {
-      ExerciseAnswer exerciseAnswer = new ExerciseAnswer();
-      exerciseAnswer.setExerciseId(exercise.getId());
-      exerciseAnswer.setExamId(exam_id);
-      exerciseAnswer.setEventId(event_id);
-      exerciseAnswer.setJsonString(data.toString());
-      db.createExerciseAnswer(exerciseAnswer);
+      exerciseAnswer.setIsSent(1);
+      IS_SENT = 1;
+    }
+
+    createOrUpdateExerciseAnswer(db, exerciseAnswer);
+    if (IS_SENT == 0) {
       showAlertDialog(ExaminationActivity.this, "Attention",
           getResources().getString(R.string.connection_alert));
+    } else {
+      finish();
+    }
+  }
+
+  private void createOrUpdateExerciseAnswer(DatabaseHelper db, ExerciseAnswer ea) {
+
+    if (db.getExerciseAnswer(exercise.getId()).getJsonString() == null) {
+      db.createExerciseAnswer(ea);
+    } else {
+      db.updateExerciseAnswer(ea);
     }
 
     db.closeDB();
@@ -608,12 +694,16 @@ public class ExaminationActivity extends Activity implements OnClickListener {
         validAnswers.put(currentQuestionId, true);
         break;
       case R.id.abandonner:
-        if (SEND_DATA)
-          showAlertDialogWhenFinishPressed("Attention",
-              getResources().getString(R.string.finish_alert_text));
-        else
-          showAlertDialogWhenFinishPressed("Attention",
-              getResources().getString(R.string.finish_alert_text_abandonner));
+        if (isActive) {
+          finish();
+        } else {
+          if (SEND_DATA)
+            showAlertDialogWhenFinishPressed("Attention",
+                getResources().getString(R.string.finish_alert_text));
+          else
+            showAlertDialogWhenFinishPressed("Attention",
+                getResources().getString(R.string.finish_alert_text_abandonner));
+        }
 
         break;
       case R.id.ennouncer:
@@ -693,6 +783,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
     Button button3 = (Button) dialog.findViewById(R.id.button3);
     Button close = (Button) dialog.findViewById(R.id.buttonClose2);
     final TextView text = (TextView) dialog.findViewById(R.id.ennouncerText);
+    text.setMovementMethod(new ScrollingMovementMethod());
 
     if (files.get("image").isEmpty()) {
       button1.setBackgroundResource(R.drawable.ic_camera_gray);
@@ -1112,32 +1203,33 @@ public class ExaminationActivity extends Activity implements OnClickListener {
     // ONLY WHEN SCREEN TURNS ON
     if (!ScreenReceiver.wasScreenOn) {
       // THIS IS WHEN ONRESUME() IS CALLED DUE TO A SCREEN STATE CHANGE
-
     } else {
       // THIS IS WHEN ONRESUME() IS CALLED WHEN THE SCREEN STATE HAS NOT
       // CHANGED
-      System.out.println("SCREEN TURNED ON");
     }
 
-    if (onPaused == true) {
+    boolean twoMinutesPassed = System.currentTimeMillis() - pauseTime >= 2 * 60 * 1000;
+
+    if (onPaused && twoMinutesPassed) {
       showAlertDialog();
+    } else {
+      pauseTime = System.currentTimeMillis();
     }
 
   }
 
   @Override
   protected void onPause() {
-
-    onPaused = true;
-
     // WHEN THE SCREEN IS ABOUT TO TURN OFF
-    if (ScreenReceiver.wasScreenOn) {
+    if (!ScreenReceiver.wasScreenOn) {
       // THIS IS THE CASE WHEN ONPAUSE() IS CALLED BY THE SYSTEM DUE TO A
       // SCREEN STATE CHANGE
       System.out.println("SCREEN TURNED OFF");
     } else {
       // THIS IS WHEN ONPAUSE() IS CALLED WHEN THE SCREEN STATE HAS NOT
       // CHANGED
+      pauseTime = System.currentTimeMillis();
+      onPaused = true;
     }
     super.onPause();
   }

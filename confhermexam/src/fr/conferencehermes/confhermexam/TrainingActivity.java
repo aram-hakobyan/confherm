@@ -296,7 +296,9 @@ public class TrainingActivity extends Activity implements OnClickListener {
         newRadioButton.setTextSize(16);
         newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams layoutParams =
-            new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT, 50);
+            new RadioGroup.LayoutParams(RadioGroup.LayoutParams.WRAP_CONTENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(0, 0, 0, 5);
         mRadioGroup.addView(newRadioButton, 0, layoutParams);
 
       }
@@ -323,7 +325,9 @@ public class TrainingActivity extends Activity implements OnClickListener {
         text.setTextSize(16);
         text.setGravity(Gravity.CENTER_VERTICAL);
         LinearLayout.LayoutParams layoutParams =
-            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 50);
+            new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(0, 0, 0, 5);
         checkBoxLayout.addView(checkBox, layoutParams);
         checkBoxLayout.addView(text, layoutParams);
         answersLayout.addView(checkBoxLayout, layoutParams);
