@@ -13,11 +13,9 @@ import org.json.JSONObject;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -25,10 +23,10 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
+import fr.conferencehermes.confhermexam.adapters.GridViewCustomAdapter;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
 import fr.conferencehermes.confhermexam.parser.Event;
@@ -44,7 +42,7 @@ public class ExamExercisesActivity extends FragmentActivity implements OnClickLi
 
   LayoutInflater inflater;
   GridView gvMain;
-  ArrayAdapter<String> adapter;
+  GridViewCustomAdapter adapter;
   ArrayList<Exercise> exercises;
   TextView timerText;
   DatabaseHelper db;
@@ -59,8 +57,6 @@ public class ExamExercisesActivity extends FragmentActivity implements OnClickLi
   private long pauseTime = 0;
   private boolean onPaused = false;
   private boolean CONFERENCE = false;
-
-  // private boolean calledFromExam = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -78,16 +74,19 @@ public class ExamExercisesActivity extends FragmentActivity implements OnClickLi
     gvMain.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        view.setBackgroundColor(Color.parseColor("#0d5c7c"));
         int e_id = exercises.get(position).getId();
         String key = "exercise_passed" + String.valueOf(e_id);
         if (!Utilities.readBoolean(ExamExercisesActivity.this, key, false)) {
           if (!TIMER_PAUSED) {
+            exercises.get(position).setClicked(true);
+            adapter.notifyDataSetChanged();
             openExercise(e_id, false);
             Constants.calledFromExam = true;
           }
         } else {
-          if (exercises.get(position).getType().equalsIgnoreCase("2")) {
+          if (getIntent().getBooleanExtra("examIsConference", false)) {
+            exercises.get(position).setClicked(true);
+            adapter.notifyDataSetChanged();
             openExercise(e_id, true);
           } else
             Utilities.showAlertDialog(ExamExercisesActivity.this, "Attention", getResources()
@@ -99,11 +98,9 @@ public class ExamExercisesActivity extends FragmentActivity implements OnClickLi
     examId = getIntent().getIntExtra("exam_id", -1);
     eventId = getIntent().getIntExtra("event_id", -1);
     exercises = db.getAllExercisesByExamId(examId);
-    String[] data = new String[exercises.size()];
+
     for (int i = 0; i < exercises.size(); i++) {
-      data[i] = exercises.get(i).getName();
-      String key = "exercise_passed" + String.valueOf(exercises.get(i).getId());
-      Utilities.writeBoolean(ExamExercisesActivity.this, key, false);
+      exercises.get(i).setClicked(false);
     }
 
     DataHolder.getInstance().setMillisUntilFinished(0);
@@ -129,8 +126,7 @@ public class ExamExercisesActivity extends FragmentActivity implements OnClickLi
       e.printStackTrace();
     }
 
-    adapter =
-        new ArrayAdapter<String>(ExamExercisesActivity.this, R.layout.item, R.id.tvText, data);
+    adapter = new GridViewCustomAdapter(ExamExercisesActivity.this, exercises);
     gvMain = (GridView) findViewById(R.id.gvMain);
     gvMain.setAdapter(adapter);
 

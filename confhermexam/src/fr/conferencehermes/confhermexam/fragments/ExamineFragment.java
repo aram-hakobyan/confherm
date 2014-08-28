@@ -87,19 +87,21 @@ public class ExamineFragment extends Fragment {
           }
         }
 
+        boolean examIsConference = clickedExam.getCategoryType().equalsIgnoreCase("conference");
         String password = clickedExam.getPassword();
         if (password != null) { // exam is downloaded
           if (clickedExam.getStatus() == 1) {
             if (canStartExam(clickedExam)) {
-              if (clickedExam.getIsAlreadyPassed() == 0) {
+              if (clickedExam.getIsAlreadyPassed() == 0 || examIsConference) {
                 if (password.isEmpty()) {
-
                   Intent intent = new Intent(getActivity(), ExamExercisesActivity.class);
                   intent.putExtra("exam_id", clickedExam.getId());
                   intent.putExtra("event_id", clickedExam.getEventId());
+                  intent.putExtra("examIsConference", examIsConference);
                   startActivity(intent);
                 } else {
-                  showPasswordAlert(clickedExam.getId(), clickedExam.getEventId(), password);
+                  showPasswordAlert(clickedExam.getId(), clickedExam.getEventId(), password,
+                      examIsConference);
                 }
               } else {
                 Utilities.showAlertDialog(getActivity(), "Attention",
@@ -144,7 +146,14 @@ public class ExamineFragment extends Fragment {
                   validExams.add(exams.get(j));
               }
 
-              setupAdapterData();
+              try {
+                setupAdapterData();
+              } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
+                getActivity().finish();
+              } catch (Exception e1) {
+                e1.printStackTrace();
+              }
             }
 
           } catch (JSONException e) {
@@ -162,7 +171,14 @@ public class ExamineFragment extends Fragment {
           validExams.add(dbExams.get(i));
       }
 
-      setupAdapterData();
+      try {
+        setupAdapterData();
+      } catch (IndexOutOfBoundsException e) {
+        e.printStackTrace();
+        getActivity().finish();
+      } catch (Exception e1) {
+        e1.printStackTrace();
+      }
     }
 
     super.onResume();
@@ -175,7 +191,7 @@ public class ExamineFragment extends Fragment {
 
   }
 
-  public void setupAdapterData() {
+  public void setupAdapterData() throws IndexOutOfBoundsException {
     for (int i = 0; i < validExams.size(); i++) {
       Exam exam = validExams.get(i);
       switch (exam.getStatus()) {
@@ -225,7 +241,8 @@ public class ExamineFragment extends Fragment {
     return false;
   }
 
-  private void showPasswordAlert(final int id, final int eventId, final String password) {
+  private void showPasswordAlert(final int id, final int eventId, final String password,
+      final boolean examIsConference) {
     AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
     builder.setTitle("Enter Password");
 
@@ -241,6 +258,7 @@ public class ExamineFragment extends Fragment {
           Intent intent = new Intent(getActivity(), ExamExercisesActivity.class);
           intent.putExtra("exam_id", id);
           intent.putExtra("event_id", eventId);
+          intent.putExtra("examIsConference", examIsConference);
           startActivity(intent);
         } else {
           Toast.makeText(getActivity(), getResources().getString(R.string.wrong_password),
