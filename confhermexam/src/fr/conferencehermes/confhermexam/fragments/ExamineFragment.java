@@ -34,6 +34,7 @@ import fr.conferencehermes.confhermexam.ExamExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.adapters.ExamsAdapter;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exam;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
@@ -206,7 +207,8 @@ public class ExamineFragment extends Fragment {
 			case 3:
 				if (examIsDownloaded(exam.getId())) {
 					Exam downloadedExam = db.getExam(exam.getId());
-					if (downloadedExam.getLastEditTime() < exam
+					Event event = db.getEvent(downloadedExam.getEventId());
+					if (event.getLastEditTime() < exam
 							.getLastEditTime()) {
 						validExams.get(i).setStatus(2); // need update
 					} else {
