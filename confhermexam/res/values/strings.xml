@@ -39,7 +39,7 @@
 
     <!-- Alerts -->
 
-    <string name="drop_out_text">L\'application était inactive durant plus de 5 sec. Vos réponses seront envoyées automatiquement pour traitement.</string>
+    <string name="drop_out_text">L\'application était inactive durant plus de 2 min. Vos réponses seront envoyées automatiquement pour traitement.</string>
     <string name="drop_out_text_ok">OK</string>
     <string name="finish_alert_text">Si vous cliquez sur "Envoyer" vos réponses seront envoyées automatiquement.</string>
     <string name="finish_alert_text_abandonner">Si vous cliquez sur "Abandonner" vos réponses seront envoyées automatiquement.</string>
