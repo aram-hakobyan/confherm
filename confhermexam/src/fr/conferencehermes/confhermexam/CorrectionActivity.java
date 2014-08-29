@@ -22,6 +22,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.InputType;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
@@ -679,6 +680,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
     Button button3 = (Button) dialog.findViewById(R.id.button3);
     Button close = (Button) dialog.findViewById(R.id.buttonClose2);
     final TextView text = (TextView) dialog.findViewById(R.id.ennouncerText);
+    text.setMovementMethod(new ScrollingMovementMethod());
 
     if (files.get("image").isEmpty()) {
       button1.setBackgroundResource(R.drawable.ic_camera_gray);

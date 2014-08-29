@@ -176,7 +176,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
     listview.setOnItemClickListener(new OnItemClickListener() {
       @Override
       public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (questionAnswers.get(position) != null || position == maxPosition)
+        if (questionAnswers.get(position) != null || position == maxPosition || isActive)
           selectQuestion(questions.get(position), position);
       }
 

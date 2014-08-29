@@ -155,7 +155,7 @@ public class ExamExercisesActivity extends FragmentActivity implements OnClickLi
 
   public long getDuration(long start, long end) {
     Calendar calendar = new GregorianCalendar(TimeZone.getTimeZone("Europe/Paris"));
-    long currentTime = calendar.getTimeInMillis() / 1000;
+    long currentTime = calendar.getTimeInMillis();
 
     long maxDuration = end - start;
     long mDuration = end - currentTime;

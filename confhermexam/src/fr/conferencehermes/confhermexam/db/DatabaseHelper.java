@@ -925,7 +925,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     values.put(KEY_EXERCISE_NAME, exercise.getName());
     values.put(KEY_EXERCISE_TYPE, exercise.getType());
     values.put(KEY_EXERCISE_CREATED_BY, exercise.getTeacher());
-    values.put(KEY_EXERCISE_EXAM_ID, exercise.getExamId());
+   // values.put(KEY_EXERCISE_EXAM_ID, exercise.getExamId());
     values.put(KEY_EXERCISE_IS_ALREADY_PASSED, exercise.getExerciseIsAlreadyPassed());
     values.put(KEY_EXERCISE_TEXT, exercise.getText());
 
