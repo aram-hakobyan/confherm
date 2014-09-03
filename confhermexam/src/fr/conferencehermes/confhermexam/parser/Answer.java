@@ -2,6 +2,7 @@ package fr.conferencehermes.confhermexam.parser;
 
 public class Answer {
 	private int id;
+	private int order;
 	private int questionId;
 	private String answer;
 	private int asnwerFormat;
@@ -75,6 +76,14 @@ public class Answer {
 
 	public void setIS_GOOD_ANSWER(int iS_GOOD_ANSWER) {
 		IS_GOOD_ANSWER = iS_GOOD_ANSWER;
+	}
+
+	public int getOrder() {
+		return order;
+	}
+
+	public void setOrder(int order) {
+		this.order = order;
 	}
 
 }
