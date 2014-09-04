@@ -302,7 +302,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			try {
 				JSONObject obj = new JSONObject(
 						currentExerciseAnswer.getJsonString());
-				JSONArray arr = obj.getJSONArray("question_answers");
+				JSONObject data = obj.getJSONObject("data");
+				JSONArray arr = data.getJSONArray("question_answers");
 				if (arr.length() > position)
 					answersJson = (JSONObject) arr.get(position);
 			} catch (JSONException e1) {
