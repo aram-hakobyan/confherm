@@ -4,21 +4,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/white" >
 
-    <Button
-        android:id="@+id/submit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginRight="100dp"
-        android:background="@drawable/global_selector"
-        android:drawableLeft="@drawable/ic_check_white"
-        android:drawablePadding="10dp"
-        android:padding="10dp"
-        android:text="ENVOYER LES ÉPREUVES"
-        android:textColor="@android:color/white"
-        android:visibility="gone" />
-
     <ListView
         android:id="@+id/listViewExamine"
         android:layout_width="match_parent"

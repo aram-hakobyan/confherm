@@ -41,7 +41,7 @@ public class TrainingsFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View fragment = inflater.inflate(R.layout.activity_examine, container,
+		View fragment = inflater.inflate(R.layout.activity_training, container,
 				false);
 
 		progressBarTrainings = (ProgressBar) fragment
@@ -98,8 +98,8 @@ public class TrainingsFragment extends Fragment {
 			Toast.makeText(
 					getActivity().getApplicationContext(),
 					getActivity().getResources().getString(
-							R.string.no_internet_connection), Toast.LENGTH_SHORT)
-					.show();
+							R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
 		}
 		return fragment;
 	}
