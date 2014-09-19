@@ -410,7 +410,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						.getId());
 				ImageView img = new ImageView(CorrectionActivity.this);
 				LinearLayout.LayoutParams imageParams = new LinearLayout.LayoutParams(
-						30, 30);
+						imgSize, imgSize);
 				imageParams.setMargins(padding, padding, padding, padding);
 
 				if (currentQuestion.getType().equalsIgnoreCase("2")) {
