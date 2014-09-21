@@ -19,17 +19,19 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import fr.conferencehermes.confhermexam.ExaminationActivity;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import android.content.Context;
 import android.os.AsyncTask;
-import android.util.Log;
 
 public class ExamJsonTransmitter extends AsyncTask<JSONObject, JSONObject, JSONObject> {
   private static final String url = "http://ecni.conference-hermes.fr/api/examanswer";
   private Context context;
+  private ExerciseAnswer exerciseAnswer;
 
-  public ExamJsonTransmitter(Context c) {
+  public ExamJsonTransmitter(Context c, ExerciseAnswer ea) {
     this.context = c;
+    this.exerciseAnswer = ea;
   }
 
   private String convertStreamToString(InputStream is) {
@@ -77,6 +79,7 @@ public class ExamJsonTransmitter extends AsyncTask<JSONObject, JSONObject, JSONO
       }
       if (ob != null) {
         Utilities.writeString(context, "jsondata", "");
+        updateAnswer(exerciseAnswer);
       }
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
@@ -86,5 +89,12 @@ public class ExamJsonTransmitter extends AsyncTask<JSONObject, JSONObject, JSONO
       e.printStackTrace();
     }
     return null;
+  }
+
+  private void updateAnswer(ExerciseAnswer ea) {
+    DatabaseHelper db = new DatabaseHelper(context);
+    ea.setIsSent(1);
+    db.updateExerciseAnswer(ea);
+    db.closeDB();
   }
 }

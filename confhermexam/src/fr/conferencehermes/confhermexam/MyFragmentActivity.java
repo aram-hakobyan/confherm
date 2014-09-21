@@ -1,10 +1,5 @@
 package fr.conferencehermes.confhermexam;
 
-import java.util.ArrayList;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,9 +20,7 @@ import fr.conferencehermes.confhermexam.fragments.MyProfileFragment;
 import fr.conferencehermes.confhermexam.fragments.PlanningFragment;
 import fr.conferencehermes.confhermexam.fragments.ResultatFragment;
 import fr.conferencehermes.confhermexam.fragments.TrainingsFragment;
-import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import fr.conferencehermes.confhermexam.util.Constants;
-import fr.conferencehermes.confhermexam.util.ExamJsonTransmitter;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class MyFragmentActivity extends FragmentActivity implements OnClickListener {
@@ -203,32 +196,6 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 
   @Override
   protected void onResume() {
-    if (Utilities.isNetworkAvailable(MyFragmentActivity.this)) {
-      ArrayList<ExerciseAnswer> exerciseAnswers = db.getAllExerciseAnswers();
-      if (!exerciseAnswers.isEmpty()) {
-        try {
-
-          for (int i = 0; i < exerciseAnswers.size(); i++) {
-            ExerciseAnswer ea = exerciseAnswers.get(i);
-            if (ea.getIsSent() == 0) {
-              String jsonstring = exerciseAnswers.get(i).getJsonString();
-              JSONObject object = new JSONObject(jsonstring);
-              ExamJsonTransmitter transmitter = new ExamJsonTransmitter(MyFragmentActivity.this);
-              transmitter.execute(object);
-
-              ea.setIsSent(1);
-              db.updateExerciseAnswer(ea);
-            }
-          }
-        } catch (JSONException e) {
-          e.printStackTrace();
-        } finally {
-          db.close();
-        }
-
-      }
-    }
-
     super.onResume();
   }
 
