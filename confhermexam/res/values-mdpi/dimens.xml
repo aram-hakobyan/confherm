@@ -15,7 +15,7 @@
     <dimen name="planning_button_margin">5dp</dimen>
     <dimen name="header_logo_width">150dp</dimen>
     <dimen name="profile_text_size">20sp</dimen>
-    <dimen name="correction_image_size">21dp</dimen>
+    <dimen name="correction_image_size">35dp</dimen>
     <dimen name="correction_image_margin1">15dp</dimen>
     <dimen name="correction_image_margin2">15dp</dimen>
     <dimen name="correction_image_margin3">15dp</dimen>
