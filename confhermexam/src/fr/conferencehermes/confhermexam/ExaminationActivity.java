@@ -54,10 +54,12 @@ import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 import android.widget.VideoView;
 
 import com.androidquery.AQuery;
 
+import fr.conferencehermes.confhermexam.ExamExercisesActivity.CounterClass;
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
@@ -119,6 +121,9 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private boolean isActive = false;
 	private ArrayList<ExerciseAnswer> exerciseAnswers;
 	private ExerciseAnswer currentExerciseAnswer;
+	private ToggleButton toggleTimer;
+	private boolean TIMER_PAUSED = false;
+	private long timeToResume = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -133,6 +138,28 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		multipleAnswers = new ArrayList<Integer>();
 		validAnswers = new SparseBooleanArray();
 		questionAnswers = new ArrayList<QuestionAnswer>();
+
+		toggleTimer = (ToggleButton) findViewById(R.id.timerToggle);
+		if (getIntent().getBooleanExtra("conference", false)) {
+			toggleTimer.setVisibility(View.VISIBLE);
+			toggleTimer
+					.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+						@Override
+						public void onCheckedChanged(CompoundButton buttonView,
+								boolean isChecked) {
+							if (isChecked) {
+								timer.cancel();
+								TIMER_PAUSED = true;
+								customHandler.removeCallbacksAndMessages(null);
+							} else {
+								timer = new CounterClass(timeToResume, 1000);
+								timer.start();
+								TIMER_PAUSED = false;
+								customHandler.postDelayed(updateTimerThread, 0);
+							}
+						}
+					});
+		}
 
 		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);
@@ -757,8 +784,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 	private Runnable updateTimerThread = new Runnable() {
 		public void run() {
-			timeInMilliseconds = SystemClock.uptimeMillis() - startTime;
-			updatedTime = timeSwapBuff + timeInMilliseconds;
+			updatedTime = SystemClock.uptimeMillis() - startTime;
+			// updatedTime = timeSwapBuff + timeInMilliseconds;
 			int secs = (int) (updatedTime / 1000);
 			int mins = secs / 60;
 			secs = secs % 60;
@@ -1302,6 +1329,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	public class CounterClass extends CountDownTimer {
+
 		public CounterClass(long millisInFuture, long countDownInterval) {
 			super(millisInFuture, countDownInterval);
 		}
@@ -1331,6 +1359,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(millis)));
 			temps1.setText("Temps epreuve - " + hms);
+			timeToResume = millis;
 		}
 	}
 
