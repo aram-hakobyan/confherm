@@ -89,6 +89,7 @@ public class ExamJsonParser {
 		// exercise.setExerciseType(data.getInt("type"));
 		exercise.setText(data.getString("text"));
 		exercise.setTeacher(data.getString("created_by"));
+		exercise.setDuration(data.getInt("duration"));
 
 		HashMap<String, String> eFiles = new HashMap<String, String>();
 		JSONObject filesExercise = (JSONObject) data

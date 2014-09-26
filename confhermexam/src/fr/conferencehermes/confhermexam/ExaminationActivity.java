@@ -9,6 +9,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -23,7 +24,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
 import android.os.SystemClock;
 import android.text.Html;
 import android.text.InputType;
@@ -59,7 +59,6 @@ import android.widget.VideoView;
 
 import com.androidquery.AQuery;
 
-import fr.conferencehermes.confhermexam.ExamExercisesActivity.CounterClass;
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
@@ -72,6 +71,7 @@ import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.DataHolder;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
+@SuppressLint("DefaultLocale")
 public class ExaminationActivity extends Activity implements OnClickListener {
 	private LayoutInflater inflater;
 	private ListView listview;
@@ -86,7 +86,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private TextView temps2;
 	private TextView teacher;
 	private TextView examName;
-	private Handler customHandler = new Handler();
 	long updatedTime = 0L, timeSwapBuff = 0L, timeInMilliseconds = 0L,
 			startTime;
 	Question currentQuestion;
@@ -115,6 +114,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private int resumPlayingSound = 0;
 	private int resumPlayingVideo = 0;
 	private CounterClass timer;
+	private CounterClassForExercise exerciseTimer;
 	private int maxPosition = 0;
 	private boolean DIALOG_IS_OPEN = false;
 	private long pauseTime = 0;
@@ -124,6 +124,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	private ToggleButton toggleTimer;
 	private boolean TIMER_PAUSED = false;
 	private long timeToResume = 0;
+	private long timeToResumeExercise = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -149,13 +150,15 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 								boolean isChecked) {
 							if (isChecked) {
 								timer.cancel();
+								exerciseTimer.cancel();
 								TIMER_PAUSED = true;
-								customHandler.removeCallbacksAndMessages(null);
 							} else {
 								timer = new CounterClass(timeToResume, 1000);
+								exerciseTimer = new CounterClassForExercise(
+										timeToResumeExercise, 1000);
 								timer.start();
+								exerciseTimer.start();
 								TIMER_PAUSED = false;
-								customHandler.postDelayed(updateTimerThread, 0);
 							}
 						}
 					});
@@ -185,15 +188,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		DatabaseHelper db = new DatabaseHelper(ExaminationActivity.this);
 
-		timer = new CounterClass(DataHolder.getInstance()
-				.getMillisUntilFinished(), 1000);
-		timer.start();
-
-		startTime = SystemClock.uptimeMillis();
-		customHandler.postDelayed(updateTimerThread, 0);
-		mediaPlayer = new MediaPlayer();
-		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-
 		exercise_id = getIntent().getIntExtra("exercise_id", 1);
 		exam_id = getIntent().getIntExtra("exam_id", 1);
 		event_id = getIntent().getIntExtra("event_id", 1);
@@ -213,6 +207,17 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
+
+		timer = new CounterClass(DataHolder.getInstance()
+				.getMillisUntilFinished(), 1000);
+		timer.start();
+		exerciseTimer = new CounterClassForExercise(
+				exercise.getDuration() * 60 * 1000, 1000);
+		exerciseTimer.start();
+
+		startTime = SystemClock.uptimeMillis();
+		mediaPlayer = new MediaPlayer();
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
 
 		if (exercise.getType().equalsIgnoreCase("2"))
 			CONFERENCE = true;
@@ -614,6 +619,35 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		dialog.show();
 	}
 
+	public void showAlertDialogWhenExerciseTimeIsOver(Context context,
+			String title, String message) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(context);
+		builder.setTitle(title);
+		builder.setMessage(message);
+		builder.setCancelable(true);
+		builder.setPositiveButton(android.R.string.ok,
+				new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						dialog.dismiss();
+					}
+				});
+		AlertDialog dialog = builder.create();
+		dialog.setOnDismissListener(new OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				try {
+					sendAnswers();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				finish();
+			}
+		});
+		dialog.show();
+	}
+
 	private void saveQuestionAnswers() throws JSONException {
 		JSONObject questionAnswer = new JSONObject();
 		questionAnswer.put("question_id", currentQuestion.getId());
@@ -781,32 +815,6 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		}
 
 	}
-
-	private Runnable updateTimerThread = new Runnable() {
-		public void run() {
-			updatedTime = SystemClock.uptimeMillis() - startTime;
-			// updatedTime = timeSwapBuff + timeInMilliseconds;
-			int secs = (int) (updatedTime / 1000);
-			int mins = secs / 60;
-			secs = secs % 60;
-
-			String hms = String.format(
-					"%02d:%02d:%02d",
-					TimeUnit.MILLISECONDS.toHours(updatedTime),
-					TimeUnit.MILLISECONDS.toMinutes(updatedTime)
-							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
-									.toHours(updatedTime)),
-					TimeUnit.MILLISECONDS.toSeconds(updatedTime)
-							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
-									.toMinutes(updatedTime)));
-
-			// temps1.setText("" + mins + ":" + String.format("%02d", secs));
-			temps2.setText("Temps exam - " + hms);
-			customHandler.postDelayed(this, 0);
-
-		}
-
-	};
 
 	private Dialog dialog = null;
 
@@ -1359,6 +1367,44 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
 									.toMinutes(millis)));
 			temps1.setText("Temps epreuve - " + hms);
+			timeToResume = millis;
+		}
+	}
+
+	public class CounterClassForExercise extends CountDownTimer {
+
+		public CounterClassForExercise(long millisInFuture,
+				long countDownInterval) {
+			super(millisInFuture, countDownInterval);
+		}
+
+		@Override
+		public void onFinish() {
+			temps2.setText("");
+
+			if (getIntent().getBooleanExtra("conference", false)) {
+				showAlertDialogWhenExerciseTimeIsOver(
+						ExaminationActivity.this,
+						"Attention",
+						getResources().getString(
+								R.string.exercise_finished_alert));
+			}
+		}
+
+		@Override
+		public void onTick(long millisUntilFinished) {
+			long millis = millisUntilFinished;
+			timeToResumeExercise = millisUntilFinished;
+			String hms = String.format(
+					"%02d:%02d:%02d",
+					TimeUnit.MILLISECONDS.toHours(millis),
+					TimeUnit.MILLISECONDS.toMinutes(millis)
+							- TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS
+									.toHours(millis)),
+					TimeUnit.MILLISECONDS.toSeconds(millis)
+							- TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS
+									.toMinutes(millis)));
+			temps2.setText("Temps exercise - " + hms);
 			timeToResume = millis;
 		}
 	}

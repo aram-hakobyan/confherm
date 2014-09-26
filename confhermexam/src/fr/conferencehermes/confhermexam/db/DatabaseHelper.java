@@ -72,6 +72,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_EXERCISE_CREATED_BY = "createdBy";
 	private static final String KEY_EXERCISE_EXAM_ID = "examId";
 	private static final String KEY_EXERCISE_TEXT = "text";
+	private static final String KEY_EXERCISE_DURATION = "duration";
 
 	// QUESTION_FILES column names
 	private static final String KEY_QUESTION_FILES_ID = "questionId";
@@ -145,7 +146,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ KEY_EXERCISE_NAME + " TEXT," + KEY_EXERCISE_TYPE + " TEXT,"
 			+ KEY_EXERCISE_IS_ALREADY_PASSED + " INTEGER,"
 			+ KEY_EXERCISE_CREATED_BY + " TEXT," + KEY_EXERCISE_TEXT + " TEXT,"
-			+ KEY_EXERCISE_EXAM_ID + " INTEGER" + ")";
+			+ KEY_EXERCISE_DURATION + " INTEGER," + KEY_EXERCISE_EXAM_ID
+			+ " INTEGER" + ")";
 
 	// QuestionFiles table create statement
 	private static final String CREATE_TABLE_QUESTION_FILES = "CREATE TABLE "
@@ -912,6 +914,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXERCISE_IS_ALREADY_PASSED,
 				exercise.getExerciseIsAlreadyPassed());
 		values.put(KEY_EXERCISE_TEXT, exercise.getText());
+		values.put(KEY_EXERCISE_DURATION, exercise.getDuration());
 
 		// insert row
 		db.beginTransaction();
@@ -947,6 +950,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			exercise.setExerciseIsAlreadyPassed(c.getInt(c
 					.getColumnIndex(KEY_EXERCISE_IS_ALREADY_PASSED)));
 			exercise.setText(c.getString(c.getColumnIndex(KEY_EXERCISE_TEXT)));
+			exercise.setDuration(c.getInt(c
+					.getColumnIndex(KEY_EXERCISE_DURATION)));
 		}
 		return exercise;
 	}
@@ -976,6 +981,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 						.getColumnIndex(KEY_EXERCISE_IS_ALREADY_PASSED)));
 				exercise.setText(c.getString(c
 						.getColumnIndex(KEY_EXERCISE_TEXT)));
+				exercise.setDuration(c.getInt(c
+						.getColumnIndex(KEY_EXERCISE_DURATION)));
 
 				exercises.add(exercise);
 			} while (c.moveToNext());
@@ -1000,6 +1007,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		values.put(KEY_EXERCISE_IS_ALREADY_PASSED,
 				exercise.getExerciseIsAlreadyPassed());
 		values.put(KEY_EXERCISE_TEXT, exercise.getText());
+		values.put(KEY_EXERCISE_DURATION, exercise.getDuration());
 
 		// updating row
 		return db.update(TABLE_EXERCISES, values, KEY_EXERCISE_ID + " = ?",
@@ -1041,6 +1049,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 							.getColumnIndex(KEY_EXERCISE_IS_ALREADY_PASSED)));
 					exercise.setText(c.getString(c
 							.getColumnIndex(KEY_EXERCISE_TEXT)));
+					exercise.setDuration(c.getInt(c
+							.getColumnIndex(KEY_EXERCISE_DURATION)));
 					exercises.add(exercise);
 				}
 

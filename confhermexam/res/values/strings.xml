@@ -48,6 +48,7 @@
     <string name="exam_not_downloaded_alert">Vous devez télécharger l\'epreuve avant de pouvoir y participer. il est conseiller de vous connecter en wi-fi.</string>
     <string name="delete_event_alert">Attention, supprimer cette épreuvre vous empechera de faire l\'eppreuve ou d\'en consulter les resultats  et corrections i vous la supprimer.</string>
     <string name="exam_already_passed_alert">Cet examen est terminé ou vous l\'avez déjà passé vous ne pouvez pas le refaire.</string>
+    <string name="exercise_finished_alert">La durée accordée pour cet exercice est écoulée.\nLes réponses que vous avez eu le temps d\'entrer ont été automatiquement sauvegardées.\nVous pouvez passer à un autre exercice.</string>
 
     <!-- Login -->
 
