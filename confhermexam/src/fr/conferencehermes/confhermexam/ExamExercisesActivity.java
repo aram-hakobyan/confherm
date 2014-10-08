@@ -103,7 +103,12 @@ public class ExamExercisesActivity extends FragmentActivity implements
 
 		examId = getIntent().getIntExtra("exam_id", -1);
 		eventId = getIntent().getIntExtra("event_id", -1);
-		exercises = db.getAllExercisesByExamId(examId);
+		try {
+			exercises = db.getAllExercisesByExamId(examId);
+		} catch (IllegalStateException e1) {
+			e1.printStackTrace();
+			finish();
+		}
 
 		for (int i = 0; i < exercises.size(); i++) {
 			exercises.get(i).setClicked(false);

@@ -41,222 +41,242 @@ import fr.conferencehermes.confhermexam.util.Utilities;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
 
 public class LoginActivity extends Activity implements ActionDelegate {
-  private static Profile lData;
-  private EditText username;
-  private EditText password;
-  private ProgressBar progressBarLogin;
-  private LinearLayout loginContentLayout;
-  public static String authToken;
-  private static SharedPreferences.Editor authKeyEditor;
-  private SharedPreferences authKeyPrefs;
-  private SharedPreferences.Editor logoutEditor;
-  private SharedPreferences logoutPrefs;
-  public static Context context;
-  boolean logout;
-  private String loginInfoText;
+	private static Profile lData;
+	private EditText username;
+	private EditText password;
+	private ProgressBar progressBarLogin;
+	private LinearLayout loginContentLayout;
+	public static String authToken;
+	private static SharedPreferences.Editor authKeyEditor;
+	private SharedPreferences authKeyPrefs;
+	private SharedPreferences.Editor logoutEditor;
+	private SharedPreferences logoutPrefs;
+	public static Context context;
+	boolean logout;
+	private String loginInfoText;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    requestWindowFeature(Window.FEATURE_NO_TITLE);
-    setContentView(R.layout.activity_login);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.activity_login);
 
-    ViewTracker.getInstance().setCurrentContext(this);
-    ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
-    context = LoginActivity.this;
-    requestLoginInfoText();
-    username = (EditText) findViewById(R.id.loginRow);
-    password = (EditText) findViewById(R.id.passwordRow);
-    loginContentLayout = (LinearLayout) findViewById(R.id.loginContentLayout);
-    progressBarLogin = (ProgressBar) findViewById(R.id.progressBarLogin);
+		ViewTracker.getInstance().setCurrentContext(this);
+		ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
+		context = LoginActivity.this;
+		requestLoginInfoText();
+		username = (EditText) findViewById(R.id.loginRow);
+		password = (EditText) findViewById(R.id.passwordRow);
+		loginContentLayout = (LinearLayout) findViewById(R.id.loginContentLayout);
+		progressBarLogin = (ProgressBar) findViewById(R.id.progressBarLogin);
 
-    if (NetworkReachability.isReachable()) {
+		if (Utilities.isNetworkAvailable(LoginActivity.this)) {
 
-      authKeyEditor = getPreferences(MODE_PRIVATE).edit();
+			authKeyEditor = getPreferences(MODE_PRIVATE).edit();
 
-      logoutPrefs = getSharedPreferences("logoutPrefs", MODE_PRIVATE);
-      logout = logoutPrefs.getBoolean(Constants.LOGOUT_SHAREDPREFS_KEY, false);
-      if (logout == false) {
-        loginAction();
+			logoutPrefs = getSharedPreferences("logoutPrefs", MODE_PRIVATE);
+			logout = logoutPrefs.getBoolean(Constants.LOGOUT_SHAREDPREFS_KEY,
+					false);
+			if (logout == false) {
+				loginAction();
 
-      } else {
-        loginContentLayout.setVisibility(View.VISIBLE);
-        progressBarLogin.setVisibility(View.GONE);
-      }
+			} else {
+				loginContentLayout.setVisibility(View.VISIBLE);
+				progressBarLogin.setVisibility(View.GONE);
+			}
 
-      Button loginButton = (Button) findViewById(R.id.loginButton);
-      loginButton.setOnClickListener(new OnClickListener() {
-        @Override
-        public void onClick(View v) {
-          loginAction();
+			Button loginButton = (Button) findViewById(R.id.loginButton);
+			loginButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					loginAction();
 
-        }
-      });
-    } else {
-      authKeyPrefs = getPreferences(MODE_PRIVATE);
-      String restoredAuthKey = authKeyPrefs.getString(Constants.AUTHKEY_SHAREDPREFS_KEY, null);
-      if (restoredAuthKey != null) {
+				}
+			});
+		} else {
+			authKeyPrefs = getPreferences(MODE_PRIVATE);
+			String restoredAuthKey = authKeyPrefs.getString(
+					Constants.AUTHKEY_SHAREDPREFS_KEY, null);
+			if (restoredAuthKey != null) {
 
-        Intent hIntent = new Intent(getApplicationContext(), HomeActivity.class);
-        startActivity(hIntent);
-        finish();
-      }
+				Intent hIntent = new Intent(getApplicationContext(),
+						HomeActivity.class);
+				startActivity(hIntent);
+				finish();
+			}
 
-    }
+		}
 
-    // SharedPreferences profilePreferences = getSharedPreferences(
-    // "fr.conferencehermes.confhermexam.fragments.MYPROFILE",
-    // Context.MODE_PRIVATE);
-    // String information = profilePreferences.getString("pInformation",
-    // "");
+		// SharedPreferences profilePreferences = getSharedPreferences(
+		// "fr.conferencehermes.confhermexam.fragments.MYPROFILE",
+		// Context.MODE_PRIVATE);
+		// String information = profilePreferences.getString("pInformation",
+		// "");
 
-  }
+	}
 
-  @Override
-  protected void onResume() {
-    super.onResume();
+	@Override
+	protected void onResume() {
+		super.onResume();
 
-    ViewTracker.getInstance().setCurrentContext(this);
-    ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
-  }
+		ViewTracker.getInstance().setCurrentContext(this);
+		ViewTracker.getInstance().setCurrentViewName(Constants.LOGIN_VIEW);
+	}
 
-  public void loginAction() {
-    String logonOrAuth = null;
-    Map<String, String> params = null;
+	public void loginAction() {
+		String logonOrAuth = null;
+		Map<String, String> params = null;
 
-    logoutEditor = getSharedPreferences("logoutPrefs", MODE_PRIVATE).edit();
-    logoutEditor.putBoolean(Constants.LOGOUT_SHAREDPREFS_KEY, false);
-    logoutEditor.commit();
+		logoutEditor = getSharedPreferences("logoutPrefs", MODE_PRIVATE).edit();
+		logoutEditor.putBoolean(Constants.LOGOUT_SHAREDPREFS_KEY, false);
+		logoutEditor.commit();
 
-    authKeyPrefs = getPreferences(MODE_PRIVATE);
-    String restoredAuthKey = authKeyPrefs.getString(Constants.AUTHKEY_SHAREDPREFS_KEY, null);
+		authKeyPrefs = getPreferences(MODE_PRIVATE);
+		String restoredAuthKey = authKeyPrefs.getString(
+				Constants.AUTHKEY_SHAREDPREFS_KEY, null);
 
-    final String uname = username.getText().toString().trim();
-    final String pass = password.getText().toString().trim();
-    RequestCreator creator = new RequestCreator();
-    if (restoredAuthKey != null && logout != true) {
-      logonOrAuth = Constants.SERVER_URL_AUTH;
-      params = creator.createAppropriateMapRequest("auth_key", restoredAuthKey);
+		final String uname = username.getText().toString().trim();
+		final String pass = password.getText().toString().trim();
+		RequestCreator creator = new RequestCreator();
+		if (restoredAuthKey != null && logout != true) {
+			logonOrAuth = Constants.SERVER_URL_AUTH;
+			params = creator.createAppropriateMapRequest("auth_key",
+					restoredAuthKey);
 
-      loginContentLayout.setVisibility(View.GONE);
-      progressBarLogin.setVisibility(View.VISIBLE);
+			loginContentLayout.setVisibility(View.GONE);
+			progressBarLogin.setVisibility(View.VISIBLE);
 
-    } else {
+		} else {
 
-      logonOrAuth = Constants.SERVER_URL;
+			logonOrAuth = Constants.SERVER_URL;
 
-      params = creator.createAppropriateMapRequest("username", uname, "password", pass);
+			params = creator.createAppropriateMapRequest("username", uname,
+					"password", pass);
 
-      loginContentLayout.setVisibility(View.VISIBLE);
-      progressBarLogin.setVisibility(View.GONE);
+			loginContentLayout.setVisibility(View.VISIBLE);
+			progressBarLogin.setVisibility(View.GONE);
 
-    }
+		}
 
-    if (!uname.isEmpty() && !pass.isEmpty() || restoredAuthKey != null) {
-      // Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
-      // "Logging into Hermes...");
-      BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
+		if (!uname.isEmpty() && !pass.isEmpty() || restoredAuthKey != null) {
+			// Utilities.showOrHideActivityIndicator(LoginActivity.this, 0,
+			// "Logging into Hermes...");
+			BaseNetworkManager baseNetworkManager = new BaseNetworkManager();
 
-      final RequestHelper reqHelper = new RequestHelper();
-      final List<NameValuePair> paramsList = reqHelper.createPostDataWithKeyValuePair(params);
+			final RequestHelper reqHelper = new RequestHelper();
+			final List<NameValuePair> paramsList = reqHelper
+					.createPostDataWithKeyValuePair(params);
 
-      baseNetworkManager.constructConnectionAndHitPOST("Login Successful", "Login Request Started",
-          paramsList, this, "LogView", "LogService", logonOrAuth);
-    } else {
-      Toast.makeText(LoginActivity.this, getResources().getString(R.string.login_alert),
-          Toast.LENGTH_LONG).show();
-    }
+			baseNetworkManager.constructConnectionAndHitPOST(
+					"Login Successful", "Login Request Started", paramsList,
+					this, "LogView", "LogService", logonOrAuth);
+		} else {
+			Toast.makeText(LoginActivity.this,
+					getResources().getString(R.string.login_alert),
+					Toast.LENGTH_LONG).show();
+		}
 
-  }
+	}
 
-  @Override
-  public void didFinishRequestProcessing() {
+	@Override
+	public void didFinishRequestProcessing() {
 
-    /***** Share Preferences Save */
+		/***** Share Preferences Save */
 
-    Intent hIntent = new Intent(getApplicationContext(), HomeActivity.class);
+		Intent hIntent = new Intent(getApplicationContext(), HomeActivity.class);
 
-    final String needToWriteLogin = Utilities.readString(this, Utilities.IS_LOGGED_IN, null);
-    if (needToWriteLogin == null) {
-      Utilities.writeString(this, Utilities.IS_LOGGED_IN, "YES");
-    } else if (needToWriteLogin.equals("NO")) {
-      Utilities.writeString(this, Utilities.IS_LOGGED_IN, "YES");
-    }
+		final String needToWriteLogin = Utilities.readString(this,
+				Utilities.IS_LOGGED_IN, null);
+		if (needToWriteLogin == null) {
+			Utilities.writeString(this, Utilities.IS_LOGGED_IN, "YES");
+		} else if (needToWriteLogin.equals("NO")) {
+			Utilities.writeString(this, Utilities.IS_LOGGED_IN, "YES");
+		}
 
-    // Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
-    // "Logging into Hermes...");
+		// Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
+		// "Logging into Hermes...");
 
-    startActivity(hIntent);
-    finish();
+		startActivity(hIntent);
+		finish();
 
-  }
+	}
 
-  @Override
-  public void didFinishRequestProcessing(ArrayList<HashMap<String, String>> list, String service) {
+	@Override
+	public void didFinishRequestProcessing(
+			ArrayList<HashMap<String, String>> list, String service) {
 
-    Utilities.showOrHideActivityIndicator(LoginActivity.this, 1, "Logging into Hermes...");
-  }
+		Utilities.showOrHideActivityIndicator(LoginActivity.this, 1,
+				"Logging into Hermes...");
+	}
 
-  @Override
-  public void didFailRequestProcessing(String Message) {
+	@Override
+	public void didFailRequestProcessing(String Message) {
 
-    Toast.makeText(getApplicationContext(), getResources().getString(R.string.wrong_login_data),
-        Toast.LENGTH_SHORT).show();
+		Toast.makeText(getApplicationContext(),
+				getResources().getString(R.string.wrong_login_data),
+				Toast.LENGTH_SHORT).show();
 
-  }
+	}
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    getMenuInflater().inflate(R.menu.main, menu);
-    return false;
-  }
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return false;
+	}
 
-  public static void setLoginData(Profile loginData) {
-    lData = loginData;
-    Utilities.writeString(context, "auth_key", lData.getAuthKey());
-    if (lData != null) {
-      authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY, lData.getAuthKey());
-    }
-    authKeyEditor.commit();
+	public static void setLoginData(Profile loginData) {
+		lData = loginData;
+		Utilities.writeString(context, "auth_key", lData.getAuthKey());
+		if (lData != null) {
+			authKeyEditor.putString(Constants.AUTHKEY_SHAREDPREFS_KEY,
+					lData.getAuthKey());
+		}
+		authKeyEditor.commit();
 
-  }
+	}
 
-  @Override
-  protected void onNewIntent(Intent intent) {
-    super.onNewIntent(intent);
-    setIntent(intent);
-  }
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		setIntent(intent);
+	}
 
-  public void requestLoginInfoText() {
+	public void requestLoginInfoText() {
 
-    AQuery aq = new AQuery(LoginActivity.this);
+		AQuery aq = new AQuery(LoginActivity.this);
 
-    HashMap<String, Object> params = new HashMap<String, Object>();
+		HashMap<String, Object> params = new HashMap<String, Object>();
 
-    if (Utilities.isNetworkAvailable(LoginActivity.this)) {
-      aq.ajax(Constants.LOGIN_INFO_URL, params, JSONObject.class, new AjaxCallback<JSONObject>() {
-        @Override
-        public void callback(String url, JSONObject json, AjaxStatus status) {
+		if (Utilities.isNetworkAvailable(LoginActivity.this)) {
+			aq.ajax(Constants.LOGIN_INFO_URL, params, JSONObject.class,
+					new AjaxCallback<JSONObject>() {
+						@Override
+						public void callback(String url, JSONObject json,
+								AjaxStatus status) {
 
-          try {
-            if (json.has(Constants.KEY_STATUS) && json.get(Constants.KEY_STATUS) != null) {
-              if (json.getInt("status") == 200) {
-                loginInfoText = JSONParser.parseLoginInfo(json);
-                ((TextView) findViewById(R.id.loginInfoText)).setText(loginInfoText);
-              }
-            }
-          } catch (JSONException e) {
-            e.printStackTrace();
+							try {
+								if (json.has(Constants.KEY_STATUS)
+										&& json.get(Constants.KEY_STATUS) != null) {
+									if (json.getInt("status") == 200) {
+										loginInfoText = JSONParser
+												.parseLoginInfo(json);
+										((TextView) findViewById(R.id.loginInfoText))
+												.setText(loginInfoText);
+									}
+								}
+							} catch (JSONException e) {
+								e.printStackTrace();
 
-          }
-        }
-      });
-    } else {
+							}
+						}
+					});
+		} else {
 
-      Toast.makeText(getApplicationContext(),
-          getResources().getString(R.string.no_internet_connection), Toast.LENGTH_SHORT).show();
+			Toast.makeText(getApplicationContext(),
+					getResources().getString(R.string.no_internet_connection),
+					Toast.LENGTH_SHORT).show();
 
-    }
-  }
+		}
+	}
 
 }

@@ -108,7 +108,7 @@ public class PlanningFragment extends Fragment implements OnClickListener {
 		fragment.findViewById(R.id.textPrevious).setOnClickListener(this);
 		fragment.findViewById(R.id.textNext).setOnClickListener(this);
 
-		if (NetworkReachability.isReachable()) {
+		if (Utilities.isNetworkAvailable(getActivity())) {
 			aq = new AQuery(getActivity());
 
 			getCalendarData();

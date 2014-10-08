@@ -153,7 +153,18 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view,
 					int position, long id) {
-				selectQuestion(questions.get(position), position);
+				try {
+					selectQuestion(questions.get(position), position);
+				} catch (IndexOutOfBoundsException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (NullPointerException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 		});
@@ -217,7 +228,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 	}
 
-	private void selectQuestion(Question q, int position) {
+	private void selectQuestion(Question q, int position)
+			throws IndexOutOfBoundsException, NullPointerException {
 		currentPosition = position;
 		DataHolder.getInstance().getSelectedQuestions().put(position, true);
 		adapter.notifyDataSetChanged();
@@ -663,7 +675,18 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 										.parseResultCorrections(json, dir);
 								answers = JSONParser
 										.parseCorrectionAnswers(json);
-								selectQuestion(questions.get(0), 0);
+								try {
+									selectQuestion(questions.get(0), 0);
+								} catch (IndexOutOfBoundsException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (NullPointerException e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								} catch (Exception e) {
+									// TODO Auto-generated catch block
+									e.printStackTrace();
+								}
 							}
 						} catch (JSONException e) {
 							e.printStackTrace();

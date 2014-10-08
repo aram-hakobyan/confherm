@@ -10,6 +10,7 @@ import android.os.Message;
 import android.util.Log;
 import fr.conferencehermes.confhermexam.connectionhelper.ActionDelegate;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
 
 /**
@@ -40,7 +41,7 @@ public class BaseNetworkManager {
 			final Object managerObject, final String classString,
 			final String serviceName, final String loginOrAuth) {
 
-		if (NetworkReachability.isReachable()) {
+		{
 
 			final Handler handler = new Handler() {
 
@@ -90,10 +91,6 @@ public class BaseNetworkManager {
 			final String httpRequestUrl = builder.toString();
 
 			connection.post(httpRequestUrl, paramsList);
-		} else {
-			ActionDelegate delegate = (ActionDelegate) ViewTracker
-					.getInstance().getCurrentContext();
-			delegate.didFailRequestProcessing("Please check your internet connection");
 		}
 	}
 

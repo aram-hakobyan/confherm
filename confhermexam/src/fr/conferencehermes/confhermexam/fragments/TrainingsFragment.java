@@ -30,6 +30,7 @@ import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Training;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class TrainingsFragment extends Fragment {
 	LayoutInflater inflater;
@@ -59,7 +60,7 @@ public class TrainingsFragment extends Fragment {
 			}
 
 		});
-		if (NetworkReachability.isReachable()) {
+		if (Utilities.isNetworkAvailable(getActivity())) {
 			AQuery aq = new AQuery(getActivity());
 
 			Map<String, Object> params = new HashMap<String, Object>();

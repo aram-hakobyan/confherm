@@ -20,6 +20,7 @@ import fr.conferencehermes.confhermexam.R;
 import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.Profile;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class MyProfileFragment extends Fragment {
 
@@ -79,7 +80,7 @@ public class MyProfileFragment extends Fragment {
         getActivity().finish();
       }
     });
-    if (NetworkReachability.isReachable()) {
+		if (Utilities.isNetworkAvailable(getActivity())) {
 
       profileEditor = profilePreferences.edit();
 

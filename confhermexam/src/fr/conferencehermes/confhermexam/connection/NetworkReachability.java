@@ -5,7 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
 
-
 public class NetworkReachability {
 
 	/**
@@ -13,27 +12,6 @@ public class NetworkReachability {
 	 * 
 	 * @return
 	 */
-	public static boolean isReachable() {
-
-		Context current = ViewTracker.getInstance().getCurrentContext();
-		ConnectivityManager connectivity = (ConnectivityManager) current
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo info = connectivity.getActiveNetworkInfo();
-		if (info == null || !connectivity.getBackgroundDataSetting()) {
-			return false;
-		}
-
-		int netType = info.getType();
-		if (netType == ConnectivityManager.TYPE_WIFI
-				|| netType == ConnectivityManager.TYPE_MOBILE) {
-			return true;
-		} else {
-			return false;
-		}
-		
-		
-
-	}
 
 	/**
 	 * Gets network type
