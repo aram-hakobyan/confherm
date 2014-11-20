@@ -91,6 +91,7 @@
     <!-- Other -->
     <string name="no_internet_connection">Une connexion à internet est nécessaire pour consulter cette page</string>
     <string name="telecharger">Télécharger</string>
+    <string name="resultTitle">Si votre correction n\'apparait pas, vérifiez que vous avez envoyé vos réponses à l\'épreuve.</string>
 
     <!-- Exam -->
     <string name="examen_avaible">Disponible</string>

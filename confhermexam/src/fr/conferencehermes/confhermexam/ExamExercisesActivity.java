@@ -300,7 +300,7 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			System.out.println("SCREEN TURNED ON");
 		}
 
-		boolean twoMinutesPassed = System.currentTimeMillis() - pauseTime >= 2 * 60 * 1000;
+		boolean twoMinutesPassed = System.currentTimeMillis() - pauseTime >= 3 * 60 * 1000;
 
 		if (onPaused && twoMinutesPassed && Constants.calledFromExam == false) {
 			showAlertDialog();

@@ -63,6 +63,7 @@ import fr.conferencehermes.confhermexam.parser.CorrectionAnswer;
 import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
+import fr.conferencehermes.confhermexam.parser.Note;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
@@ -105,6 +106,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private boolean CONFERENCE = false;
 	int padding = 10, imgSize;
 
+	Button noteBtn;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -133,12 +136,14 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		btnImage.bringToFront();
 		btnAudio.bringToFront();
 		btnVideo.bringToFront();
+		noteBtn = (Button) findViewById(R.id.noteBtn);
 
 		abandonner = (Button) findViewById(R.id.abandonner);
 		ennouncer = (Button) findViewById(R.id.ennouncer);
 
 		abandonner.setOnClickListener(this);
 		ennouncer.setOnClickListener(this);
+		noteBtn.setOnClickListener(this);
 
 		mediaPlayer = new MediaPlayer();
 		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -254,6 +259,13 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 					setFileIcons(currentQuestionFiles);
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+
+		Note n = db.getNote(currentQuestionId);
+		if (n != null) {
+			noteBtn.setBackgroundResource(R.drawable.note_icon);
+		} else {
+			noteBtn.setBackgroundResource(R.drawable.note_icon_gray);
 		}
 
 		currentQuestionAnswers = db.getAllAnswersByQuestionId(currentQuestion
@@ -730,11 +742,71 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			if (currentQuestionCorrectionFiles != null)
 				openDialog(currentQuestionCorrectionFiles, 3);
 			break;
+		case R.id.noteBtn:
+			openNoteDialog();
+			break;
 
 		default:
 			break;
 		}
 
+	}
+
+	private void openNoteDialog() {
+		final Dialog notedialog = new Dialog(CorrectionActivity.this);
+		notedialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		notedialog.setContentView(R.layout.note_dialog);
+
+		final DatabaseHelper dbh = new DatabaseHelper(CorrectionActivity.this);
+		final EditText note = (EditText) notedialog
+				.findViewById(R.id.editTextNote);
+		Button done = (Button) notedialog.findViewById(R.id.closeNoteDialog);
+		done.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				saveNote(dbh, note.getText().toString());
+				notedialog.dismiss();
+			}
+		});
+
+		if (!notedialog.isShowing()) {
+			notedialog.show();
+			notedialog.getWindow().setLayout(
+					getResources().getDimensionPixelSize(
+							R.dimen.note_dialog_width),
+					getResources().getDimensionPixelSize(
+							R.dimen.note_dialog_height));
+		}
+
+		notedialog.setOnDismissListener(new OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				dbh.closeDB();
+			}
+		});
+
+		Note n = dbh.getNote(currentQuestionId);
+		if (n != null) {
+			note.setText(n.getText());
+		}
+	}
+
+	private void saveNote(DatabaseHelper dbh, String note) {
+		try {
+			Note n = new Note();
+			n.setId(currentQuestionId);
+			n.setText(note);
+
+			if (dbh.getNote(currentQuestionId) == null) {
+				dbh.createNote(n);
+			} else {
+				dbh.updateNote(n);
+			}
+			noteBtn.setBackgroundResource(R.drawable.note_icon);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private Dialog dialog = null;

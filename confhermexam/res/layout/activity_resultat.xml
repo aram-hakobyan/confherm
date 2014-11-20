@@ -5,17 +5,28 @@
     android:background="@android:color/white"
     tools:context="fr.conferencehermes.confhermexam.fragments.DownloadsFragment" >
 
+    <TextView
+        android:id="@+id/resultTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="@string/resultTitle"
+        android:textColor="@color/app_main_color_dark" />
+
     <ListView
         android:id="@+id/listViewResultat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@+id/resultTitle"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="40dp"
         android:layout_marginLeft="100dp"
         android:layout_marginRight="100dp"
         android:layout_marginTop="70dp"
         android:divider="@android:color/transparent"
-       android:dividerHeight="@dimen/listview_divider_height" >
+        android:dividerHeight="@dimen/listview_divider_height" >
     </ListView>
 
     <ProgressBar
