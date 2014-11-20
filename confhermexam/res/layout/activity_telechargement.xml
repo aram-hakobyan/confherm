@@ -15,7 +15,8 @@
         android:layout_marginTop="25dp"
         android:gravity="center_horizontal"
         android:text="Attention : le téléchargement de données lourdes peut occasionner des frais auprès de votre opérateur téléphonique.
-Nous vous conseillons de vous connecter en WIFI pour télécharger vos épreuves" />
+Nous vous conseillons de vous connecter en WIFI pour télécharger vos épreuves"
+        android:textColor="@color/app_main_color_dark" />
 
     <LinearLayout
         android:layout_width="match_parent"

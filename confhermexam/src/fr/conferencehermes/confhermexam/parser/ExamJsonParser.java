@@ -8,6 +8,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import fr.conferencehermes.confhermexam.util.DataHolder;
+import fr.conferencehermes.confhermexam.util.StringUtils;
 
 public class ExamJsonParser {
 	private static String directory = "";
@@ -94,33 +95,50 @@ public class ExamJsonParser {
 		HashMap<String, String> eFiles = new HashMap<String, String>();
 		JSONObject filesExercise = (JSONObject) data
 				.getJSONObject("exercise_files");
+
 		JSONArray imgArrayExercise = (JSONArray) filesExercise
 				.getJSONArray("image");
+		String[] images = new String[imgArrayExercise.length()];
 		if (imgArrayExercise.length() != 0) {
-			JSONObject imgObjExercise = (JSONObject) imgArrayExercise.get(0);
-			eFiles.put("image",
-					imgObjExercise.getString("file") != null ? directory
-							+ imgObjExercise.getString("file") : "");
+			for (int i = 0; i < imgArrayExercise.length(); i++) {
+				JSONObject imgObjExercise = (JSONObject) imgArrayExercise
+						.get(i);
+				images[i] = imgObjExercise.getString("file") != null ? directory
+						+ imgObjExercise.getString("file")
+						: "";
+			}
+			eFiles.put("image", StringUtils.convertArrayToString(images));
+
 		} else
 			eFiles.put("image", "");
+
 		JSONArray soundArrayExercise = (JSONArray) filesExercise
 				.getJSONArray("sound");
+		String[] sounds = new String[soundArrayExercise.length()];
 		if (soundArrayExercise.length() != 0) {
-			JSONObject soundObjExercise = (JSONObject) soundArrayExercise
-					.get(0);
-			eFiles.put("sound",
-					soundObjExercise.getString("file") != null ? directory
-							+ soundObjExercise.getString("file") : "");
+			for (int i = 0; i < soundArrayExercise.length(); i++) {
+				JSONObject soundObjExercise = (JSONObject) soundArrayExercise
+						.get(0);
+				sounds[i] = soundObjExercise.getString("file") != null ? directory
+						+ soundObjExercise.getString("file")
+						: "";
+			}
+			eFiles.put("sound", StringUtils.convertArrayToString(sounds));
 		} else
 			eFiles.put("sound", "");
+
 		JSONArray videoArrayExercise = (JSONArray) filesExercise
 				.getJSONArray("video");
+		String[] videos = new String[videoArrayExercise.length()];
 		if (videoArrayExercise.length() != 0) {
-			JSONObject videoObjExercise = (JSONObject) videoArrayExercise
-					.get(0);
-			eFiles.put("video",
-					videoObjExercise.getString("file") != null ? directory
-							+ videoObjExercise.getString("file") : "");
+			for (int i = 0; i < videoArrayExercise.length(); i++) {
+				JSONObject videoObjExercise = (JSONObject) videoArrayExercise
+						.get(0);
+				videos[i] = videoObjExercise.getString("file") != null ? directory
+						+ videoObjExercise.getString("file")
+						: "";
+			}
+			eFiles.put("video", StringUtils.convertArrayToString(videos));
 		} else
 			eFiles.put("video", "");
 
@@ -142,32 +160,42 @@ public class ExamJsonParser {
 			JSONObject files = (JSONObject) qObj
 					.getJSONObject("question_files");
 			JSONArray imgArray = (JSONArray) files.getJSONArray("image");
+			String[] imagesQ = new String[imgArray.length()];
 			if (imgArray.length() != 0) {
-				JSONObject imgObj = (JSONObject) imgArray.get(0);
-				qFiles.put(
-						"image",
-						imgObj.getString("file") != null ? directory
-								+ imgObj.getString("file") : "");
+				for (int i = 0; i < imgArray.length(); i++) {
+					JSONObject imgObj = (JSONObject) imgArray.get(i);
+					imagesQ[i] = imgObj.getString("file") != null ? directory
+							+ imgObj.getString("file") : "";
+				}
+				qFiles.put("image", StringUtils.convertArrayToString(imagesQ));
+
 			} else
 				qFiles.put("image", "");
+
 			JSONArray soundArray = (JSONArray) files.getJSONArray("sound");
+			String[] soundsQ = new String[soundArray.length()];
 			if (soundArray.length() != 0) {
-				JSONObject soundObj = (JSONObject) soundArray.get(0);
-				qFiles.put("sound",
-						soundObj.getString("file") != null ? directory
-								+ soundObj.getString("file") : "");
+				for (int i = 0; i < soundArray.length(); i++) {
+					JSONObject soundObj = (JSONObject) soundArray.get(0);
+					soundsQ[i] = soundObj.getString("file") != null ? directory
+							+ soundObj.getString("file") : "";
+				}
+				qFiles.put("sound", StringUtils.convertArrayToString(soundsQ));
 			} else
 				qFiles.put("sound", "");
-			JSONArray videoArray = (JSONArray) files.getJSONArray("video");
+
+			JSONArray videoArray = (JSONArray) filesExercise
+					.getJSONArray("video");
+			String[] videosQ = new String[videoArray.length()];
 			if (videoArray.length() != 0) {
-				JSONObject videoObj = (JSONObject) videoArray.get(0);
-				qFiles.put("video",
-						videoObj.getString("file") != null ? directory
-								+ videoObj.getString("file") : "");
+				for (int i = 0; i < videoArray.length(); i++) {
+					JSONObject videoObj = (JSONObject) videoArray.get(0);
+					videosQ[i] = videoObj.getString("file") != null ? directory
+							+ videoObj.getString("file") : "";
+				}
+				qFiles.put("video", StringUtils.convertArrayToString(videosQ));
 			} else
 				qFiles.put("video", "");
-
-			q.setFiles(qFiles);
 
 			JSONArray answers = (JSONArray) qObj.getJSONArray("answers");
 			ArrayList<Answer> answersArrayList = new ArrayList<Answer>();
@@ -189,5 +217,4 @@ public class ExamJsonParser {
 
 		return exercise;
 	}
-
 }

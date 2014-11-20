@@ -67,6 +67,7 @@ import fr.conferencehermes.confhermexam.parser.Note;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
+import fr.conferencehermes.confhermexam.util.StringUtils;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class CorrectionActivity extends Activity implements OnClickListener {
@@ -855,9 +856,13 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			button3.setAlpha(1f);
 		}
 
-		final String IMAGE_URL = files.get("image");
-		final String AUDIO_URL = files.get("sound");
-		final String VIDEO_URL = files.get("video");
+		String[] images = StringUtils.convertStringToArray(files.get("image"));
+		String[] sounds = StringUtils.convertStringToArray(files.get("sound"));
+		String[] videos = StringUtils.convertStringToArray(files.get("video"));
+
+		final String IMAGE_URL = images[0];
+		final String AUDIO_URL = sounds[0];
+		final String VIDEO_URL = videos[0];
 		VIDEO_URL.replaceAll(" ", "%20");
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
 
@@ -1016,10 +1021,8 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		if (IMAGE_URL != null)
 			if (!IMAGE_URL.isEmpty()) {
-				if (!IMAGE_URL.isEmpty()) {
-					Bitmap bitmap = BitmapFactory.decodeFile(IMAGE_URL);
-					img.setImageBitmap(bitmap);
-				}
+				Bitmap bitmap = BitmapFactory.decodeFile(IMAGE_URL);
+				img.setImageBitmap(bitmap);
 			}
 
 		switch (from) {

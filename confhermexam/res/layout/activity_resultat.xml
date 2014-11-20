@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="25dp"
         android:text="@string/resultTitle"
         android:textColor="@color/app_main_color_dark" />
 
@@ -19,12 +19,12 @@
         android:id="@+id/listViewResultat"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/resultTitle"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="40dp"
         android:layout_marginLeft="100dp"
         android:layout_marginRight="100dp"
-        android:layout_marginTop="70dp"
+        android:layout_marginTop="80dp"
         android:divider="@android:color/transparent"
         android:dividerHeight="@dimen/listview_divider_height" >
     </ListView>
