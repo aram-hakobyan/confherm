@@ -993,13 +993,13 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		final String[] videos = StringUtils.convertStringToArray(files
 				.get("video"));
 
+		POS = 1;
 		final String IMAGE_URL = getMediaURL(images);
 		final String AUDIO_URL = getMediaURL(sounds);
 		final String VIDEO_URL = getMediaURL(videos);
 		final int IMAGE_COUNT = images.length;
 		final int SOUND_COUNT = sounds.length;
 		final int VIDEO_COUNT = videos.length;
-		POS = 1;
 
 		for (int i = 0; i < VIDEO_COUNT; i++) {
 			videos[i] = videos[i].replaceAll(" ", "%20");
