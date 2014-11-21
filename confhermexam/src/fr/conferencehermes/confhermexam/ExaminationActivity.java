@@ -1638,7 +1638,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 
 	@Override
 	protected void onStop() {
-		timer.cancel();
+		if (timer != null)
+			timer.cancel();
 		super.onStop();
 	}
 

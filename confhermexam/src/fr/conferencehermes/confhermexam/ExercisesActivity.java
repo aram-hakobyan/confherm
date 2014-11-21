@@ -138,7 +138,8 @@ public class ExercisesActivity extends FragmentActivity implements
 
 	@Override
 	protected void onPause() {
-		timer.cancel();
+		if (timer != null)
+			timer.cancel();
 		super.onPause();
 	}
 
