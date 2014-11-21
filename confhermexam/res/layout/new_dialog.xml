@@ -138,11 +138,39 @@
             android:background="@drawable/ic_video" />
     </LinearLayout>
 
+    <TextView
+        android:id="@+id/countText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_margin="25dp"
+        android:textColor="@android:color/black"
+        android:textStyle="bold" />
+
     <MediaController
         android:id="@+id/mediaController1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="22dp" >
     </MediaController>
+
+    <ImageButton
+        android:id="@+id/prev"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/arrow_left"
+        android:clickable="true" />
+
+    <ImageButton
+        android:id="@+id/next"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:background="@drawable/arrow_right"
+        android:clickable="true" />
 
 </RelativeLayout>

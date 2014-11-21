@@ -42,6 +42,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -106,6 +107,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private ArrayList<CorrectionAnswer> answers;
 	private boolean CONFERENCE = false;
 	int padding = 10, imgSize;
+	int POS = 1;
+	final int TYPE_IMAGE = 0;
+	final int TYPE_SOUND = 1;
+	final int TYPE_VIDEO = 2;
+	int MEDIA_TYPE = -1;
 
 	Button noteBtn;
 
@@ -263,7 +269,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		}
 
 		Note n = db.getNote(currentQuestionId);
-		if (n != null) {
+		if (n != null && !n.getText().isEmpty()) {
 			noteBtn.setBackgroundResource(R.drawable.note_icon);
 		} else {
 			noteBtn.setBackgroundResource(R.drawable.note_icon_gray);
@@ -605,62 +611,62 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	}
 
 	private void setFileIcons(HashMap<String, String> files) {
-		if (files.get("image").isEmpty()) {
-			btnImage.setBackgroundResource(R.drawable.ic_camera_gray);
-			btnImage.setClickable(false);
-			btnImage.setAlpha(0.5f);
-		} else {
+		if (files.get("image") != null && !files.get("image").isEmpty()) {
 			btnImage.setBackgroundResource(R.drawable.ic_camera);
 			btnImage.setClickable(true);
 			btnImage.setAlpha(1f);
-		}
-		if (files.get("sound").isEmpty()) {
-			btnAudio.setBackgroundResource(R.drawable.ic_sound_gray);
-			btnAudio.setClickable(false);
-			btnAudio.setAlpha(0.5f);
 		} else {
+			btnImage.setBackgroundResource(R.drawable.ic_camera_gray);
+			btnImage.setClickable(false);
+			btnImage.setAlpha(0.5f);
+		}
+		if (files.get("sound") != null && !files.get("sound").isEmpty()) {
 			btnAudio.setBackgroundResource(R.drawable.ic_sound);
 			btnAudio.setClickable(true);
 			btnAudio.setAlpha(1f);
-		}
-		if (files.get("video").isEmpty()) {
-			btnVideo.setBackgroundResource(R.drawable.ic_video_gray);
-			btnVideo.setClickable(false);
-			btnVideo.setAlpha(0.5f);
 		} else {
+			btnAudio.setBackgroundResource(R.drawable.ic_sound_gray);
+			btnAudio.setClickable(false);
+			btnAudio.setAlpha(0.5f);
+		}
+		if (files.get("video") != null && !files.get("video").isEmpty()) {
 			btnVideo.setBackgroundResource(R.drawable.ic_video);
 			btnVideo.setClickable(true);
 			btnVideo.setAlpha(1f);
+		} else {
+			btnVideo.setBackgroundResource(R.drawable.ic_video_gray);
+			btnVideo.setClickable(false);
+			btnVideo.setAlpha(0.5f);
 		}
 	}
 
 	private void setCorrectionFileIcons(HashMap<String, String> files) {
-		if (files.get("image").isEmpty()) {
-			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera_gray);
-			btnImageCorrection.setClickable(false);
-			btnImageCorrection.setAlpha(0.5f);
-		} else {
+		if (files.get("image") != null && !files.get("image").isEmpty()) {
 			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera);
 			btnImageCorrection.setClickable(true);
 			btnImageCorrection.setAlpha(1f);
-		}
-		if (files.get("sound").isEmpty()) {
-			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound_gray);
-			btnAudioCorrection.setClickable(false);
-			btnAudioCorrection.setAlpha(0.5f);
 		} else {
+			btnImageCorrection.setBackgroundResource(R.drawable.ic_camera_gray);
+			btnImageCorrection.setClickable(false);
+			btnImageCorrection.setAlpha(0.5f);
+		}
+		if (files.get("sound") != null && !files.get("sound").isEmpty()) {
 			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound);
 			btnAudioCorrection.setClickable(true);
 			btnAudioCorrection.setAlpha(1f);
-		}
-		if (files.get("video").isEmpty()) {
-			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video_gray);
-			btnVideoCorrection.setClickable(false);
-			btnVideoCorrection.setAlpha(0.5f);
 		} else {
+			btnAudioCorrection.setBackgroundResource(R.drawable.ic_sound_gray);
+			btnAudioCorrection.setClickable(false);
+			btnAudioCorrection.setAlpha(0.5f);
+		}
+		if (files.get("video") != null && !files.get("video").isEmpty()) {
 			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video);
 			btnVideoCorrection.setClickable(true);
 			btnVideoCorrection.setAlpha(1f);
+		} else {
+			btnVideoCorrection.setBackgroundResource(R.drawable.ic_video_gray);
+			btnVideoCorrection.setClickable(false);
+			btnVideoCorrection.setAlpha(0.5f);
 		}
 	}
 
@@ -804,13 +810,88 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			} else {
 				dbh.updateNote(n);
 			}
-			noteBtn.setBackgroundResource(R.drawable.note_icon);
+
+			if (note.isEmpty())
+				noteBtn.setBackgroundResource(R.drawable.note_icon_gray);
+			else
+				noteBtn.setBackgroundResource(R.drawable.note_icon);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
 	private Dialog dialog = null;
+
+	private void setCount(TextView text, int pos, int count) {
+		String s = String.valueOf(pos) + " sur " + String.valueOf(count);
+		text.setText(s);
+	}
+
+	private String getMediaURL(String[] array) {
+		if (POS < 1)
+			return array[0];
+		if (POS > array.length)
+			return array[array.length - 1];
+		return array[POS - 1];
+	}
+
+	private void prepareImage(final ImageView img, final String url) {
+		if (url != null)
+			if (!url.isEmpty()) {
+				Bitmap bitmap = BitmapFactory.decodeFile(url);
+				if (bitmap != null)
+					img.setImageBitmap(bitmap);
+				else {
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							final Bitmap mbitmap = Utilities
+									.getBitmapFromURL(url);
+							runOnUiThread(new Runnable() {
+								@Override
+								public void run() {
+									img.setImageBitmap(mbitmap);
+								}
+							});
+						}
+					}).start();
+
+				}
+
+			}
+	}
+
+	private void prepareAudio(String url) {
+		if (url != null)
+			if (!url.isEmpty()) {
+				try {
+					mediaPlayer.setDataSource(url);
+					mediaPlayer.prepare();
+				} catch (IllegalArgumentException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IllegalStateException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+	}
+
+	private void prepareVideo(VideoView video, String url) {
+		if (url != null)
+			if (!url.isEmpty()) {
+				Uri videoURI = Uri.parse(url);
+				video.setVideoURI(videoURI);
+				video.setZOrderOnTop(true);
+
+			}
+	}
 
 	public void openDialog(HashMap<String, String> files, int from) {
 		dialog = new Dialog(CorrectionActivity.this);
@@ -828,44 +909,59 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				.findViewById(R.id.ennouncerText);
 		text.setMovementMethod(new ScrollingMovementMethod());
 
-		if (files.get("image").isEmpty()) {
-			button1.setBackgroundResource(R.drawable.ic_camera_gray);
-			button1.setEnabled(false);
-			button1.setAlpha(0.5f);
-		} else {
+		final ImageButton prev = (ImageButton) dialog.findViewById(R.id.prev);
+		final ImageButton next = (ImageButton) dialog.findViewById(R.id.next);
+		final TextView countText = (TextView) dialog
+				.findViewById(R.id.countText);
+
+		if (files.get("image") != null && !files.get("image").isEmpty()) {
 			button1.setBackgroundResource(R.drawable.ic_camera);
 			button1.setEnabled(true);
 			button1.setAlpha(1.0f);
-		}
-		if (files.get("sound").isEmpty()) {
-			button2.setBackgroundResource(R.drawable.ic_sound_gray);
-			button2.setEnabled(false);
-			button2.setAlpha(0.5f);
 		} else {
+			button1.setBackgroundResource(R.drawable.ic_camera_gray);
+			button1.setEnabled(false);
+			button1.setAlpha(0.5f);
+		}
+		if (files.get("sound") != null && !files.get("sound").isEmpty()) {
 			button2.setBackgroundResource(R.drawable.ic_sound);
 			button2.setEnabled(true);
 			button2.setAlpha(1f);
-		}
-		if (files.get("video").isEmpty()) {
-			button3.setBackgroundResource(R.drawable.ic_video_gray);
-			button3.setEnabled(false);
-			button3.setAlpha(0.5f);
 		} else {
+			button2.setBackgroundResource(R.drawable.ic_sound_gray);
+			button2.setEnabled(false);
+			button2.setAlpha(0.5f);
+		}
+		if (files.get("video") != null && !files.get("video").isEmpty()) {
 			button3.setBackgroundResource(R.drawable.ic_video);
 			button3.setEnabled(true);
 			button3.setAlpha(1f);
+		} else {
+			button3.setBackgroundResource(R.drawable.ic_video_gray);
+			button3.setEnabled(false);
+			button3.setAlpha(0.5f);
 		}
 
-		String[] images = StringUtils.convertStringToArray(files.get("image"));
-		String[] sounds = StringUtils.convertStringToArray(files.get("sound"));
-		String[] videos = StringUtils.convertStringToArray(files.get("video"));
+		final String[] images = StringUtils.convertStringToArray(files
+				.get("image"));
+		final String[] sounds = StringUtils.convertStringToArray(files
+				.get("sound"));
+		final String[] videos = StringUtils.convertStringToArray(files
+				.get("video"));
 
-		final String IMAGE_URL = images[0];
-		final String AUDIO_URL = sounds[0];
-		final String VIDEO_URL = videos[0];
-		VIDEO_URL.replaceAll(" ", "%20");
+		final String IMAGE_URL = getMediaURL(images);
+		final String AUDIO_URL = getMediaURL(sounds);
+		final String VIDEO_URL = getMediaURL(videos);
+		final int IMAGE_COUNT = images.length;
+		final int SOUND_COUNT = sounds.length;
+		final int VIDEO_COUNT = videos.length;
+		POS = 1;
+
+		for (int i = 0; i < VIDEO_COUNT; i++) {
+			videos[i] = videos[i].replaceAll(" ", "%20");
+		}
+
 		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
-
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
 
@@ -991,39 +1087,9 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			}
 		});
 
-		if (AUDIO_URL != null)
-			if (!AUDIO_URL.isEmpty()) {
-				try {
-					mediaPlayer.setDataSource(AUDIO_URL);
-					mediaPlayer.prepare();
-				} catch (IllegalArgumentException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IllegalStateException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-		if (VIDEO_URL != null)
-			if (!VIDEO_URL.isEmpty()) {
-				Uri videoURI = Uri.parse(VIDEO_URL);
-
-				video.setVideoURI(videoURI);
-				video.setZOrderOnTop(true);
-
-			}
-
-		if (IMAGE_URL != null)
-			if (!IMAGE_URL.isEmpty()) {
-				Bitmap bitmap = BitmapFactory.decodeFile(IMAGE_URL);
-				img.setImageBitmap(bitmap);
-			}
+		prepareAudio(AUDIO_URL);
+		prepareVideo(video, VIDEO_URL);
+		prepareImage(img, IMAGE_URL);
 
 		switch (from) {
 		case 0:
@@ -1032,11 +1098,13 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
-
 			soundControlLayout.setVisibility(View.GONE);
-
+			countText.setVisibility(View.GONE);
+			prev.setVisibility(View.GONE);
+			next.setVisibility(View.GONE);
 			break;
 		case 1:
+			MEDIA_TYPE = TYPE_IMAGE;
 			if (mediaPlayer != null) {
 				try {
 					if (mediaPlayer.isPlaying()) {
@@ -1052,18 +1120,24 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			img.setVisibility(View.VISIBLE);
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
-
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
+			countText.setVisibility(View.VISIBLE);
+			prev.setVisibility(View.VISIBLE);
+			next.setVisibility(View.VISIBLE);
+			setCount(countText, POS, IMAGE_COUNT);
 			break;
 		case 2:
+			MEDIA_TYPE = TYPE_SOUND;
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.GONE);
 			videoControlLayout.setVisibility(View.GONE);
-
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.VISIBLE);
-
+			countText.setVisibility(View.VISIBLE);
+			prev.setVisibility(View.VISIBLE);
+			next.setVisibility(View.VISIBLE);
+			setCount(countText, POS, SOUND_COUNT);
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
@@ -1078,6 +1152,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 			break;
 		case 3:
+			MEDIA_TYPE = TYPE_VIDEO;
 			try {
 				if (mediaPlayer.isPlaying()) {
 					mediaPlayer.pause();
@@ -1088,12 +1163,13 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			img.setVisibility(View.GONE);
 			video.setVisibility(View.VISIBLE);
 			videoControlLayout.setVisibility(View.VISIBLE);
-
 			text.setVisibility(View.GONE);
 			soundControlLayout.setVisibility(View.GONE);
-
+			countText.setVisibility(View.VISIBLE);
+			prev.setVisibility(View.VISIBLE);
+			next.setVisibility(View.VISIBLE);
+			setCount(countText, POS, VIDEO_COUNT);
 			try {
-
 				video.start();
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -1108,6 +1184,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						MEDIA_TYPE = TYPE_IMAGE;
 						if (mediaPlayer != null) {
 							try {
 								if (mediaPlayer.isPlaying()) {
@@ -1123,9 +1200,12 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						img.setVisibility(View.VISIBLE);
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
-
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
+						countText.setVisibility(View.VISIBLE);
+						prev.setVisibility(View.VISIBLE);
+						next.setVisibility(View.VISIBLE);
+						setCount(countText, POS, IMAGE_COUNT);
 					}
 				});
 
@@ -1133,11 +1213,14 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						MEDIA_TYPE = TYPE_SOUND;
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.GONE);
 						videoControlLayout.setVisibility(View.GONE);
 						text.setVisibility(View.GONE);
-
+						countText.setVisibility(View.VISIBLE);
+						prev.setVisibility(View.VISIBLE);
+						next.setVisibility(View.VISIBLE);
 						soundControlLayout.setVisibility(View.VISIBLE);
 						if (video.isPlaying()) {
 							video.stopPlayback();
@@ -1150,7 +1233,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
-
+						setCount(countText, POS, SOUND_COUNT);
 					}
 				});
 
@@ -1158,6 +1241,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				new OnClickListener() {
 					@Override
 					public void onClick(View v) {
+						MEDIA_TYPE = TYPE_VIDEO;
 						try {
 							if (mediaPlayer.isPlaying()) {
 								mediaPlayer.pause();
@@ -1168,9 +1252,12 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						img.setVisibility(View.GONE);
 						video.setVisibility(View.VISIBLE);
 						videoControlLayout.setVisibility(View.VISIBLE);
-
+						countText.setVisibility(View.VISIBLE);
+						prev.setVisibility(View.VISIBLE);
+						next.setVisibility(View.VISIBLE);
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
+						setCount(countText, POS, VIDEO_COUNT);
 
 						try {
 							video.start();
@@ -1180,6 +1267,67 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 					}
 				});
+
+		prev.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				if (POS > 1)
+					POS--;
+				else
+					return;
+				switch (MEDIA_TYPE) {
+				case TYPE_IMAGE:
+					prepareImage(img, getMediaURL(images));
+					setCount(countText, POS, IMAGE_COUNT);
+					break;
+				case TYPE_SOUND:
+					prepareAudio(getMediaURL(sounds));
+					setCount(countText, POS, SOUND_COUNT);
+					break;
+				case TYPE_VIDEO:
+					prepareVideo(video, getMediaURL(videos));
+					setCount(countText, POS, VIDEO_COUNT);
+					break;
+				default:
+					break;
+				}
+			}
+		});
+
+		next.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+
+				switch (MEDIA_TYPE) {
+				case TYPE_IMAGE:
+					if (POS < IMAGE_COUNT)
+						POS++;
+					else
+						return;
+					prepareImage(img, getMediaURL(images));
+					setCount(countText, POS, IMAGE_COUNT);
+					break;
+				case TYPE_SOUND:
+					if (POS < SOUND_COUNT)
+						POS++;
+					else
+						return;
+					prepareAudio(getMediaURL(sounds));
+					setCount(countText, POS, SOUND_COUNT);
+					break;
+				case TYPE_VIDEO:
+					if (POS < VIDEO_COUNT)
+						POS++;
+					else
+						return;
+					prepareVideo(video, getMediaURL(videos));
+					setCount(countText, POS, VIDEO_COUNT);
+					break;
+				default:
+					break;
+				}
+			}
+		});
 
 		close.setOnClickListener(new OnClickListener() {
 			@Override
