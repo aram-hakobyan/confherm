@@ -872,6 +872,44 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		text.setText(s);
 	}
 
+	private void setSlideButtons(int pos, int count, ImageButton prev,
+			ImageButton next) {
+		if (count <= 1) {
+			disableSlideButtons(next, prev);
+		} else {
+			enableSlideButtons(next, prev);
+		}
+
+		if (pos == 1 & count > 1) {
+			disablePrevSlideButton(next, prev);
+		} else if (pos == count & count > 1) {
+			disableNextSlideButton(next, prev);
+		} else if (count > 1) {
+			enableSlideButtons(next, prev);
+		}
+
+	}
+
+	private void enableSlideButtons(ImageButton next, ImageButton prev) {
+		next.setBackgroundResource(R.drawable.arrow_right);
+		prev.setBackgroundResource(R.drawable.arrow_left);
+	}
+
+	private void disableSlideButtons(ImageButton next, ImageButton prev) {
+		next.setBackgroundResource(R.drawable.arrow_right_alpha);
+		prev.setBackgroundResource(R.drawable.arrow_left_alpha);
+	}
+
+	private void disablePrevSlideButton(ImageButton next, ImageButton prev) {
+		next.setBackgroundResource(R.drawable.arrow_right);
+		prev.setBackgroundResource(R.drawable.arrow_left_alpha);
+	}
+
+	private void disableNextSlideButton(ImageButton next, ImageButton prev) {
+		next.setBackgroundResource(R.drawable.arrow_right_alpha);
+		prev.setBackgroundResource(R.drawable.arrow_left);
+	}
+
 	private String getMediaURL(String[] array) {
 		if (POS < 1)
 			return array[0];
@@ -1170,6 +1208,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			prev.setVisibility(View.VISIBLE);
 			next.setVisibility(View.VISIBLE);
 			setCount(countText, POS, IMAGE_COUNT);
+			setSlideButtons(POS, IMAGE_COUNT, prev, next);
 			break;
 		case 2:
 			MEDIA_TYPE = TYPE_SOUND;
@@ -1182,6 +1221,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			prev.setVisibility(View.VISIBLE);
 			next.setVisibility(View.VISIBLE);
 			setCount(countText, POS, SOUND_COUNT);
+			setSlideButtons(POS, SOUND_COUNT, prev, next);
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
@@ -1213,6 +1253,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			prev.setVisibility(View.VISIBLE);
 			next.setVisibility(View.VISIBLE);
 			setCount(countText, POS, VIDEO_COUNT);
+			setSlideButtons(POS, VIDEO_COUNT, prev, next);
 			try {
 				video.start();
 			} catch (Exception e) {
@@ -1250,6 +1291,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						prev.setVisibility(View.VISIBLE);
 						next.setVisibility(View.VISIBLE);
 						setCount(countText, POS, IMAGE_COUNT);
+						setSlideButtons(POS, IMAGE_COUNT, prev, next);
 					}
 				});
 
@@ -1278,6 +1320,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 							e.printStackTrace();
 						}
 						setCount(countText, POS, SOUND_COUNT);
+						setSlideButtons(POS, SOUND_COUNT, prev, next);
 					}
 				});
 
@@ -1302,6 +1345,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 						setCount(countText, POS, VIDEO_COUNT);
+						setSlideButtons(POS, VIDEO_COUNT, prev, next);
 
 						try {
 							video.start();
@@ -1323,14 +1367,17 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				case TYPE_IMAGE:
 					prepareImage(img, getMediaURL(images));
 					setCount(countText, POS, IMAGE_COUNT);
+					setSlideButtons(POS, IMAGE_COUNT, prev, next);
 					break;
 				case TYPE_SOUND:
 					prepareAudio(getMediaURL(sounds));
 					setCount(countText, POS, SOUND_COUNT);
+					setSlideButtons(POS, SOUND_COUNT, prev, next);
 					break;
 				case TYPE_VIDEO:
 					prepareVideo(video, getMediaURL(videos));
 					setCount(countText, POS, VIDEO_COUNT);
+					setSlideButtons(POS, VIDEO_COUNT, prev, next);
 					break;
 				default:
 					break;
@@ -1350,6 +1397,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						return;
 					prepareImage(img, getMediaURL(images));
 					setCount(countText, POS, IMAGE_COUNT);
+					setSlideButtons(POS, IMAGE_COUNT, prev, next);
 					break;
 				case TYPE_SOUND:
 					if (POS < SOUND_COUNT)
@@ -1358,6 +1406,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						return;
 					prepareAudio(getMediaURL(sounds));
 					setCount(countText, POS, SOUND_COUNT);
+					setSlideButtons(POS, SOUND_COUNT, prev, next);
 					break;
 				case TYPE_VIDEO:
 					if (POS < VIDEO_COUNT)
@@ -1366,6 +1415,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 						return;
 					prepareVideo(video, getMediaURL(videos));
 					setCount(countText, POS, VIDEO_COUNT);
+					setSlideButtons(POS, VIDEO_COUNT, prev, next);
 					break;
 				default:
 					break;

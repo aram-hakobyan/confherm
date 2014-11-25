@@ -58,6 +58,7 @@ import com.androidquery.callback.AjaxStatus;
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.model.LineEditText;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.CorrectionAnswer;
@@ -765,7 +766,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 		notedialog.setContentView(R.layout.note_dialog);
 
 		final DatabaseHelper dbh = new DatabaseHelper(CorrectionActivity.this);
-		final EditText note = (EditText) notedialog
+		final LineEditText note = (LineEditText) notedialog
 				.findViewById(R.id.editTextNote);
 		Button done = (Button) notedialog.findViewById(R.id.closeNoteDialog);
 		done.setOnClickListener(new View.OnClickListener() {
@@ -825,6 +826,44 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 	private void setCount(TextView text, int pos, int count) {
 		String s = String.valueOf(pos) + " sur " + String.valueOf(count);
 		text.setText(s);
+	}
+
+	private void setSlideButtons(int pos, int count, ImageButton prev,
+			ImageButton next) {
+		if (count <= 1) {
+			disableSlideButtons(next, prev);
+		} else {
+			enableSlideButtons(next, prev);
+		}
+
+		if (pos == 1 & count > 1) {
+			disablePrevSlideButton(next, prev);
+		} else if (pos == count & count > 1) {
+			disableNextSlideButton(next, prev);
+		} else if (count > 1) {
+			enableSlideButtons(next, prev);
+		}
+
+	}
+
+	private void enableSlideButtons(ImageButton next, ImageButton prev) {
+		next.setBackgroundResource(R.drawable.arrow_right);
+		prev.setBackgroundResource(R.drawable.arrow_left);
+	}
+
+	private void disableSlideButtons(ImageButton next, ImageButton prev) {
+		next.setBackgroundResource(R.drawable.arrow_right_alpha);
+		prev.setBackgroundResource(R.drawable.arrow_left_alpha);
+	}
+
+	private void disablePrevSlideButton(ImageButton next, ImageButton prev) {
+		next.setBackgroundResource(R.drawable.arrow_right);
+		prev.setBackgroundResource(R.drawable.arrow_left_alpha);
+	}
+
+	private void disableNextSlideButton(ImageButton next, ImageButton prev) {
+		next.setBackgroundResource(R.drawable.arrow_right_alpha);
+		prev.setBackgroundResource(R.drawable.arrow_left);
 	}
 
 	private String getMediaURL(String[] array) {
@@ -1126,6 +1165,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			prev.setVisibility(View.VISIBLE);
 			next.setVisibility(View.VISIBLE);
 			setCount(countText, POS, IMAGE_COUNT);
+			setSlideButtons(POS, IMAGE_COUNT, prev, next);
 			break;
 		case 2:
 			MEDIA_TYPE = TYPE_SOUND;
@@ -1138,6 +1178,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			prev.setVisibility(View.VISIBLE);
 			next.setVisibility(View.VISIBLE);
 			setCount(countText, POS, SOUND_COUNT);
+			setSlideButtons(POS, SOUND_COUNT, prev, next);
 			if (video.isPlaying()) {
 				video.stopPlayback();
 			}
@@ -1169,6 +1210,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			prev.setVisibility(View.VISIBLE);
 			next.setVisibility(View.VISIBLE);
 			setCount(countText, POS, VIDEO_COUNT);
+			setSlideButtons(POS, VIDEO_COUNT, prev, next);
 			try {
 				video.start();
 			} catch (Exception e) {
@@ -1206,6 +1248,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						prev.setVisibility(View.VISIBLE);
 						next.setVisibility(View.VISIBLE);
 						setCount(countText, POS, IMAGE_COUNT);
+						setSlideButtons(POS, IMAGE_COUNT, prev, next);
 					}
 				});
 
@@ -1234,6 +1277,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 							e.printStackTrace();
 						}
 						setCount(countText, POS, SOUND_COUNT);
+						setSlideButtons(POS, SOUND_COUNT, prev, next);
 					}
 				});
 
@@ -1258,6 +1302,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						text.setVisibility(View.GONE);
 						soundControlLayout.setVisibility(View.GONE);
 						setCount(countText, POS, VIDEO_COUNT);
+						setSlideButtons(POS, VIDEO_COUNT, prev, next);
 
 						try {
 							video.start();
@@ -1279,14 +1324,17 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 				case TYPE_IMAGE:
 					prepareImage(img, getMediaURL(images));
 					setCount(countText, POS, IMAGE_COUNT);
+					setSlideButtons(POS, IMAGE_COUNT, prev, next);
 					break;
 				case TYPE_SOUND:
 					prepareAudio(getMediaURL(sounds));
 					setCount(countText, POS, SOUND_COUNT);
+					setSlideButtons(POS, SOUND_COUNT, prev, next);
 					break;
 				case TYPE_VIDEO:
 					prepareVideo(video, getMediaURL(videos));
 					setCount(countText, POS, VIDEO_COUNT);
+					setSlideButtons(POS, VIDEO_COUNT, prev, next);
 					break;
 				default:
 					break;
@@ -1306,6 +1354,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						return;
 					prepareImage(img, getMediaURL(images));
 					setCount(countText, POS, IMAGE_COUNT);
+					setSlideButtons(POS, IMAGE_COUNT, prev, next);
 					break;
 				case TYPE_SOUND:
 					if (POS < SOUND_COUNT)
@@ -1314,6 +1363,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						return;
 					prepareAudio(getMediaURL(sounds));
 					setCount(countText, POS, SOUND_COUNT);
+					setSlideButtons(POS, SOUND_COUNT, prev, next);
 					break;
 				case TYPE_VIDEO:
 					if (POS < VIDEO_COUNT)
@@ -1322,6 +1372,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 						return;
 					prepareVideo(video, getMediaURL(videos));
 					setCount(countText, POS, VIDEO_COUNT);
+					setSlideButtons(POS, VIDEO_COUNT, prev, next);
 					break;
 				default:
 					break;
