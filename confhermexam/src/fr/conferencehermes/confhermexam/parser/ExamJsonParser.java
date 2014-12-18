@@ -197,6 +197,7 @@ public class ExamJsonParser {
 				qFiles.put("video", StringUtils.convertArrayToString(videosQ));
 			} else
 				qFiles.put("video", DUMMY_TEXT);
+			q.setFiles(qFiles);
 
 			JSONArray answers = (JSONArray) qObj.getJSONArray("answers");
 			ArrayList<Answer> answersArrayList = new ArrayList<Answer>();

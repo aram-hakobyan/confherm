@@ -249,6 +249,7 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		currentQuestionId = q.getId();
 		currentQuestion = q;
+
 		currentQuestionFiles = db.getQuestionFile(currentQuestion.getId());
 		if (position < corrections.size())
 			currentQuestionCorrectionFiles = corrections.get(position)
