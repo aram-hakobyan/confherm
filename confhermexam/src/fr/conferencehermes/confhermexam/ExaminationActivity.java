@@ -67,6 +67,7 @@ import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
+import fr.conferencehermes.confhermexam.model.ResizableImageView;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exercise;
@@ -1043,7 +1044,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			videos[i] = videos[i].replaceAll(" ", "%20");
 		}
 
-		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
+		final ResizableImageView img = (ResizableImageView) dialog
+				.findViewById(R.id.imageView1);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
 
