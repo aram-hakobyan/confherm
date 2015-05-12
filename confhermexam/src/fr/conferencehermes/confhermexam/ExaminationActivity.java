@@ -501,13 +501,15 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(ExaminationActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				editText.setTextSize(16);
+				editText.setTextSize((int) getResources().getDimension(
+						R.dimen.qrocTextSize));
 				editText.clearFocus();
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						LinearLayout.LayoutParams.MATCH_PARENT, 50);
+						LinearLayout.LayoutParams.MATCH_PARENT,
+						(int) getResources().getDimension(R.dimen.qrocHeight));
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 

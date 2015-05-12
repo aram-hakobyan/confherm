@@ -22,5 +22,7 @@
     <dimen name="correction_image_margin3">5dp</dimen>
     <dimen name="note_dialog_width">500dp</dimen>
     <dimen name="note_dialog_height">300dp</dimen>
+    <dimen name="qrocTextSize">16sp</dimen>
+    <dimen name="qrocHeight">55dp</dimen>
 
 </resources>
