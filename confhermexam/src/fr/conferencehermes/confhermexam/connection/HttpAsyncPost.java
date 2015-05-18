@@ -12,12 +12,11 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import fr.conferencehermes.confhermexam.parser.JSONParser;
 import android.os.AsyncTask;
 import android.util.Log;
+import fr.conferencehermes.confhermexam.parser.JSONParser;
 
 public class HttpAsyncPost extends AsyncTask<Void, Void, JSONObject> {
 	@Override

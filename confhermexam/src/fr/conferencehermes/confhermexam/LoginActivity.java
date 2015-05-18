@@ -30,7 +30,6 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.connection.BaseNetworkManager;
-import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.connectionhelper.ActionDelegate;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestCreator;
 import fr.conferencehermes.confhermexam.connectionhelper.RequestHelper;

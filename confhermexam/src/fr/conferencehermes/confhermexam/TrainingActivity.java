@@ -5,10 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +45,7 @@ import android.os.SystemClock;
 import android.text.Html;
 import android.text.InputType;
 import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
+import android.util.DisplayMetrics;
 import android.util.SparseBooleanArray;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -1614,13 +1610,14 @@ public class TrainingActivity extends Activity implements OnClickListener {
 			}
 		});
 
+		int x = Utilities.getSizeX(this);
 		if (!dialog.isShowing()) {
 			dialog.show();
-			dialog.getWindow().setLayout(
-					getResources().getDimensionPixelSize(
-							R.dimen.file_dialog_width),
-					getResources().getDimensionPixelSize(
-							R.dimen.file_dialog_height));
+			dialog.getWindow().setLayout(x, x - 100);
+			// getResources().getDimensionPixelSize(
+			// R.dimen.file_dialog_width),
+			// getResources().getDimensionPixelSize(
+			// R.dimen.file_dialog_height)
 		}
 
 	}

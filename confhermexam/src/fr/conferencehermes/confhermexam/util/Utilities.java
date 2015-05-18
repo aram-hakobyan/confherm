@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -275,6 +276,15 @@ public class Utilities {
 			// Log exception
 			return null;
 		}
+	}
+
+	public static int getSizeX(Activity a) {
+		DisplayMetrics metrics = new DisplayMetrics();
+		a.getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+		int h = metrics.heightPixels;
+		int w = metrics.widthPixels;
+		return Math.min(h, w);
 	}
 
 }

@@ -14,8 +14,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.view.View.OnClickListener;
+import android.view.ViewTreeObserver;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -35,7 +35,6 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.ExerciseAdapter;
 import fr.conferencehermes.confhermexam.adapters.NotesAdapter;
-import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.parser.ExamExercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.NotesResult;

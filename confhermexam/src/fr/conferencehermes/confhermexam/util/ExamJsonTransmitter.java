@@ -19,10 +19,10 @@ import org.apache.http.protocol.HTTP;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import fr.conferencehermes.confhermexam.db.DatabaseHelper;
-import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 import android.content.Context;
 import android.os.AsyncTask;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
+import fr.conferencehermes.confhermexam.parser.ExerciseAnswer;
 
 public class ExamJsonTransmitter extends
 		AsyncTask<JSONObject, JSONObject, JSONObject> {

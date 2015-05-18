@@ -1403,13 +1403,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			}
 		});
 
+		int x = Utilities.getSizeX(this);
 		if (!dialog.isShowing()) {
 			dialog.show();
-			dialog.getWindow().setLayout(
-					getResources().getDimensionPixelSize(
-							R.dimen.file_dialog_width),
-					getResources().getDimensionPixelSize(
-							R.dimen.file_dialog_height));
+			dialog.getWindow().setLayout(x, x - 100);
 		}
 
 	}

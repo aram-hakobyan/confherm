@@ -35,7 +35,6 @@ import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.R;
-import fr.conferencehermes.confhermexam.connection.NetworkReachability;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.JSONParser;

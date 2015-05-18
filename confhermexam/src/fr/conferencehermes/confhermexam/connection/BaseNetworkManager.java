@@ -10,7 +10,6 @@ import android.os.Message;
 import android.util.Log;
 import fr.conferencehermes.confhermexam.connectionhelper.ActionDelegate;
 import fr.conferencehermes.confhermexam.util.Constants;
-import fr.conferencehermes.confhermexam.util.Utilities;
 import fr.conferencehermes.confhermexam.util.ViewTracker;
 
 /**
