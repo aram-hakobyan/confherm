@@ -67,6 +67,7 @@ import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
 import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
+import fr.conferencehermes.confhermexam.model.ResizableImageView;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Event;
 import fr.conferencehermes.confhermexam.parser.Exercise;
@@ -500,13 +501,15 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(ExaminationActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				editText.setTextSize(16);
+				editText.setTextSize((int) getResources().getDimension(
+						R.dimen.qrocTextSize));
 				editText.clearFocus();
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						LinearLayout.LayoutParams.MATCH_PARENT, 50);
+						LinearLayout.LayoutParams.MATCH_PARENT,
+						(int) getResources().getDimension(R.dimen.qrocHeight));
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 
@@ -1043,7 +1046,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 			videos[i] = videos[i].replaceAll(" ", "%20");
 		}
 
-		final ImageView img = (ImageView) dialog.findViewById(R.id.imageView1);
+		final ResizableImageView img = (ResizableImageView) dialog
+				.findViewById(R.id.imageView1);
 		final VideoView video = (VideoView) dialog
 				.findViewById(R.id.videoView1);
 

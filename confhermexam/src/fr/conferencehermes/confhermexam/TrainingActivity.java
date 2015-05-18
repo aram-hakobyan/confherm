@@ -322,8 +322,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				newRadioButton.setTextSize(16);
 				newRadioButton.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new RadioGroup.LayoutParams(
-						RadioGroup.LayoutParams.WRAP_CONTENT,
-						RadioGroup.LayoutParams.WRAP_CONTENT);
+						RadioGroup.LayoutParams.WRAP_CONTENT, imgSize);
 				layoutParams.setMargins(padding, padding, padding, padding);
 				layoutParams.gravity = Gravity.CENTER_VERTICAL;
 				mRadioGroup.addView(newRadioButton, 0, layoutParams);
@@ -354,8 +353,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				text.setTextSize(16);
 				text.setGravity(Gravity.CENTER_VERTICAL);
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						LinearLayout.LayoutParams.WRAP_CONTENT,
-						LinearLayout.LayoutParams.WRAP_CONTENT);
+						LinearLayout.LayoutParams.WRAP_CONTENT, imgSize);
 				layoutParams.setMargins(padding, padding, padding, padding);
 				layoutParams.gravity = Gravity.CENTER_VERTICAL;
 				checkBoxLayout.addView(checkBox, layoutParams);
@@ -411,13 +409,15 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(TrainingActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				editText.setTextSize(16);
+				editText.setTextSize(getResources().getDimension(
+						R.dimen.qrocTextSize));
 
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
 
 				LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-						LinearLayout.LayoutParams.MATCH_PARENT, 50);
+						LinearLayout.LayoutParams.MATCH_PARENT, imgSize);
+				layoutParams.setMargins(padding, padding, padding, padding);
 				answersLayout.addView(editText, layoutParams);
 				editTextsArray.add(editText);
 
