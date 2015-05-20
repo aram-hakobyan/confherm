@@ -501,8 +501,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(ExaminationActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				editText.setTextSize((int) getResources().getDimension(
-						R.dimen.qrocTextSize));
+				editText.setTextSize(20);
 				editText.clearFocus();
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
@@ -990,6 +989,7 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 		Button button2 = (Button) dialog.findViewById(R.id.button2);
 		Button button3 = (Button) dialog.findViewById(R.id.button3);
 		Button close = (Button) dialog.findViewById(R.id.buttonClose2);
+		close.bringToFront();
 		final TextView text = (TextView) dialog
 				.findViewById(R.id.ennouncerText);
 		text.setMovementMethod(new ScrollingMovementMethod());

@@ -409,8 +409,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 				EditText editText = new EditText(TrainingActivity.this);
 				editText.setGravity(Gravity.CENTER_VERTICAL);
 				editText.setInputType(InputType.TYPE_CLASS_TEXT);
-				editText.setTextSize(getResources().getDimension(
-						R.dimen.qrocTextSize));
+				editText.setTextSize(20);
 
 				InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 				mgr.showSoftInput(editText, InputMethodManager.SHOW_FORCED);
@@ -1150,6 +1149,7 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		Button button2 = (Button) dialog.findViewById(R.id.button2);
 		Button button3 = (Button) dialog.findViewById(R.id.button3);
 		Button close = (Button) dialog.findViewById(R.id.buttonClose2);
+		close.bringToFront();
 		final TextView text = (TextView) dialog
 				.findViewById(R.id.ennouncerText);
 		text.setMovementMethod(new ScrollingMovementMethod());

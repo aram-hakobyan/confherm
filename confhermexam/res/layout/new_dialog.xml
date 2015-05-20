@@ -27,9 +27,9 @@
     <fr.conferencehermes.confhermexam.model.ResizableImageView
         android:id="@+id/imageView1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_centerInParent="true"
-        android:layout_margin="130dp" />
+        android:layout_margin="20dp" />
 
     <LinearLayout
         android:layout_width="wrap_content"
