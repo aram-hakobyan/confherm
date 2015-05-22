@@ -80,11 +80,14 @@ import com.androidquery.callback.AjaxStatus;
 
 import fr.conferencehermes.confhermexam.adapters.QuestionsAdapter;
 import fr.conferencehermes.confhermexam.correction.QuestionAnswer;
+import fr.conferencehermes.confhermexam.db.DatabaseHelper;
 import fr.conferencehermes.confhermexam.lifecycle.ScreenReceiver;
+import fr.conferencehermes.confhermexam.model.LineEditText;
 import fr.conferencehermes.confhermexam.parser.Answer;
 import fr.conferencehermes.confhermexam.parser.Correction;
 import fr.conferencehermes.confhermexam.parser.Exercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
+import fr.conferencehermes.confhermexam.parser.Note;
 import fr.conferencehermes.confhermexam.parser.Question;
 import fr.conferencehermes.confhermexam.util.Constants;
 import fr.conferencehermes.confhermexam.util.DataHolder;
@@ -143,11 +146,14 @@ public class TrainingActivity extends Activity implements OnClickListener {
 	final int TYPE_VIDEO = 2;
 	int MEDIA_TYPE = -1;
 
+	DatabaseHelper db;
+	Button noteBtn;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		setContentView(R.layout.activity_question_response);
+		setContentView(R.layout.activity_training_response);
 		inflater = (LayoutInflater) this
 				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		aq = new AQuery(TrainingActivity.this);
@@ -163,6 +169,8 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		mReceiver = new ScreenReceiver();
 		registerReceiver(mReceiver, filter);
 
+		db = new DatabaseHelper(TrainingActivity.this);
+
 		editTextsArray = new ArrayList<EditText>();
 		temps1 = (TextView) findViewById(R.id.temps1);
 		temps2 = (TextView) findViewById(R.id.temps2);
@@ -177,6 +185,9 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		btnImage.bringToFront();
 		btnAudio.bringToFront();
 		btnVideo.bringToFront();
+
+		noteBtn = (Button) findViewById(R.id.noteBtn);
+		noteBtn.setOnClickListener(this);
 
 		abandonner = (Button) findViewById(R.id.abandonner);
 		ennouncer = (Button) findViewById(R.id.ennouncer);
@@ -308,6 +319,13 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		title.setText("QUESTION " + String.valueOf(position + 1));
 		txt.setText(Html.fromHtml(q.getQuestionText()));
 
+		Note n = db.getTrainingNote(getNoteId());
+		if (n != null && !n.getText().isEmpty()) {
+			noteBtn.setBackgroundResource(R.drawable.note_icon);
+		} else {
+			noteBtn.setBackgroundResource(R.drawable.note_icon_gray);
+		}
+
 		setFileIcons(currentQuestion.getFiles());
 
 		int answersCount = q.getAnswers().size();
@@ -435,8 +453,12 @@ public class TrainingActivity extends Activity implements OnClickListener {
 			}
 		}
 
-		if (CORRECTED_ANSWERS)
-			drawCorrections(DataHolder.getInstance().getCorrections());
+		try {
+			if (CORRECTED_ANSWERS)
+				drawCorrections(DataHolder.getInstance().getCorrections());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -636,8 +658,12 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		abandonner.setText("ABANDONNER");
 		CORRECTED_ANSWERS = true;
 
-		selectQuestion(questions.get(0), 0);
-		drawCorrections(corrections);
+		try {
+			selectQuestion(questions.get(0), 0);
+			drawCorrections(corrections);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
 	}
 
@@ -958,6 +984,9 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		case R.id.btnVideoCorrection:
 			if (currentQuestion != null && !DIALOG_IS_OPEN)
 				openDialog(currentQuestion.getCorrectionFiles(), 3);
+			break;
+		case R.id.noteBtn:
+			openNoteDialog();
 			break;
 
 		default:
@@ -1653,6 +1682,71 @@ public class TrainingActivity extends Activity implements OnClickListener {
 		// show it
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		alertDialog.show();
+	}
+
+	private void saveNote(DatabaseHelper dbh, String note) {
+		try {
+			Note n = new Note();
+			n.setId(getNoteId());
+			n.setText(note);
+
+			if (dbh.getTrainingNote(getNoteId()) == null) {
+				dbh.createTrainingNote(n);
+			} else {
+				dbh.updateTrainingNote(n);
+			}
+
+			if (note.isEmpty())
+				noteBtn.setBackgroundResource(R.drawable.note_icon_gray);
+			else
+				noteBtn.setBackgroundResource(R.drawable.note_icon);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void openNoteDialog() {
+		final Dialog notedialog = new Dialog(TrainingActivity.this);
+		notedialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+		notedialog.setContentView(R.layout.note_dialog);
+
+		final DatabaseHelper dbh = new DatabaseHelper(TrainingActivity.this);
+		final LineEditText note = (LineEditText) notedialog
+				.findViewById(R.id.editTextNote);
+		Button done = (Button) notedialog.findViewById(R.id.closeNoteDialog);
+		done.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				saveNote(dbh, note.getText().toString());
+				notedialog.dismiss();
+			}
+		});
+
+		if (!notedialog.isShowing()) {
+			notedialog.show();
+			notedialog.getWindow().setLayout(
+					getResources().getDimensionPixelSize(
+							R.dimen.note_dialog_width),
+					getResources().getDimensionPixelSize(
+							R.dimen.note_dialog_height));
+		}
+
+		notedialog.setOnDismissListener(new OnDismissListener() {
+			@Override
+			public void onDismiss(DialogInterface dialog) {
+				dbh.closeDB();
+			}
+		});
+
+		Note n = dbh.getTrainingNote(getNoteId());
+		if (n != null) {
+			note.setText(n.getText());
+		}
+	}
+
+	private int getNoteId() {
+		return currentQuestion.getId() * 10000 + currentQuestionId;
 	}
 
 }

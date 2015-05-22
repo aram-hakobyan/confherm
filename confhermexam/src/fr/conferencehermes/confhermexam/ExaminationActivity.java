@@ -733,27 +733,32 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	private void saveValidation() {
-		QuestionAnswer qa = new QuestionAnswer();
-		if (currentQuestion.getType().equalsIgnoreCase("2")) {
-			qa.setType(2);
-			int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
-			View radioButton = mRadioGroup.findViewById(radioButtonID);
-			int idx = mRadioGroup.indexOfChild(radioButton);
-			qa.setSingleAnswerPosition(idx);
-		} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
-			qa.setType(1);
-			ArrayList<Integer> mAnswers = new ArrayList<Integer>(
-					multipleAnswers);
-			qa.setMultiAnswerPositions(mAnswers);
-		} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
-			qa.setType(3);
-			for (int e = 0; e < editTextsArray.size(); e++) {
-				qa.getTextAnswers().add(e,
-						editTextsArray.get(e).getText().toString());
+		try {
+			QuestionAnswer qa = new QuestionAnswer();
+			if (currentQuestion.getType().equalsIgnoreCase("2")) {
+				qa.setType(2);
+				int radioButtonID = mRadioGroup.getCheckedRadioButtonId();
+				View radioButton = mRadioGroup.findViewById(radioButtonID);
+				int idx = mRadioGroup.indexOfChild(radioButton);
+				qa.setSingleAnswerPosition(idx);
+			} else if (currentQuestion.getType().equalsIgnoreCase("1")) {
+				qa.setType(1);
+				ArrayList<Integer> mAnswers = new ArrayList<Integer>(
+						multipleAnswers);
+				qa.setMultiAnswerPositions(mAnswers);
+			} else if (currentQuestion.getType().equalsIgnoreCase("3")) {
+				qa.setType(3);
+				for (int e = 0; e < editTextsArray.size(); e++) {
+					qa.getTextAnswers().add(e,
+							editTextsArray.get(e).getText().toString());
+				}
 			}
-		}
 
-		questionAnswers.set(currentQuestionId, qa);
+			questionAnswers.set(currentQuestionId, qa);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private boolean isValidAnswer() {
@@ -921,29 +926,36 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 	}
 
 	private void prepareImage(final ImageView img, final String url) {
-		if (url != null)
-			if (!url.isEmpty()) {
-				Bitmap bitmap = BitmapFactory.decodeFile(url);
-				if (bitmap != null)
-					img.setImageBitmap(bitmap);
-				else {
-					new Thread(new Runnable() {
-						@Override
-						public void run() {
-							final Bitmap mbitmap = Utilities
-									.getBitmapFromURL(url);
-							runOnUiThread(new Runnable() {
-								@Override
-								public void run() {
-									img.setImageBitmap(mbitmap);
-								}
-							});
-						}
-					}).start();
+		try {
+			if (url != null)
+				if (!url.isEmpty()) {
+					Bitmap bitmap = BitmapFactory.decodeFile(url);
+					if (bitmap != null)
+						img.setImageBitmap(bitmap);
+					else {
+						new Thread(new Runnable() {
+							@Override
+							public void run() {
+								final Bitmap mbitmap = Utilities
+										.getBitmapFromURL(url);
+								runOnUiThread(new Runnable() {
+									@Override
+									public void run() {
+										if (mbitmap != null)
+											img.setImageBitmap(mbitmap);
+									}
+								});
+							}
+						}).start();
+
+					}
 
 				}
-
-			}
+		} catch (OutOfMemoryError e) {
+			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	private void prepareAudio(String url) {

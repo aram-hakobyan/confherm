@@ -273,7 +273,10 @@ public class Utilities {
 			Bitmap myBitmap = BitmapFactory.decodeStream(input);
 			return myBitmap;
 		} catch (IOException e) {
-			// Log exception
+			e.printStackTrace();
+			return null;
+		} catch (OutOfMemoryError e) {
+			e.printStackTrace();
 			return null;
 		}
 	}

@@ -186,6 +186,10 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 
 		exercise = db.getExercise(exercise_id);
 		exerciseFiles = db.getExerciseFile(exercise_id);
+
+		if (exercise == null)
+			return;
+
 		if (exercise.getExerciseType() == 2) {
 			ennouncer.setVisibility(View.GONE);
 		}

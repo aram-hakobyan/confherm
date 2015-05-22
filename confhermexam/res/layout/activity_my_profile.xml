@@ -4,6 +4,18 @@
     android:layout_height="match_parent"
     android:background="@android:color/white" >
 
+    <CheckBox
+        android:id="@+id/hideProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="10dp"
+        android:text="Hide my name"
+        android:textColor="#0d5c7c"
+        android:textSize="18sp" />
+
     <LinearLayout
         android:id="@+id/profile_layout"
         android:layout_width="match_parent"

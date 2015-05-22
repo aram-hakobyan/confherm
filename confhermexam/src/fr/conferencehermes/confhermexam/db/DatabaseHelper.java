@@ -20,7 +20,7 @@ import fr.conferencehermes.confhermexam.parser.Question;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 3;
 	// Database Name
 	private static final String DATABASE_NAME = "eventManager";
 
@@ -36,6 +36,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String TABLE_ANSWERS = "Answers";
 	private static final String TABLE_EXERCISE_ANSWERS = "ExerciseAnswers";
 	private static final String TABLE_NOTES = "Notes";
+	private static final String TABLE_TRAINING_NOTES = "TrainingNotes";
 
 	// EVENT column names
 	private static final String KEY_EVENT_ID = "eventId";
@@ -119,6 +120,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	private static final String KEY_NOTE_ID = "noteId";
 	private static final String KEY_NOTE_TEXT = "noteText";
 
+	// TRAINING NOTE column names
+	private static final String KEY_TRAINING_NOTE_ID = "trainingNoteId";
+	private static final String KEY_TRAINING_NOTE_TEXT = "trainingNoteText";
+
 	// Table Create Statements
 	// Event table create statement
 	private static final String CREATE_TABLE_EVENT = "CREATE TABLE "
@@ -201,6 +206,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			+ TABLE_NOTES + "(" + KEY_NOTE_ID + " INTEGER PRIMARY KEY,"
 			+ KEY_NOTE_TEXT + " TEXT" + ")";
 
+	// Training Notes table create statement
+	private static final String CREATE_TABLE_TRAINING_NOTES = "CREATE TABLE "
+			+ TABLE_TRAINING_NOTES + "(" + KEY_TRAINING_NOTE_ID
+			+ " INTEGER PRIMARY KEY," + KEY_TRAINING_NOTE_TEXT + " TEXT" + ")";
+
 	public DatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
@@ -219,6 +229,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL(CREATE_TABLE_ANSWERS);
 		db.execSQL(CREATE_TABLE_EXERCISE_ANSWERS);
 		db.execSQL(CREATE_TABLE_NOTES);
+		db.execSQL(CREATE_TABLE_TRAINING_NOTES);
 	}
 
 	@Override
@@ -235,6 +246,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_ANSWERS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_EXERCISE_ANSWERS);
 		db.execSQL("DROP TABLE IF EXISTS " + TABLE_NOTES);
+		db.execSQL("DROP TABLE IF EXISTS " + TABLE_TRAINING_NOTES);
 		// create new tables
 		onCreate(db);
 	}
@@ -1640,6 +1652,78 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	public void deleteNote(long note_id) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		db.delete(TABLE_NOTES, KEY_NOTE_ID + " = ?",
+				new String[] { String.valueOf(note_id) });
+	}
+
+	/*
+	 * Creating a note
+	 */
+	public long createTrainingNote(Note n) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_TRAINING_NOTE_ID, n.getId());
+		values.put(KEY_TRAINING_NOTE_TEXT, n.getText());
+
+		// insert row
+		db.beginTransaction();
+		long id = -1;
+		try {
+			id = db.insertWithOnConflict(TABLE_TRAINING_NOTES, null, values,
+					SQLiteDatabase.CONFLICT_REPLACE);
+			db.setTransactionSuccessful();
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		} finally {
+			db.endTransaction();
+		}
+
+		return id;
+	}
+
+	/*
+	 * get single note
+	 */
+	public Note getTrainingNote(long note_id) {
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		String selectQuery = "SELECT  * FROM " + TABLE_TRAINING_NOTES
+				+ " WHERE " + KEY_TRAINING_NOTE_ID + " = " + note_id;
+
+		Cursor c = db.rawQuery(selectQuery, null);
+
+		Note n = null;
+		if (c != null && c.moveToFirst()) {
+			n = new Note();
+			n.setId((c.getInt(c.getColumnIndex(KEY_TRAINING_NOTE_ID))));
+			n.setText((c.getString(c.getColumnIndex(KEY_TRAINING_NOTE_TEXT))));
+			c.close();
+		}
+
+		return n;
+	}
+
+	/*
+	 * Updating a note
+	 */
+	public int updateTrainingNote(Note n) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(KEY_TRAINING_NOTE_ID, n.getId());
+		values.put(KEY_TRAINING_NOTE_TEXT, n.getText());
+
+		// updating row
+		return db.update(TABLE_TRAINING_NOTES, values, KEY_TRAINING_NOTE_ID
+				+ " = ?", new String[] { String.valueOf(n.getId()) });
+	}
+
+	/*
+	 * Deleting a note
+	 */
+	public void deleteTrainingNote(long note_id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		db.delete(TABLE_TRAINING_NOTES, KEY_TRAINING_NOTE_ID + " = ?",
 				new String[] { String.valueOf(note_id) });
 	}
 
