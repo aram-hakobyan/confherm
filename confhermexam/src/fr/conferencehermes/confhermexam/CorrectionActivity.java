@@ -390,9 +390,11 @@ public class CorrectionActivity extends Activity implements OnClickListener {
 			answerCount = allAnswers.size();
 		}
 
-		TextView reponse = (TextView) findViewById(R.id.reponse);
-		reponse.setText(getResources().getString(R.string.reponse) + "  "
-				+ corrections.get(currentPosition).getQuestionPoint());
+		if (currentPosition < corrections.size()) {
+			TextView reponse = (TextView) findViewById(R.id.reponse);
+			reponse.setText(getResources().getString(R.string.reponse) + "  "
+					+ corrections.get(currentPosition).getQuestionPoint());
+		}
 
 		int count = answerCount;
 		if (currentQuestion.getType().equalsIgnoreCase("3")) {

@@ -531,12 +531,12 @@ public class JSONParser {
 
 				for (int i = 0; i < corrections.length(); i++) {
 					Correction c = new Correction();
-					JSONObject obj = corrections.getJSONObject(i);
-					c.setQuestionId(obj.getString("question_id"));
-					c.setText(obj.getString("correction_text"));
-					c.setQuestionPoint(obj.getString("question_point"));
+					JSONObject obj = corrections.optJSONObject(i);
+					c.setQuestionId(obj.optString("question_id"));
+					c.setText(obj.optString("correction_text"));
+					c.setQuestionPoint(obj.optString("question_point"));
 					ArrayList<String> answersArray = new ArrayList<String>();
-					JSONArray answers = obj.getJSONArray("answers");
+					JSONArray answers = obj.optJSONArray("answers");
 					for (int j = 0; j < answers.length(); j++) {
 						answersArray.add(String.valueOf(answers.get(j)));
 					}
@@ -564,16 +564,16 @@ public class JSONParser {
 					return correctionsList;
 
 				JSONArray corrections = data
-						.getJSONArray("question_corrections");
+						.optJSONArray("question_corrections");
 
 				for (int i = 0; i < corrections.length(); i++) {
 					Correction c = new Correction();
-					JSONObject obj = corrections.getJSONObject(i);
+					JSONObject obj = corrections.optJSONObject(i);
 					c.setQuestionId(obj.getString("question_id"));
-					c.setText(obj.getString("correction_text"));
-					c.setQuestionPoint(obj.getString("question_point"));
+					c.setText(obj.optString("correction_text"));
+					c.setQuestionPoint(obj.optString("question_point"));
 					ArrayList<String> answersArray = new ArrayList<String>();
-					JSONArray answers = obj.getJSONArray("answers");
+					JSONArray answers = obj.optJSONArray("answers");
 					for (int j = 0; j < answers.length(); j++) {
 						answersArray.add(String.valueOf(answers.get(j)));
 					}
@@ -585,7 +585,7 @@ public class JSONParser {
 									.getJSONObject("question_correction_files");
 
 							JSONArray imgArrayCorrection = (JSONArray) files
-									.getJSONArray("image");
+									.optJSONArray("image");
 							String[] imagesCorrectionQ = new String[imgArrayCorrection
 									.length()];
 							if (imgArrayCorrection.length() != 0) {
