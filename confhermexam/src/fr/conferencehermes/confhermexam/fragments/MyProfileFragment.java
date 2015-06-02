@@ -1,6 +1,14 @@
 package fr.conferencehermes.confhermexam.fragments;
 
 import java.util.HashMap;
+import java.util.Map;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.androidquery.AQuery;
+import com.androidquery.callback.AjaxCallback;
+import com.androidquery.callback.AjaxStatus;
 
 import android.content.Context;
 import android.content.Intent;
@@ -19,8 +27,10 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.TextView;
 import fr.conferencehermes.confhermexam.LoginActivity;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.parser.Profile;
 import fr.conferencehermes.confhermexam.util.Constants;
+import fr.conferencehermes.confhermexam.util.PreferenceStorage;
 import fr.conferencehermes.confhermexam.util.Utilities;
 
 public class MyProfileFragment extends Fragment {
@@ -60,12 +70,14 @@ public class MyProfileFragment extends Fragment {
 		pEmailAdress = (TextView) pFragment.findViewById(R.id.pEmail);
 		pInformation = (TextView) pFragment.findViewById(R.id.pInformation);
 		hideProfile = (CheckBox) pFragment.findViewById(R.id.hideProfile);
+		hideProfile.setChecked(PreferenceStorage.getInstance(getActivity())
+				.isNameHidden());
 		hideProfile.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
-				hideProfileRequest();
+				hideProfileRequest(isChecked);
 			}
 		});
 
@@ -173,8 +185,34 @@ public class MyProfileFragment extends Fragment {
 		return pFragment;
 	}
 
-	private void hideProfileRequest() {
-		// TODO
+	private void hideProfileRequest(final boolean isChecked) {
+
+		AQuery aq = new AQuery(getActivity());
+		Map<String, Object> params = new HashMap<String, Object>();
+		params.put(Constants.KEY_AUTH_TOKEN, JSONParser.AUTH_KEY);
+		params.put(Constants.KEY_DEVICE_ID,
+				Utilities.getDeviceId(getActivity()));
+		params.put(Constants.KEY_HIDE_PROFILE, isChecked);
+
+		if (Utilities.isNetworkAvailable(getActivity())) {
+			aq.ajax(Constants.HIDE_PROFILE_URL, params, JSONObject.class,
+					new AjaxCallback<JSONObject>() {
+						@Override
+						public void callback(String url, JSONObject json,
+								AjaxStatus status) {
+
+							try {
+								if (json.optInt("status") == 200) {
+									PreferenceStorage
+											.getInstance(getActivity())
+											.setNameHidden(isChecked);
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+		}
 	}
 
 	public static void setProfileData(Profile profileData) {

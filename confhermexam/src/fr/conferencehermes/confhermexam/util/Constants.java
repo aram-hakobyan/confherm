@@ -28,6 +28,7 @@ public class Constants {
 	public static String LOG_OUT_URL = "http://ecni.conference-hermes.fr/api/logout.php";
 	public static String CURRENT_EXAM_URL = "http://ecni.conference-hermes.fr/api/result";
 	public static String PLANNING_URL = "http://ecni.conference-hermes.fr/api/planning";
+	public static String HIDE_PROFILE_URL = "http://ecni.conference-hermes.fr/api/hide_user_name";
 
 	public static String EXAM_CORRECTIONS_URL = "http://ecni.conference-hermes.fr/api/exam_corrections";
 
@@ -46,6 +47,7 @@ public class Constants {
 	public static String KEY_DEVICE_ID = "device_id";
 	public static String KEY_FROM = "from";
 	public static String KEY_TO = "to";
+	public static String KEY_HIDE_PROFILE = "hide_name";
 
 	/********************************* Other ***********************************/
 	public static final String RIGHT_SLASH = "/";
