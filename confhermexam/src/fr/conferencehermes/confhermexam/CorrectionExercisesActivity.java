@@ -24,6 +24,7 @@ import com.androidquery.AQuery;
 import com.androidquery.callback.AjaxCallback;
 import com.androidquery.callback.AjaxStatus;
 
+import fr.conferencehermes.confhermexam.adapters.GridViewAdapter;
 import fr.conferencehermes.confhermexam.parser.CorrectionsExercise;
 import fr.conferencehermes.confhermexam.parser.JSONParser;
 import fr.conferencehermes.confhermexam.util.Constants;
@@ -33,7 +34,7 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 
 	LayoutInflater inflater;
 	GridView gvMain;
-	ArrayAdapter<String> adapter;
+	GridViewAdapter adapter;
 	ArrayList<CorrectionsExercise> corExercises;
 	int exam_id;
 
@@ -43,7 +44,7 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_correction_exersice);
 		exam_id = getIntent().getIntExtra("exam_id", 0);
-		
+
 		gvMain = (GridView) findViewById(R.id.gvMain);
 		adjustGridView();
 		gvMain.setOnItemClickListener(new OnItemClickListener() {
@@ -75,14 +76,10 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 							if (json.has("data") && json.get("data") != null) {
 								corExercises = JSONParser
 										.parseCorrectionsExercises(json);
-								String[] data = new String[corExercises.size()];
-								for (int i = 0; i < corExercises.size(); i++) {
-									data[i] = corExercises.get(i).getName();
-								}
 
-								adapter = new ArrayAdapter<String>(
+								adapter = new GridViewAdapter(
 										CorrectionExercisesActivity.this,
-										R.layout.item, R.id.tvText, data);
+										corExercises);
 								gvMain = (GridView) findViewById(R.id.gvMain);
 								gvMain.setAdapter(adapter);
 
@@ -98,7 +95,7 @@ public class CorrectionExercisesActivity extends FragmentActivity implements
 
 	private void adjustGridView() {
 		gvMain.setNumColumns(GridView.AUTO_FIT);
-		gvMain.setColumnWidth(180);
+		gvMain.setColumnWidth(250);
 		gvMain.setVerticalSpacing(20);
 		gvMain.setHorizontalSpacing(50);
 		gvMain.setStretchMode(GridView.STRETCH_COLUMN_WIDTH);
