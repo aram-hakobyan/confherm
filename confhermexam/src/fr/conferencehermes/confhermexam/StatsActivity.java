@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.View;
 import android.view.Window;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -36,6 +37,7 @@ public class StatsActivity extends Activity {
 	private int exerciseId;
 	private int eventId;
 	private LayoutInflater inflater;
+	private TextView title, desc;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +52,8 @@ public class StatsActivity extends Activity {
 
 		statsLayout = (LinearLayout) findViewById(R.id.statsLayout);
 		progress = (ProgressBar) findViewById(R.id.progressBarStats);
+		title = (TextView) findViewById(R.id.exerciseName);
+		desc = (TextView) findViewById(R.id.descText);
 
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
@@ -81,8 +85,11 @@ public class StatsActivity extends Activity {
 						public void callback(String url, JSONObject json,
 								AjaxStatus status) {
 							JSONObject data = json.optJSONObject("data");
-							String title = data.optString("title");
-							String texts = data.optString("text");
+							String titleText = data.optString("title");
+							String descText = data.optString("text");
+							title.setText(titleText);
+							desc.setText(descText);
+
 							JSONArray questions = data
 									.optJSONArray("questions");
 							parseQuestionStats(questions);
@@ -110,6 +117,16 @@ public class StatsActivity extends Activity {
 			s.setBadAnswerPerc(bad.optString("percentage"));
 			s.setPassedAnswerPerc(passed.optString("percentage"));
 
+			if (s.getType() == 3) {
+				ArrayList<String> goodAnswers = new ArrayList<String>();
+				JSONArray gAnswers = obj.optJSONArray("good_answers");
+				for (int j = 0; j < gAnswers.length(); j++) {
+					goodAnswers.add(gAnswers.optString(j));
+				}
+				s.setGoodAnswers(goodAnswers);
+				s.setAllAnswers(obj.optString("all_answers"));
+			}
+
 			ArrayList<HashMap<String, String>> array = new ArrayList<HashMap<String, String>>();
 			JSONArray answers = obj.optJSONArray("answers");
 			for (int j = 0; j < answers.length(); j++) {
@@ -132,38 +149,54 @@ public class StatsActivity extends Activity {
 
 	private void drawQuestionStats(ArrayList<Stat> stats) {
 
+		LinearLayout.LayoutParams params = new LayoutParams(
+				LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+		params.setMargins(0, 0, 0, 15);
+
 		for (int i = 0; i < stats.size(); i++) {
 			Stat s = stats.get(i);
-			if (s.getType() == 1) {
-				LinearLayout layout = (LinearLayout) inflater.inflate(
-						R.layout.stat_item_qcm, null, false);
 
-				TextView title = (TextView) layout.findViewById(R.id.title);
-				TextView res1 = (TextView) layout.findViewById(R.id.res1);
-				TextView res2 = (TextView) layout.findViewById(R.id.res2);
-				TextView res3 = (TextView) layout.findViewById(R.id.res3);
-				TextView type = (TextView) layout.findViewById(R.id.type);
-				TextView question = (TextView) layout
-						.findViewById(R.id.question);
-				TextView answers = (TextView) layout.findViewById(R.id.answers);
+			LinearLayout layout = (LinearLayout) inflater.inflate(
+					R.layout.stat_item_qcm, null, false);
 
-				title.setText("Question " + String.valueOf(i));
-				res1.setText(s.getGoodAnswerPerc());
-				res2.setText(s.getBadAnswerPerc());
-				res3.setText(s.getPassedAnswerPerc());
-				type.setText(s.getTypeName());
-				question.setText(s.getName());
+			TextView title = (TextView) layout.findViewById(R.id.title);
+			TextView res1 = (TextView) layout.findViewById(R.id.res1);
+			TextView res2 = (TextView) layout.findViewById(R.id.res2);
+			TextView res3 = (TextView) layout.findViewById(R.id.res3);
+			TextView type = (TextView) layout.findViewById(R.id.type);
+			TextView question = (TextView) layout.findViewById(R.id.question);
+			TextView answers = (TextView) layout.findViewById(R.id.answers);
 
-				StringBuilder sb = new StringBuilder();
+			title.setText("Question " + String.valueOf(i + 1) + ".");
+			res1.setText(s.getGoodAnswerPerc() + "%");
+			res2.setText(s.getBadAnswerPerc() + "%");
+			res3.setText(s.getPassedAnswerPerc() + "%");
+			type.setText(s.getTypeName());
+			question.setText(s.getName());
+
+			StringBuilder sb = new StringBuilder();
+			if (s.getType() == 1 || s.getType() == 2) {
 				for (int j = 0; j < s.getAnswers().size(); j++) {
 					HashMap<String, String> map = s.getAnswers().get(j);
-					sb.append(map.get("percentage") + " " + map.get("name")
-							+ "\n");
+					sb.append(map.get("percentage") + "% - " + map.get("name")
+							+ "\n" + "\n");
 				}
 
-				answers.setText(sb.toString());
-				statsLayout.addView(layout);
+			} else if (s.getType() == 3) {
+				ArrayList<String> goodAnswers = s.getGoodAnswers();
+				for (int j = 0; j < goodAnswers.size(); j++) {
+					sb.append(goodAnswers.get(j));
+					if (j < goodAnswers.size() - 1)
+						sb.append(" / ");
+				}
+				sb.append("\n\n");
+				sb.append(s.getAllAnswers());
+				sb.append("\n\n");
 			}
+
+			answers.setText(sb.toString());
+			statsLayout.addView(layout, params);
+
 		}
 
 		progress.setVisibility(View.GONE);

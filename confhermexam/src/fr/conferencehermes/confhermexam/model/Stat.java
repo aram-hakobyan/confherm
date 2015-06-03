@@ -13,6 +13,8 @@ public class Stat {
 	private String badAnswerPerc;
 	private String passedAnswerPerc;
 	private ArrayList<HashMap<String, String>> answers;
+	private ArrayList<String> goodAnswers;
+	private String allAnswers;
 
 	public int getType() {
 		return type;
@@ -68,6 +70,22 @@ public class Stat {
 
 	public void setAnswers(ArrayList<HashMap<String, String>> answers) {
 		this.answers = answers;
+	}
+
+	public ArrayList<String> getGoodAnswers() {
+		return goodAnswers;
+	}
+
+	public void setGoodAnswers(ArrayList<String> goodAnswers) {
+		this.goodAnswers = goodAnswers;
+	}
+
+	public String getAllAnswers() {
+		return allAnswers;
+	}
+
+	public void setAllAnswers(String allAnswers) {
+		this.allAnswers = allAnswers;
 	}
 
 }

@@ -34,19 +34,57 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/relativeLayout1"
         android:layout_margin="30dp"
-        android:orientation="horizontal" >
+        android:orientation="vertical" >
 
         <ScrollView
             android:id="@+id/statsScrollView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
             android:scrollbars="vertical" >
 
             <LinearLayout
-                android:id="@+id/statsLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/exerciseName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:textColor="@android:color/black"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/descTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Énoncé"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:textStyle="normal" />
+
+                <TextView
+                    android:id="@+id/descText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="left"
+                    android:layout_marginRight="50dp"
+                    android:layout_marginTop="10dp"
+                    android:textColor="@android:color/black"
+                    android:textStyle="normal" />
+
+                <LinearLayout
+                    android:id="@+id/statsLayout"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="30dp"
+                    android:orientation="vertical" >
+                </LinearLayout>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>

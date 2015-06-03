@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/rect" >
+    android:background="@drawable/rect"
+    android:padding="5dp" >
 
     <TextView
         android:id="@+id/exName"
@@ -26,7 +27,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_margin="5dp"
-        android:background="@drawable/arrow_right"
+        android:background="@drawable/ic_chart"
         android:gravity="center"
         android:minHeight="60dp" >
     </ImageButton>
