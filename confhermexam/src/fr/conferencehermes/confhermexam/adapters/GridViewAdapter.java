@@ -14,6 +14,7 @@ import android.widget.TextView;
 import fr.conferencehermes.confhermexam.CorrectionActivity;
 import fr.conferencehermes.confhermexam.CorrectionExercisesActivity;
 import fr.conferencehermes.confhermexam.R;
+import fr.conferencehermes.confhermexam.StatsActivity;
 import fr.conferencehermes.confhermexam.parser.CorrectionsExercise;
 
 public class GridViewAdapter extends ArrayAdapter<Object> {
@@ -54,7 +55,6 @@ public class GridViewAdapter extends ArrayAdapter<Object> {
 			@Override
 			public void onClick(View v) {
 				openExamCorrection(position);
-
 			}
 		});
 
@@ -62,8 +62,7 @@ public class GridViewAdapter extends ArrayAdapter<Object> {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
-
+				openStats(position);
 			}
 		});
 
@@ -85,6 +84,17 @@ public class GridViewAdapter extends ArrayAdapter<Object> {
 		Intent intent = new Intent(context, CorrectionActivity.class);
 		intent.putExtra("exercise_id", exersice_id);
 		intent.putExtra("event_id", exam_id);
+		context.startActivity(intent);
+	}
+
+	private void openStats(int position) {
+
+		int exersice_id = data.get(position).getExercise_id();
+		int event_id = data.get(position).getEvent_id();
+
+		Intent intent = new Intent(context, StatsActivity.class);
+		intent.putExtra("exercise_id", exersice_id);
+		intent.putExtra("event_id", event_id);
 		context.startActivity(intent);
 	}
 }

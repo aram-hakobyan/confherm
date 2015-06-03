@@ -29,6 +29,7 @@ public class Constants {
 	public static String CURRENT_EXAM_URL = "http://ecni.conference-hermes.fr/api/result";
 	public static String PLANNING_URL = "http://ecni.conference-hermes.fr/api/planning";
 	public static String HIDE_PROFILE_URL = "http://ecni.conference-hermes.fr/api/hide_user_name";
+	public static String STATISTICS_URL = "http://ecni.conference-hermes.fr/api/statistics";
 
 	public static String EXAM_CORRECTIONS_URL = "http://ecni.conference-hermes.fr/api/exam_corrections";
 
@@ -41,6 +42,7 @@ public class Constants {
 	public static String KEY_DATA = "data";
 	public static String KEY_RESULTS = "results";
 	public static String KEY_EXERCSICE_ID = "exercise_id";
+	public static String KEY_EVENT_ID = "event_id";
 	public static String KEY_EXAM_ID = "exam_id";
 	public static String KEY_GLOBAL_TEST = "global_test";
 	public static String KEY_GROUPS = "groups";
