@@ -48,7 +48,8 @@ public class NotesActivity extends Activity {
 	private ListView listviewEx;
 	private ExerciseAdapter adapterEx;
 	private int listViewLastPosition = -1;
-	private static TextView teacherName, examName, medianScore, moyenneScore;
+	private static TextView teacherName, examName, medianScore, moyenneScore,
+			points;
 	private ArrayList<ExamExercise> listEx;
 	private ExamExercise ex;
 	private static ProgressBar progressBarNotes;
@@ -77,6 +78,7 @@ public class NotesActivity extends Activity {
 		globalTest = (TextView) findViewById(R.id.globalTest);
 		medianScore = (TextView) findViewById(R.id.medianScore);
 		moyenneScore = (TextView) findViewById(R.id.moyenneScore);
+		points = (TextView) findViewById(R.id.points);
 		targetMe = (ImageView) findViewById(R.id.targetMe);
 		progressBarNotes = (ProgressBar) findViewById(R.id.progressBarNotes);
 		try {
@@ -397,6 +399,12 @@ public class NotesActivity extends Activity {
 														+ " : "
 														+ String.valueOf(NotesResult.moyenne_score)
 														+ " | ");
+										float point = (NotesResult.exercisePoint > 0) ? NotesResult.exercisePoint
+												: NotesResult.testPoint;
+										points.setText(getResources()
+												.getString(
+														R.string.notes_stats_points)
+												+ " : " + String.valueOf(point));
 										progressBarNotes
 												.setVisibility(View.GONE);
 										listviewNt.setVisibility(View.VISIBLE);

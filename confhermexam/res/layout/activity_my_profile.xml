@@ -12,7 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginRight="30dp"
         android:layout_marginTop="10dp"
-        android:text="Hide my name"
+        android:text="Masquer mon nom"
         android:textColor="#0d5c7c"
         android:textSize="18sp" />
 

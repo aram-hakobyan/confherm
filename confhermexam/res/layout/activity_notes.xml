@@ -12,7 +12,7 @@
         android:background="@color/app_main_color_dark" >
 
         <ImageView
-               android:layout_width="@dimen/header_logo_width"
+            android:layout_width="@dimen/header_logo_width"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="20dp"
@@ -58,7 +58,8 @@
                     android:id="@+id/moyenneScore"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="120dp"
+                    android:layout_marginLeft="40dp"
+                    android:text="Moyenne"
                     android:textColor="@color/app_main_color"
                     android:textSize="20sp" />
 
@@ -67,6 +68,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="10dp"
+                    android:text="Medianne"
                     android:textColor="@color/app_main_color"
                     android:textSize="20sp" />
 
@@ -74,10 +76,8 @@
                     android:id="@+id/radioGroupPG"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-               
                     android:layout_marginLeft="15dp"
                     android:layout_marginRight="5dp"
-                    
                     android:orientation="horizontal" >
 
                     <RadioButton
@@ -98,6 +98,15 @@
                         android:checked="true" />
                 </RadioGroup>
             </LinearLayout>
+
+            <TextView
+                android:id="@+id/points"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Points:"
+                android:textColor="@color/app_main_color"
+                android:textSize="20sp" />
 
             <RelativeLayout
                 android:id="@+id/listHeader"
@@ -225,7 +234,6 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
                 android:layout_marginTop="10dp"
-     
                 android:choiceMode="singleChoice"
                 android:divider="@android:color/transparent"
                 android:dividerHeight="1dp" >

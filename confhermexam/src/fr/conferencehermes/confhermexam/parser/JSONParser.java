@@ -219,6 +219,8 @@ public class JSONParser {
 						exR.setScore(gObj.getInt("score"));
 						exR.setMedianScore(obj.getInt("median_score"));
 						exR.setMonenneScore(obj.getInt("moyenne_score"));
+						exR.setExercisePoint(obj.getInt("exercise_point"));
+						exR.setTestPoint(obj.getInt("test_points"));
 						exerciseResult.add(exR);
 					}
 

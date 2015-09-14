@@ -104,6 +104,7 @@
     <string name="notes_stats_target">Me situer</string>
     <string name="notes_stats_moyenne">Moyenne</string>
     <string name="notes_stats_medianne">Medianne</string>
+    <string name="notes_stats_points">Points</string>
     <string name="notes_stats_rang">RANG</string>
     <string name="notes_stats_nom">NOM</string>
     <string name="notes_stats_note">NOTE</string>

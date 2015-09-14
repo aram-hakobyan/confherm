@@ -7,6 +7,8 @@ public class NotesResult {
 	private String rank;
 	public static int moyenne_score;
 	public static int median_score;
+	public static float exercisePoint;
+	public static float testPoint;
 
 	public NotesResult() {
 
@@ -58,6 +60,22 @@ public class NotesResult {
 
 	public void setStudentName(String name) {
 		this.name = name;
+	}
+
+	public float getExercisePoint() {
+		return exercisePoint;
+	}
+
+	public void setExercisePoint(float exercisePoint) {
+		this.exercisePoint = exercisePoint;
+	}
+
+	public float getTestPoint() {
+		return testPoint;
+	}
+
+	public void setTestPoint(float testPoint) {
+		this.testPoint = testPoint;
 	}
 
 }
