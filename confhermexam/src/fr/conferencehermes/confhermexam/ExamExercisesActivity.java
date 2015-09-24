@@ -163,6 +163,14 @@ public class ExamExercisesActivity extends FragmentActivity implements
 			}
 		});
 
+		findViewById(R.id.examExit).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				onBackPressed();
+			}
+		});
+
 	}
 
 	public long getDuration(long start, long end) {

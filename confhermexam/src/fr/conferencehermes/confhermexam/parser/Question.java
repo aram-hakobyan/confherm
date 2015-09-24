@@ -5,6 +5,7 @@ import java.util.HashMap;
 
 public class Question {
 	private int id;
+	private int orderId;
 	private int exerciseId;
 	private String name;
 	private String questionText;
@@ -108,6 +109,14 @@ public class Question {
 
 	public void setExerciseId(int exerciseId) {
 		this.exerciseId = exerciseId;
+	}
+
+	public int getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
 	}
 
 }

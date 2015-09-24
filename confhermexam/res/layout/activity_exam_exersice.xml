@@ -8,15 +8,30 @@
         android:layout_width="match_parent"
         android:layout_height="80dp"
         android:layout_alignParentTop="true"
-        android:background="@color/app_main_color_dark" >
+        android:background="@color/app_main_color_dark"
+        android:gravity="center_vertical" >
 
         <ImageView
-              android:layout_width="@dimen/header_logo_width"
+            android:layout_width="@dimen/header_logo_width"
             android:layout_height="match_parent"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="20dp"
             android:src="@drawable/logo_with_text" >
         </ImageView>
+
+        <Button
+            android:id="@+id/examExit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="20dp"
+            android:background="@drawable/global_selector"
+            android:gravity="center_vertical"
+            android:padding="5dp"
+            android:text="TERMINER L&apos;EPREUVE"
+            android:textColor="@android:color/white" >
+        </Button>
     </RelativeLayout>
 
     <GridView

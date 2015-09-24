@@ -152,6 +152,7 @@ public class ExamJsonParser {
 			Question q = new Question();
 			JSONObject qObj = (JSONObject) questions.get(k);
 			q.setId(qObj.getInt("question_id"));
+			q.setOrderId(k);
 			q.setType(qObj.getString("question_type"));
 			q.setQuestionText(qObj.getString("question_text"));
 			q.setInputCount(qObj.getString("input_count"));

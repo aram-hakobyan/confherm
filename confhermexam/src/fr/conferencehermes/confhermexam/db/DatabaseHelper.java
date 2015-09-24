@@ -20,7 +20,7 @@ import fr.conferencehermes.confhermexam.parser.Question;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
 	// Database Version
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	// Database Name
 	private static final String DATABASE_NAME = "eventManager";
 
@@ -90,6 +90,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	// QUESTIONS column names
 	private static final String KEY_QUESTION_ID = "questionId";
+	private static final String KEY_QUESTION_ORDER = "questionOrder";
 	private static final String KEY_QUESTION_TEXT = "text";
 	private static final String KEY_QUESTION_TYPE = "type";
 	private static final String KEY_QUESTION_INPUT_COUNT = "inputCound";
@@ -176,9 +177,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	// Question table create statement
 	private static final String CREATE_TABLE_QUESTION = "CREATE TABLE "
 			+ TABLE_QUESTIONS + "(" + KEY_QUESTION_ID + " INTEGER PRIMARY KEY,"
-			+ KEY_QUESTION_TEXT + " TEXT," + KEY_QUESTION_TYPE + " TEXT,"
-			+ KEY_QUESTION_INPUT_COUNT + " INTEGER," + KEY_QUESTION_EXERCISE_ID
-			+ " INTEGER" + ")";
+			+ KEY_QUESTION_ORDER + " INTEGER," + KEY_QUESTION_TEXT + " TEXT,"
+			+ KEY_QUESTION_TYPE + " TEXT," + KEY_QUESTION_INPUT_COUNT
+			+ " INTEGER," + KEY_QUESTION_EXERCISE_ID + " INTEGER" + ")";
 
 	// User table create statement
 	private static final String CREATE_TABLE_USER = "CREATE TABLE "
@@ -569,6 +570,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_QUESTION_ID, q.getId());
+		values.put(KEY_QUESTION_ORDER, q.getOrderId());
 		values.put(KEY_QUESTION_INPUT_COUNT, q.getInputCount());
 		values.put(KEY_QUESTION_TEXT, q.getQuestionText());
 		values.put(KEY_QUESTION_TYPE, q.getType());
@@ -604,6 +606,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		Question q = new Question();
 		if (c != null && c.moveToFirst()) {
 			q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+			q.setOrderId((c.getInt(c.getColumnIndex(KEY_QUESTION_ORDER))));
 			q.setExerciseId((c.getInt(c
 					.getColumnIndex(KEY_QUESTION_EXERCISE_ID))));
 			q.setInputCount(c.getString(c
@@ -630,6 +633,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 			do {
 				Question q = new Question();
 				q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+				q.setOrderId((c.getInt(c.getColumnIndex(KEY_QUESTION_ORDER))));
 				q.setExerciseId((c.getInt(c
 						.getColumnIndex(KEY_QUESTION_EXERCISE_ID))));
 				q.setInputCount(c.getString(c
@@ -654,6 +658,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		ContentValues values = new ContentValues();
 		values.put(KEY_QUESTION_ID, q.getId());
+		values.put(KEY_QUESTION_ORDER, q.getOrderId());
 		values.put(KEY_QUESTION_INPUT_COUNT, q.getInputCount());
 		values.put(KEY_QUESTION_TEXT, q.getQuestionText());
 		values.put(KEY_QUESTION_TYPE, q.getType());
@@ -681,7 +686,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 		SQLiteDatabase db = this.getReadableDatabase();
 		String selectQuery = "SELECT  * FROM " + TABLE_QUESTIONS + " WHERE "
-				+ KEY_QUESTION_EXERCISE_ID + " = " + exerciseId;
+				+ KEY_QUESTION_EXERCISE_ID + " = " + exerciseId + " ORDER BY "
+				+ KEY_QUESTION_ORDER + " ASC";
 
 		Cursor c = db.rawQuery(selectQuery, null);
 
@@ -690,6 +696,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 				if (c.getInt(c.getColumnIndex(KEY_QUESTION_EXERCISE_ID)) == exerciseId) {
 					Question q = new Question();
 					q.setId((c.getInt(c.getColumnIndex(KEY_QUESTION_ID))));
+					q.setOrderId((c.getInt(c.getColumnIndex(KEY_QUESTION_ORDER))));
 					q.setInputCount(c.getString(c
 							.getColumnIndex(KEY_QUESTION_INPUT_COUNT)));
 					q.setQuestionText(c.getString(c

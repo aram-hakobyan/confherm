@@ -796,7 +796,8 @@ public class ExaminationActivity extends Activity implements OnClickListener {
 					saveQuestionAnswers();
 					ANSWERED_QUESTIONS_COUNT++;
 					if (areAllAnswersValidated()) {
-						abandonner.setText("ENVOYER");
+						abandonner.setText("ENVOYER MES RÉPONSES AU SERVEUR");
+						abandonner.setPadding(10, 10, 10, 10);
 						valider.setVisibility(View.GONE);
 						SEND_DATA = true;
 					}
